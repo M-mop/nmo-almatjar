@@ -306,33 +306,33 @@ app.post('/api/translate', async (req, res) => {
 app.post('/api/update-product', async (req, res) => {
   try {
     const { productId, description, seoTitle, seoDescription, token } = req.body;
-    if (!productId || !description || !token) {
+    if (!productId || !token) {
       return res.status(400).json({ error: 'بيانات ناقصة' });
     }
 
-    // Convert plain text to HTML
-    const htmlDescription = description
-      .split('\n\n')
-      .filter(p => p.trim())
-      .map(p => {
-        const trimmed = p.trim();
-        if (trimmed.includes(':') && trimmed.length < 60) {
-          return `<h3>${trimmed}</h3>`;
-        }
-        if (trimmed.startsWith('- ')) {
-          const items = trimmed.split('\n').filter(l => l.startsWith('- '));
-          return `<ul>${items.map(i => `<li>${i.replace('- ','')}</li>`).join('')}</ul>`;
-        }
-        return `<p>${trimmed}</p>`;
-      }).join('\n');
+    const updateData = {};
 
-    const updateData = {
-      description: htmlDescription,
-      metadata: {
-        title: seoTitle || '',
-        description: seoDescription || ''
-      }
-    };
+    // Add description if provided
+    if (description) {
+      const htmlDescription = description
+        .split('\n\n')
+        .filter(p => p.trim())
+        .map(p => {
+          const trimmed = p.trim();
+          if (trimmed.startsWith('- ') || trimmed.includes('\n- ')) {
+            const items = trimmed.split('\n').filter(l => l.trim().startsWith('- '));
+            return `<ul>${items.map(i => `<li>${i.replace(/^-\s*/,'')}</li>`).join('')}</ul>`;
+          }
+          return `<p>${trimmed}</p>`;
+        }).join('\n');
+      updateData.description = htmlDescription;
+    }
+
+    // Add SEO fields using correct Salla API structure
+    if (seoTitle || seoDescription) {
+      updateData.page_title = seoTitle || '';
+      updateData.page_description = seoDescription || '';
+    }
 
     const response = await axios.put(
       `https://api.salla.dev/admin/v2/products/${productId}`,
