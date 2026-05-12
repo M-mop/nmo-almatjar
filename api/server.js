@@ -95,53 +95,49 @@ app.post('/api/generate-description', async (req, res) => {
     const { name, features, audience, price } = req.body;
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 4000,
+      max_tokens: 1500,
       messages: [{
         role: 'user',
-        content: `أنت كاتب محتوى تجاري محترف متخصص في التجارة الإلكترونية السعودية. مهمتك كتابة وصف منتج استثنائي يجعل العميل يقول "واو" ويضغط زر الشراء فوراً. لا تستخدم رموز markdown مثل ## أو ** أو * — اكتب نصاً عادياً فقط.
+        content: `أنت كاتب محتوى للتجارة الإلكترونية. اكتب بالعربية فقط بدون markdown.
 
 المنتج: ${name}
-الميزات: ${features}
-الفئة المستهدفة: ${audience}
+الميزات: ${features || name}
+الفئة: ${audience || 'الجميع'}
 السعر: ${price} ريال
 
-اكتب وصفاً طويلاً ومتكاملاً بهذا الترتيب:
+اكتب بهذا الترتيب بالضبط:
 
-عنوان SEO:
-اكتب عنواناً مثيراً وجذاباً لا يتجاوز 60 حرفاً يحتوي على الكلمة المفتاحية الرئيسية
+SEO_TITLE:
+[عنوان جذاب 50-60 حرف]
 
-افتتاحية مشوّقة:
-اكتب فقرة افتتاحية قوية من 3 أسطر تخلق فضولاً وتجذب القارئ من الكلمة الأولى، استخدم أسلوب قصصي أو سؤال مثير
+SEO_DESC:
+[وصف محركات البحث 150 حرف بالضبط]
 
-قصة المنتج وتجربة الاستخدام:
-اكتب 3 فقرات طويلة تصف تجربة استخدام المنتج بشكل حي وواقعي، كأنك تحكي قصة. اجعل العميل يتخيل نفسه يستخدم المنتج ويشعر بالفرق قبل وبعد. استخدم مشاعر وحواس وتفاصيل دقيقة.
+DESCRIPTION:
+[فقرة افتتاحية مقنعة - 3 أسطر]
 
-لماذا هذا المنتج الأفضل في فئته:
-اكتب فقرتين تشرح فيهما ما يميز هذا المنتج عن المنافسين وما الذي يجعله استثماراً ذكياً
+[فقرة تصف تجربة الاستخدام - 3 أسطر]
 
-المواصفات والتفاصيل الكاملة:
-- ميزة 1 مع شرح مفصل لفائدتها
-- ميزة 2 مع شرح مفصل لفائدتها
-- ميزة 3 مع شرح مفصل لفائدتها
-- ميزة 4 مع شرح مفصل لفائدتها
-- ميزة 5 مع شرح مفصل لفائدتها
-- ميزة 6 مع شرح مفصل لفائدتها
-- ميزة 7 مع شرح مفصل لفائدتها
+المميزات:
+- [ميزة 1 مع فائدتها]
+- [ميزة 2 مع فائدتها]
+- [ميزة 3 مع فائدتها]
+- [ميزة 4 مع فائدتها]
+- [ميزة 5 مع فائدتها]
 
-لمن هذا المنتج:
-اكتب فقرة تصف بالتفصيل الشخص المثالي الذي سيستفيد من هذا المنتج، اجعله يشعر أن المنتج صُنع خصيصاً له
-
-الضمان والثقة:
-فقرة تبني الثقة وتزيل أي تردد لدى العميل
-
-الدعوة للشراء:
-اكتب خاتمة قوية ومحفزة تدفع العميل لإضافة المنتج للسلة الآن مع التركيز على قيمة السعر ${price} ريال
-
-كلمات البحث SEO:
-15 كلمة مفتاحية مفصولة بفاصلة تشمل الكلمات الأكثر بحثاً`
+[خاتمة تحفز الشراء بسعر ${price} ريال - سطرين]`
       }]
     });
-    res.json({ description: message.content[0].text });
+
+    const fullText = message.content[0].text;
+    const seoTitleMatch = fullText.match(/SEO_TITLE:\n([^\n]+)/);
+    const seoTitle = seoTitleMatch ? seoTitleMatch[1].trim() : '';
+    const seoDescMatch = fullText.match(/SEO_DESC:\n([^\n]+)/);
+    const seoDescription = seoDescMatch ? seoDescMatch[1].trim() : '';
+    const descMatch = fullText.match(/DESCRIPTION:\n([\s\S]+)/);
+    const description = descMatch ? descMatch[1].trim() : fullText;
+
+    res.json({ description, seoTitle, seoDescription });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -203,13 +199,38 @@ app.post('/api/translate', async (req, res) => {
 // ===== UPDATE PRODUCT IN SALLA =====
 app.post('/api/update-product', async (req, res) => {
   try {
-    const { productId, description, token } = req.body;
+    const { productId, description, seoTitle, seoDescription, token } = req.body;
     if (!productId || !description || !token) {
       return res.status(400).json({ error: 'بيانات ناقصة' });
     }
+
+    // Convert plain text to HTML
+    const htmlDescription = description
+      .split('\n\n')
+      .filter(p => p.trim())
+      .map(p => {
+        const trimmed = p.trim();
+        if (trimmed.includes(':') && trimmed.length < 60) {
+          return `<h3>${trimmed}</h3>`;
+        }
+        if (trimmed.startsWith('- ')) {
+          const items = trimmed.split('\n').filter(l => l.startsWith('- '));
+          return `<ul>${items.map(i => `<li>${i.replace('- ','')}</li>`).join('')}</ul>`;
+        }
+        return `<p>${trimmed}</p>`;
+      }).join('\n');
+
+    const updateData = {
+      description: htmlDescription,
+      metadata: {
+        title: seoTitle || '',
+        description: seoDescription || ''
+      }
+    };
+
     const response = await axios.put(
       `https://api.salla.dev/admin/v2/products/${productId}`,
-      { description },
+      updateData,
       { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
     );
     res.json({ success: true, product: response.data.data });
