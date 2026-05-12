@@ -200,7 +200,26 @@ app.post('/api/translate', async (req, res) => {
   }
 });
 
-// ===== SALLA WEBHOOK =====
+// ===== UPDATE PRODUCT IN SALLA =====
+app.post('/api/update-product', async (req, res) => {
+  try {
+    const { productId, description, token } = req.body;
+    if (!productId || !description || !token) {
+      return res.status(400).json({ error: 'بيانات ناقصة' });
+    }
+    const response = await axios.put(
+      `https://api.salla.dev/admin/v2/products/${productId}`,
+      { description },
+      { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
+    );
+    res.json({ success: true, product: response.data.data });
+  } catch (e) {
+    console.error('Update product error:', e.response?.data || e.message);
+    res.status(500).json({ error: e.response?.data?.message || e.message });
+  }
+});
+
+
 app.post('/webhook/salla', express.json(), (req, res) => {
   console.log('Salla webhook:', req.body);
   res.json({ success: true });
