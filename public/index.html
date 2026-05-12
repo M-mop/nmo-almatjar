@@ -401,6 +401,8 @@ async function generateAndUploadAll() {
 
   progress.innerHTML = `🎉 اكتملت العملية! ${success} منتج تم رفعه بنجاح${failed > 0 ? ` — ${failed} فشل` : ''}`;
 }
+
+async function updateAllDescriptions() {
   const selected = [...document.querySelectorAll('.product-checkbox:checked')];
   if (selected.length === 0) return alert('اختر منتجاً على الأقل');
   
@@ -627,33 +629,38 @@ async function translateText() {
 
 // Init
 async function init() {
-  const params = new URLSearchParams(window.location.search);
-  const tokenFromUrl = params.get('token');
-  
-  if (tokenFromUrl) {
-    localStorage.setItem('salla_token', tokenFromUrl);
-    window.history.replaceState({}, '', '/');
-  }
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromUrl = params.get('token');
+    
+    if (tokenFromUrl) {
+      localStorage.setItem('salla_token', tokenFromUrl);
+      window.history.replaceState({}, '', '/');
+    }
 
-  const token = localStorage.getItem('salla_token');
-  
-  if (!token) {
-    document.getElementById('store-name').textContent = 'غير مرتبط';
-    document.getElementById('products-list').innerHTML = `
-      <div style="text-align:center;padding:40px;">
-        <p style="color:#a0a0c0;margin-bottom:16px;">لم يتم ربط المتجر بعد</p>
-        <a href="/auth/salla" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;">
-          🔗 ربط متجر سلة
-        </a>
-      </div>`;
-    return;
-  }
+    const token = localStorage.getItem('salla_token');
+    
+    if (!token) {
+      document.getElementById('store-name').textContent = 'غير مرتبط';
+      document.getElementById('products-list').innerHTML = `
+        <div style="text-align:center;padding:40px;">
+          <p style="color:#a0a0c0;margin-bottom:16px;">لم يتم ربط المتجر بعد</p>
+          <a href="/auth/salla" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;">
+            🔗 ربط متجر سلة
+          </a>
+        </div>`;
+      return;
+    }
 
-  document.getElementById('store-name').textContent = 'متجرك في سلة ✅';
-  await loadProducts();
+    document.getElementById('store-name').textContent = 'متجرك في سلة ✅';
+    await loadProducts();
+  } catch(e) {
+    console.error('Init error:', e);
+    document.getElementById('store-name').textContent = 'خطأ في التحميل';
+  }
 }
 
-init();
+document.addEventListener('DOMContentLoaded', () => { init(); });
 </script>
 </body>
 </html>
