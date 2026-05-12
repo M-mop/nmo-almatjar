@@ -20,13 +20,15 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ===== SALLA OAUTH =====
 app.get('/auth/salla', (req, res) => {
-  const url = `https://accounts.salla.sa/oauth2/auth?client_id=${process.env.SALLA_CLIENT_ID}&redirect_uri=${process.env.APP_URL}/auth/callback&response_type=code&scope=offline_access`;
+  const state = Math.random().toString(36).substring(2, 15);
+  const url = `https://accounts.salla.sa/oauth2/auth?client_id=${process.env.SALLA_CLIENT_ID}&redirect_uri=${process.env.APP_URL}/auth/callback&response_type=code&scope=offline_access&state=${state}`;
   res.redirect(url);
 });
 
 app.get('/auth/callback', async (req, res) => {
   try {
     const { code } = req.query;
+    if (!code) return res.redirect('/?error=no_code');
     const response = await axios.post('https://accounts.salla.sa/oauth2/token', {
       client_id: process.env.SALLA_CLIENT_ID,
       client_secret: process.env.SALLA_CLIENT_SECRET,
@@ -37,6 +39,7 @@ app.get('/auth/callback', async (req, res) => {
     const token = response.data.access_token;
     res.redirect(`/?token=${token}`);
   } catch (e) {
+    console.error('Auth error:', e.response?.data || e.message);
     res.redirect('/?error=auth_failed');
   }
 });
