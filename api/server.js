@@ -23,7 +23,7 @@ const REDIRECT_URI = 'https://salla-ai-app-indol.vercel.app/auth/callback';
 
 app.get('/auth/salla', (req, res) => {
   const state = Math.random().toString(36).substring(2, 15);
-  const url = `https://accounts.salla.sa/oauth2/auth?client_id=${process.env.SALLA_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=offline_access&state=${state}`;
+  const url = `https://accounts.salla.sa/oauth2/auth?client_id=${process.env.SALLA_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=offline_access&state=${state}`;
   res.redirect(url);
 });
 
