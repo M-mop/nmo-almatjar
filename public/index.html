@@ -202,6 +202,13 @@ textarea { resize:vertical; min-height:100px; }
       <button class="btn-primary" onclick="generateDescription()">✍️ كتابة الوصف والـ SEO</button>
       <div class="loading" id="desc-loading">جاري كتابة الوصف... <span class="spinner"></span></div>
       <div class="result-box" id="desc-result"></div>
+      <input type="hidden" id="desc-product-id" value="">
+      <div id="desc-approve-box" style="display:none;margin-top:16px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:16px;text-align:center;">
+        <p style="font-size:14px;color:#34d399;margin-bottom:12px;">✅ الوصف جاهز — هل تريد رفعه للمتجر؟</p>
+        <button id="approve-btn" onclick="approveAndUpload()" style="background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;">
+          🚀 موافق — ارفع للمتجر
+        </button>
+      </div>
     </div>
   </div>
 
@@ -322,8 +329,8 @@ function renderProducts(products) {
           </div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-small" onclick="autoFill('image-gen','${p.name.replace(/'/g,"\\'")}')">صورة</button>
-          <button class="btn-small" onclick="autoFill('description','${p.name.replace(/'/g,"\\'")}')">وصف</button>
+          <button class="btn-small" onclick="autoFill('image-gen','${p.name.replace(/'/g,"\\'")}','${p.id}')">صورة</button>
+          <button class="btn-small" onclick="autoFill('description','${p.name.replace(/'/g,"\\'")}','${p.id}')">وصف</button>
         </div>
       </div>
     `).join('')}
@@ -369,10 +376,14 @@ async function updateAllDescriptions() {
   progress.textContent = `✅ تم تحديث ${selected.length} منتج بنجاح!`;
 }
 
-function autoFill(tab, productName) {
+function autoFill(tab, productName, productId = '') {
   switchTab(tab);
   if (tab === 'image-gen') document.getElementById('img-product-name').value = productName;
-  if (tab === 'description') document.getElementById('desc-name').value = productName;
+  if (tab === 'description') {
+    document.getElementById('desc-name').value = productName;
+    document.getElementById('desc-product-id').value = productId;
+    document.getElementById('desc-approve-box').style.display = 'none';
+  }
 }
 
 // Generate Image
@@ -409,17 +420,22 @@ async function generateImage() {
 }
 
 // Generate Description
+let lastGeneratedDesc = '';
+let lastDescProductId = '';
+
 async function generateDescription() {
   const name = document.getElementById('desc-name').value;
   const features = document.getElementById('desc-features').value;
   const audience = document.getElementById('desc-audience').value;
   const price = document.getElementById('desc-price').value;
+  const productId = document.getElementById('desc-product-id')?.value || '';
   if (!name) return alert('أدخل اسم المنتج');
 
   const btn = document.querySelector('#tab-description .btn-primary');
   btn.disabled = true;
   document.getElementById('desc-loading').classList.add('visible');
   document.getElementById('desc-result').classList.remove('visible');
+  document.getElementById('desc-approve-box').style.display = 'none';
 
   try {
     const res = await fetch(`${API_BASE}/api/generate-description`, {
@@ -429,8 +445,13 @@ async function generateDescription() {
     });
     const data = await res.json();
     if (data.description) {
+      lastGeneratedDesc = data.description;
+      lastDescProductId = productId;
       document.getElementById('desc-result').textContent = data.description;
       document.getElementById('desc-result').classList.add('visible');
+      if (productId) {
+        document.getElementById('desc-approve-box').style.display = 'block';
+      }
     } else {
       alert('حدث خطأ: ' + (data.error || 'حاول مرة أخرى'));
     }
@@ -439,6 +460,35 @@ async function generateDescription() {
   }
   btn.disabled = false;
   document.getElementById('desc-loading').classList.remove('visible');
+}
+
+async function approveAndUpload() {
+  if (!lastDescProductId) return alert('ما في منتج مرتبط');
+  const btn = document.getElementById('approve-btn');
+  btn.disabled = true;
+  btn.textContent = 'جاري الرفع...';
+  try {
+    const res = await fetch(`${API_BASE}/api/update-product`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        productId: lastDescProductId,
+        description: lastGeneratedDesc,
+        token: accessToken
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      btn.textContent = '✅ تم الرفع بنجاح!';
+      btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+    } else {
+      btn.textContent = '❌ فشل الرفع';
+      btn.disabled = false;
+    }
+  } catch(e) {
+    btn.textContent = '❌ خطأ في الاتصال';
+    btn.disabled = false;
+  }
 }
 
 // Edit Image
