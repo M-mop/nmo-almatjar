@@ -31,12 +31,14 @@ app.get('/auth/callback', async (req, res) => {
   try {
     const { code } = req.query;
     if (!code) return res.redirect('/?error=no_code');
-    const response = await axios.post('https://accounts.salla.sa/oauth2/token', {
-      client_id: process.env.SALLA_CLIENT_ID,
-      client_secret: process.env.SALLA_CLIENT_SECRET,
-      grant_type: 'authorization_code',
-      code,
-      redirect_uri: REDIRECT_URI
+    const params = new URLSearchParams();
+    params.append('client_id', process.env.SALLA_CLIENT_ID);
+    params.append('client_secret', process.env.SALLA_CLIENT_SECRET);
+    params.append('grant_type', 'authorization_code');
+    params.append('code', code);
+    params.append('redirect_uri', REDIRECT_URI);
+    const response = await axios.post('https://accounts.salla.sa/oauth2/token', params, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
     const token = response.data.access_token;
     res.redirect(`/?token=${token}`);
