@@ -12,7 +12,20 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+
+// Serve static files
+const publicPath = path.join(__dirname, '../public');
+app.use(express.static(publicPath));
+
+// Serve index.html for root
+app.get('/', (req, res) => {
+  const indexPath = path.join(publicPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.send('<h1>مصمم المنتجات AI</h1><p>جاري التحميل...</p>');
+  }
+});
 
 // Init AI clients
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
