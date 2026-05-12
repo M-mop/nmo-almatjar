@@ -1,43 +1,63 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 const OpenAI = require('openai');
 const Anthropic = require('@anthropic-ai/sdk');
 const axios = require('axios');
 
 const app = express();
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
-// Serve static files
 const publicPath = path.join(__dirname, '../public');
 app.use(express.static(publicPath));
-
-// Serve index.html for root
 app.get('/', (req, res) => {
-  const indexPath = path.join(publicPath, 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.send('<h1>مصمم المنتجات AI</h1><p>جاري التحميل...</p>');
-  }
+  const f = path.join(publicPath, 'index.html');
+  fs.existsSync(f) ? res.sendFile(f) : res.send('<h1>ذكاء المتجر</h1>');
 });
 
-// Init AI clients
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-// ===== SALLA OAUTH =====
 const REDIRECT_URI = 'https://salla-ai-app-indol.vercel.app/auth/callback';
 
+// ===== HELPERS =====
+function getToken(req) {
+  return req.headers.authorization?.replace('Bearer ', '') || req.body?.token || '';
+}
+
+async function sallaGet(endpoint, token) {
+  const r = await axios.get(`https://api.salla.dev/admin/v2/${endpoint}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return r.data;
+}
+
+async function sallaUpdate(productId, data, token) {
+  const r = await axios.put(`https://api.salla.dev/admin/v2/products/${productId}`, data, {
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+  });
+  return r.data;
+}
+
+function textToHtml(text) {
+  return text.split('\n\n').filter(p => p.trim()).map(p => {
+    const t = p.trim();
+    if (t.startsWith('- ') || t.includes('\n- ')) {
+      const items = t.split('\n').filter(l => l.trim().startsWith('- '));
+      return `<ul>${items.map(i => `<li>${i.replace(/^-\s*/, '')}</li>`).join('')}</ul>`;
+    }
+    return `<p>${t}</p>`;
+  }).join('\n');
+}
+
+// ===== AUTH =====
 app.get('/auth/salla', (req, res) => {
   const state = Math.random().toString(36).substring(2, 15);
-  const url = `https://accounts.salla.sa/oauth2/auth?client_id=${process.env.SALLA_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=offline_access&state=${state}`;
-  res.redirect(url);
+  res.redirect(`https://accounts.salla.sa/oauth2/auth?client_id=${process.env.SALLA_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=offline_access&state=${state}`);
 });
 
 app.get('/auth/callback', async (req, res) => {
@@ -50,50 +70,153 @@ app.get('/auth/callback', async (req, res) => {
     params.append('grant_type', 'authorization_code');
     params.append('code', code);
     params.append('redirect_uri', REDIRECT_URI);
-    const response = await axios.post('https://accounts.salla.sa/oauth2/token', params, {
+    const r = await axios.post('https://accounts.salla.sa/oauth2/token', params, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
-    const token = response.data.access_token;
-    res.redirect(`/?token=${token}`);
+    res.redirect(`/?token=${r.data.access_token}`);
   } catch (e) {
     console.error('Auth error:', e.response?.data || e.message);
     res.redirect('/?error=auth_failed');
   }
 });
 
-// ===== GET PRODUCTS FROM SALLA =====
+// ===== PRODUCTS =====
 app.get('/api/products', async (req, res) => {
   try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    const token = getToken(req);
     if (!token || token === 'demo') {
       return res.json({ products: [
-        { id: 1, name: 'منتج تجريبي', price: 99 },
-        { id: 2, name: 'منتج آخر', price: 149 }
+        { id: 1, name: 'منتج تجريبي', price: { amount: 99 }, description: 'وصف قصير' },
+        { id: 2, name: 'منتج آخر', price: { amount: 149 }, description: '' }
       ]});
     }
-    const response = await axios.get('https://api.salla.dev/admin/v2/products', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    res.json({ products: response.data.data || [] });
+    const data = await sallaGet('products?per_page=50', token);
+    res.json({ products: data.data || [] });
   } catch (e) {
     res.json({ products: [] });
   }
 });
 
-// ===== GET SINGLE PRODUCT =====
-app.get('/api/product/:id', async (req, res) => {
+// ===== SEO SCORE =====
+app.post('/api/seo-score', async (req, res) => {
   try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
-    const response = await axios.get(`https://api.salla.dev/admin/v2/products/${req.params.id}`, {
-      headers: { Authorization: `Bearer ${token}` }
+    const { products } = req.body;
+    const scored = products.map(p => {
+      let score = 0;
+      const issues = [];
+      const desc = p.description || '';
+      const name = p.name || '';
+
+      if (desc.length > 100) score += 25; else issues.push('الوصف قصير جداً أو غير موجود');
+      if (desc.length > 300) score += 15;
+      if (name.length > 20) score += 20; else issues.push('العنوان قصير — أضف تفاصيل');
+      if (p.tags?.length > 0) score += 15; else issues.push('لا توجد وسوم (Tags)');
+      if (p.images?.length > 0) score += 15; else issues.push('لا توجد صور');
+      if (p.metadata_title) score += 10; else issues.push('عنوان SEO غير موجود');
+
+      let grade = 'F';
+      if (score >= 90) grade = 'A+';
+      else if (score >= 80) grade = 'A';
+      else if (score >= 70) grade = 'B';
+      else if (score >= 60) grade = 'C';
+      else if (score >= 40) grade = 'D';
+
+      return { id: p.id, name: p.name, score, grade, issues };
     });
-    res.json({ product: response.data.data });
+    res.json({ results: scored });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-// ===== IMPROVE EXISTING DESCRIPTION =====
+// ===== GENERATE DESCRIPTION (FULL FEATURED) =====
+app.post('/api/generate-description', async (req, res) => {
+  try {
+    const { name, currentDescription, audience, tone, instructions, mode, platform } = req.body;
+
+    const toneMap = {
+      professional: 'احترافي ورسمي',
+      youth: 'شبابي وعصري',
+      luxury: 'فاخر وراقي',
+      friendly: 'ودي وقريب'
+    };
+
+    const platformMap = {
+      salla: 'متجر سلة',
+      google: 'Google Shopping',
+      tiktok: 'TikTok Shop',
+      all: 'جميع المنصات'
+    };
+
+    const currentDesc = currentDescription ? `الوصف الحالي:\n${currentDescription}\n\n` : '';
+    const modeInst = mode === 'improve' ? 'حسّن الوصف الحالي' : mode === 'renew' ? 'اكتب وصفاً جديداً كلياً' : 'اكتب وصفاً احترافياً';
+
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 2000,
+      messages: [{
+        role: 'user',
+        content: `أنت كاتب محتوى للتجارة الإلكترونية. اكتب بالعربية بدون markdown.
+
+المنتج: ${name}
+${currentDesc}الفئة المستهدفة: ${audience || 'العملاء السعوديين'}
+الأسلوب: ${toneMap[tone] || 'احترافي'}
+المنصة: ${platformMap[platform] || 'متجر سلة'}
+التعليمات: ${instructions || modeInst}
+
+اكتب بهذا الترتيب بالضبط:
+
+SEO_TITLE:
+[عنوان منتج قوي ومحسّن لمحركات البحث — 50-60 حرف — يتضمن الكلمة الرئيسية وميزة مهمة]
+
+SEO_DESC:
+[وصف محركات البحث — 150-160 حرف — يحفز النقر]
+
+SHORT_DESC:
+[وصف قصير للمنتج — جملتين فقط — مناسب لبطاقة المنتج]
+
+LONG_DESC:
+[وصف طويل مقنع — 3 فقرات — يصف تجربة الاستخدام ويحفز الشراء]
+
+FEATURES:
+- [ميزة 1 مع فائدتها]
+- [ميزة 2 مع فائدتها]
+- [ميزة 3 مع فائدتها]
+- [ميزة 4 مع فائدتها]
+- [ميزة 5 مع فائدتها]
+
+TIKTOK_CAPTION:
+[كابشن TikTok جذاب — جملة أو جملتين + هاشتاقات]
+
+GOOGLE_TITLE:
+[عنوان Google Shopping — 70 حرف كحد أقصى]`
+      }]
+    });
+
+    const text = message.content[0].text;
+    const extract = (key) => {
+      const m = text.match(new RegExp(`${key}:\\n([\\s\\S]+?)(?=\\n[A-Z_]+:|$)`));
+      return m ? m[1].trim() : '';
+    };
+
+    const features = extract('FEATURES').split('\n').filter(f => f.trim().startsWith('-')).map(f => f.replace(/^-\s*/, '').trim());
+
+    res.json({
+      seoTitle: extract('SEO_TITLE'),
+      seoDescription: extract('SEO_DESC'),
+      shortDescription: extract('SHORT_DESC'),
+      description: extract('LONG_DESC'),
+      features,
+      tiktokCaption: extract('TIKTOK_CAPTION'),
+      googleTitle: extract('GOOGLE_TITLE'),
+      oldDescription: currentDescription || ''
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ===== IMPROVE DESCRIPTION =====
 app.post('/api/improve-description', async (req, res) => {
   try {
     const { name, currentDescription, instructions } = req.body;
@@ -102,215 +225,247 @@ app.post('/api/improve-description', async (req, res) => {
       max_tokens: 1500,
       messages: [{
         role: 'user',
-        content: `أنت خبير تحسين محتوى للتجارة الإلكترونية. اكتب بالعربية فقط بدون markdown.
+        content: `أنت خبير تحسين محتوى للتجارة الإلكترونية. اكتب بالعربية بدون markdown.
 
 المنتج: ${name}
-الوصف الحالي: ${currentDescription || 'لا يوجد وصف'}
-تعليمات إضافية: ${instructions || 'حسّن الوصف الحالي'}
+الوصف الحالي: ${currentDescription || 'لا يوجد'}
+تعليمات: ${instructions || 'حسّن الوصف وارفع جودته'}
 
-المطلوب:
 SEO_TITLE:
-[عنوان محسّن 50-60 حرف]
+[عنوان محسّن]
 
 SEO_DESC:
 [وصف SEO محسّن 150 حرف]
 
 DESCRIPTION:
-[وصف محسّن مقنع يحافظ على روح الوصف الأصلي مع تحسينه — فقرتين + نقاط مميزات + خاتمة]`
+[الوصف المحسّن — فقرتان + نقاط مميزات + خاتمة]`
       }]
     });
-    const fullText = message.content[0].text;
-    const seoTitleMatch = fullText.match(/SEO_TITLE:\n([^\n]+)/);
-    const seoDescMatch = fullText.match(/SEO_DESC:\n([^\n]+)/);
-    const descMatch = fullText.match(/DESCRIPTION:\n([\s\S]+)/);
+
+    const text = message.content[0].text;
+    const extract = (key) => {
+      const m = text.match(new RegExp(`${key}:\\n([\\s\\S]+?)(?=\\n[A-Z_]+:|$)`));
+      return m ? m[1].trim() : '';
+    };
+
     res.json({
-      description: descMatch ? descMatch[1].trim() : fullText,
-      seoTitle: seoTitleMatch ? seoTitleMatch[1].trim() : '',
-      seoDescription: seoDescMatch ? seoDescMatch[1].trim() : ''
+      seoTitle: extract('SEO_TITLE'),
+      seoDescription: extract('SEO_DESC'),
+      description: extract('DESCRIPTION'),
+      oldDescription: currentDescription || ''
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-// ===== GENERATE SEO ONLY =====
+// ===== GENERATE SEO =====
 app.post('/api/generate-seo', async (req, res) => {
   try {
     const { name, description, keywords } = req.body;
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 800,
+      max_tokens: 600,
       messages: [{
         role: 'user',
-        content: `أنت خبير SEO للتجارة الإلكترونية السعودية. اكتب بالعربية فقط بدون markdown.
+        content: `خبير SEO للتجارة الإلكترونية. بالعربية فقط بدون markdown.
 
 المنتج: ${name}
 الوصف: ${description || name}
-كلمات مفتاحية مقترحة: ${keywords || ''}
+كلمات إضافية: ${keywords || ''}
 
-اكتب:
 SEO_TITLE:
-[عنوان SEO جذاب 50-60 حرف يحتوي الكلمة المفتاحية]
+[عنوان SEO 50-60 حرف]
 
 SEO_DESC:
-[وصف SEO دقيق 150-160 حرف يحفز النقر]
+[وصف SEO 150-160 حرف يحفز النقر]
 
 SEO_KEYWORDS:
-[15 كلمة مفتاحية مفصولة بفاصلة — قصيرة ومتنوعة]`
+[15 كلمة مفتاحية بالعربية مفصولة بفاصلة]`
       }]
     });
-    const fullText = message.content[0].text;
-    const titleMatch = fullText.match(/SEO_TITLE:\n([^\n]+)/);
-    const descMatch = fullText.match(/SEO_DESC:\n([^\n]+)/);
-    const kwMatch = fullText.match(/SEO_KEYWORDS:\n([^\n]+)/);
+
+    const text = message.content[0].text;
+    const extract = (key) => {
+      const m = text.match(new RegExp(`${key}:\\n([^\\n]+)`));
+      return m ? m[1].trim() : '';
+    };
+
     res.json({
-      seoTitle: titleMatch ? titleMatch[1].trim() : '',
-      seoDescription: descMatch ? descMatch[1].trim() : '',
-      seoKeywords: kwMatch ? kwMatch[1].trim() : ''
+      seoTitle: extract('SEO_TITLE'),
+      seoDescription: extract('SEO_DESC'),
+      seoKeywords: extract('SEO_KEYWORDS')
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-
 // ===== GENERATE TAGS =====
 app.post('/api/generate-tags', async (req, res) => {
   try {
-    const { name, description, existingTags } = req.body;
+    const { name, description } = req.body;
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 300,
+      max_tokens: 200,
       messages: [{
         role: 'user',
-        content: `أنت خبير SEO وتجارة إلكترونية. اكتب وسوم (tags) للمنتج التالي.
-
-المنتج: ${name}
-الوصف: ${description || name}
-
-القواعد:
-- كل وسم من 1-3 كلمات فقط
-- الوسوم يجب أن تكون قريبة جداً من اسم المنتج وفئته
-- أضف وسوم عربية وإنجليزية
-- تجنب الوسوم العامة جداً
-
-أعطني 10 وسوم مفصولة بفاصلة فقط، بدون شرح:`
+        content: `وسوم (tags) للمنتج: ${name}. الوصف: ${description || ''}.
+أعطني 10 وسوم قصيرة (1-3 كلمات) مفصولة بفاصلة. عربية وإنجليزية. فقط الوسوم بدون شرح:`
       }]
     });
-    const tagsText = message.content[0].text.trim();
-    const tags = tagsText.split(',').map(t => t.trim()).filter(t => t.length > 0 && t.length < 50);
+
+    const tags = message.content[0].text.split(',').map(t => t.trim()).filter(t => t && t.length < 40);
     res.json({ tags });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-// ===== ADD TAGS TO PRODUCT =====
-app.post('/api/add-tags', async (req, res) => {
+// ===== GENERATE SOCIAL CONTENT =====
+app.post('/api/generate-social', async (req, res) => {
   try {
-    const { productId, tags, token } = req.body;
-    if (!productId || !tags || !token) {
-      return res.status(400).json({ error: 'بيانات ناقصة' });
-    }
-    // Create tags first, then attach to product
-    const createdTags = [];
-    for (const tagName of tags) {
-      try {
-        const tagRes = await axios.post(
-          'https://api.salla.dev/admin/v2/products/tags',
-          { name: tagName },
-          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
-        );
-        if (tagRes.data?.data?.id) {
-          createdTags.push(tagRes.data.data.id);
-        }
-      } catch (e) { /* tag might already exist */ }
-    }
-    // Update product with tags
-    if (createdTags.length > 0) {
-      await axios.put(
-        `https://api.salla.dev/admin/v2/products/${productId}`,
-        { tags: createdTags },
-        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
-      );
-    }
-    res.json({ success: true, tagsAdded: createdTags.length });
-  } catch (e) {
-    console.error('Add tags error:', e.response?.data || e.message);
-    res.status(500).json({ error: e.message });
-  }
-});
-
-
-  try {
-    const { name, prompt, style } = req.body;
-    const fullPrompt = `Professional product photo of ${name}. ${prompt}. ${style}. High quality, commercial photography, sharp details, no text.`;
-
-    const response = await openai.images.generate({
-      model: 'dall-e-3',
-      prompt: fullPrompt,
-      n: 1,
-      size: '1024x1024',
-      quality: 'standard'
-    });
-
-    const imageUrl = response.data[0].url;
-    res.json({ imageUrl });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: e.message });
-  }
-});
-
-// ===== GENERATE DESCRIPTION =====
-app.post('/api/generate-description', async (req, res) => {
-  try {
-    const { name, features, audience, price } = req.body;
+    const { name, description, platform } = req.body;
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1500,
+      max_tokens: 800,
       messages: [{
         role: 'user',
-        content: `أنت كاتب محتوى للتجارة الإلكترونية. اكتب بالعربية فقط بدون markdown.
+        content: `اكتب محتوى سوشال ميديا لمنتج: ${name}
+الوصف: ${description || ''}
+المنصة: ${platform || 'عام'}
 
-المنتج: ${name}
-الميزات: ${features || name}
-الفئة: ${audience || 'الجميع'}
-السعر: ${price} ريال
+INSTAGRAM:
+[كابشن انستغرام جذاب + هاشتاقات]
 
-اكتب بهذا الترتيب بالضبط:
+TIKTOK:
+[سكريبت TikTok قصير 15-30 ثانية]
 
-SEO_TITLE:
-[عنوان جذاب 50-60 حرف]
+TWITTER:
+[تغريدة مقنعة 280 حرف]
 
-SEO_DESC:
-[وصف محركات البحث 150 حرف بالضبط]
-
-DESCRIPTION:
-[فقرة افتتاحية مقنعة - 3 أسطر]
-
-[فقرة تصف تجربة الاستخدام - 3 أسطر]
-
-المميزات:
-- [ميزة 1 مع فائدتها]
-- [ميزة 2 مع فائدتها]
-- [ميزة 3 مع فائدتها]
-- [ميزة 4 مع فائدتها]
-- [ميزة 5 مع فائدتها]
-
-[خاتمة تحفز الشراء بسعر ${price} ريال - سطرين]`
+HASHTAGS:
+[20 هاشتاق مناسب]`
       }]
     });
 
-    const fullText = message.content[0].text;
-    const seoTitleMatch = fullText.match(/SEO_TITLE:\n([^\n]+)/);
-    const seoTitle = seoTitleMatch ? seoTitleMatch[1].trim() : '';
-    const seoDescMatch = fullText.match(/SEO_DESC:\n([^\n]+)/);
-    const seoDescription = seoDescMatch ? seoDescMatch[1].trim() : '';
-    const descMatch = fullText.match(/DESCRIPTION:\n([\s\S]+)/);
-    const description = descMatch ? descMatch[1].trim() : fullText;
+    const text = message.content[0].text;
+    const extract = (key) => {
+      const m = text.match(new RegExp(`${key}:\\n([\\s\\S]+?)(?=\\n[A-Z]+:|$)`));
+      return m ? m[1].trim() : '';
+    };
 
-    res.json({ description, seoTitle, seoDescription });
+    res.json({
+      instagram: extract('INSTAGRAM'),
+      tiktok: extract('TIKTOK'),
+      twitter: extract('TWITTER'),
+      hashtags: extract('HASHTAGS')
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ===== GENERATE BLOG POST =====
+app.post('/api/generate-blog', async (req, res) => {
+  try {
+    const { storeName, products, topic } = req.body;
+    const productNames = products.map(p => p.name).join('، ');
+
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 2500,
+      messages: [{
+        role: 'user',
+        content: `اكتب مقالة SEO احترافية بالعربية لمتجر "${storeName}".
+الموضوع: ${topic}
+المنتجات المرتبطة: ${productNames}
+
+BLOG_TITLE:
+[عنوان المقالة — جذاب ومحسّن لـ SEO]
+
+BLOG_INTRO:
+[مقدمة قوية — 2 فقرة]
+
+BLOG_BODY:
+[جسم المقالة — 4-5 فقرات تتضمن معلومات مفيدة وربط طبيعي بالمنتجات]
+
+BLOG_CONCLUSION:
+[خاتمة تحفز على الشراء]
+
+BLOG_META:
+[وصف SEO للمقالة — 150 حرف]`
+      }]
+    });
+
+    const text = message.content[0].text;
+    const extract = (key) => {
+      const m = text.match(new RegExp(`${key}:\\n([\\s\\S]+?)(?=\\n[A-Z_]+:|$)`));
+      return m ? m[1].trim() : '';
+    };
+
+    res.json({
+      title: extract('BLOG_TITLE'),
+      intro: extract('BLOG_INTRO'),
+      body: extract('BLOG_BODY'),
+      conclusion: extract('BLOG_CONCLUSION'),
+      meta: extract('BLOG_META')
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ===== UPDATE PRODUCT =====
+app.post('/api/update-product', async (req, res) => {
+  try {
+    const { productId, description, seoTitle, seoDescription, name, token } = req.body;
+    if (!productId || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
+
+    const updateData = {};
+    if (description) updateData.description = textToHtml(description);
+    if (seoTitle) updateData.metadata_title = seoTitle;
+    if (seoDescription) updateData.metadata_description = seoDescription;
+    if (name) updateData.name = name;
+
+    const result = await sallaUpdate(productId, updateData, token);
+    res.json({ success: true, product: result.data });
+  } catch (e) {
+    console.error('Update error:', e.response?.data || e.message);
+    res.status(500).json({ error: e.response?.data?.message || e.message });
+  }
+});
+
+// ===== ADD TAGS =====
+app.post('/api/add-tags', async (req, res) => {
+  try {
+    const { productId, tags, token } = req.body;
+    const created = [];
+    for (const tag of tags) {
+      try {
+        const r = await axios.post('https://api.salla.dev/admin/v2/products/tags',
+          { name: tag },
+          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
+        );
+        if (r.data?.data?.id) created.push(r.data.data.id);
+      } catch (e) {}
+    }
+    if (created.length) {
+      await sallaUpdate(productId, { tags: created }, token);
+    }
+    res.json({ success: true, added: created.length });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ===== GENERATE IMAGE =====
+app.post('/api/generate-image', async (req, res) => {
+  try {
+    const { name, prompt, style } = req.body;
+    const fullPrompt = `Professional product photo of ${name}. ${prompt || ''}. ${style}. High quality, commercial photography, sharp details, no text.`;
+    const r = await openai.images.generate({ model: 'dall-e-3', prompt: fullPrompt, n: 1, size: '1024x1024', quality: 'standard' });
+    res.json({ imageUrl: r.data[0].url });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -320,32 +475,24 @@ DESCRIPTION:
 app.post('/api/edit-image', upload.single('image'), async (req, res) => {
   try {
     const { prompt } = req.body;
-    const imageBuffer = req.file.buffer;
-    const base64Image = imageBuffer.toString('base64');
-    const mimeType = req.file.mimetype;
+    const base64 = req.file.buffer.toString('base64');
+    const mime = req.file.mimetype;
 
-    const message = await anthropic.messages.create({
+    const msg = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 500,
       messages: [{
         role: 'user',
         content: [
-          { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64Image } },
-          { type: 'text', text: `أنت خبير تحرير صور. المستخدم يريد: "${prompt}". صف بالتفصيل كيف تبدو الصورة بعد التعديل، ثم أنشئ prompt احترافي بالإنجليزي لـ DALL-E لإنشاء صورة مشابهة مع التعديل المطلوب.` }
+          { type: 'image', source: { type: 'base64', media_type: mime, data: base64 } },
+          { type: 'text', text: `خبير تحرير صور. المطلوب: "${prompt}". أنشئ prompt إنجليزي احترافي لـ DALL-E لإنشاء صورة مشابهة مع التعديل. أعطني الـ prompt فقط.` }
         ]
       }]
     });
 
-    const editPrompt = message.content[0].text;
-    const response = await openai.images.generate({
-      model: 'dall-e-3',
-      prompt: editPrompt.slice(0, 1000),
-      n: 1,
-      size: '1024x1024',
-      quality: 'standard'
-    });
-
-    res.json({ imageUrl: response.data[0].url });
+    const editPrompt = msg.content[0].text.slice(0, 900);
+    const r = await openai.images.generate({ model: 'dall-e-3', prompt: editPrompt, n: 1, size: '1024x1024', quality: 'standard' });
+    res.json({ imageUrl: r.data[0].url });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -355,69 +502,25 @@ app.post('/api/edit-image', upload.single('image'), async (req, res) => {
 app.post('/api/translate', async (req, res) => {
   try {
     const { text, language } = req.body;
-    const message = await anthropic.messages.create({
+    const msg = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 500,
       messages: [{
         role: 'user',
-        content: `ترجم النص التالي إلى ${language} بشكل احترافي مناسب للتجارة الإلكترونية. أعطني الترجمة فقط بدون شرح:\n\n${text}`
+        content: `ترجم هذا النص إلى ${language} بشكل احترافي مناسب للتجارة الإلكترونية. الترجمة فقط بدون شرح:\n\n${text}`
       }]
     });
-    res.json({ translation: message.content[0].text });
+    res.json({ translation: msg.content[0].text });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-// ===== UPDATE PRODUCT IN SALLA =====
-app.post('/api/update-product', async (req, res) => {
-  try {
-    const { productId, description, seoTitle, seoDescription, token } = req.body;
-    if (!productId || !token) {
-      return res.status(400).json({ error: 'بيانات ناقصة' });
-    }
-
-    const updateData = {};
-
-    // Add description if provided
-    if (description) {
-      const htmlDescription = description
-        .split('\n\n')
-        .filter(p => p.trim())
-        .map(p => {
-          const trimmed = p.trim();
-          if (trimmed.startsWith('- ') || trimmed.includes('\n- ')) {
-            const items = trimmed.split('\n').filter(l => l.trim().startsWith('- '));
-            return `<ul>${items.map(i => `<li>${i.replace(/^-\s*/,'')}</li>`).join('')}</ul>`;
-          }
-          return `<p>${trimmed}</p>`;
-        }).join('\n');
-      updateData.description = htmlDescription;
-    }
-
-    // Add SEO fields using correct Salla API field names
-    if (seoTitle || seoDescription) {
-      updateData.metadata_title = seoTitle || '';
-      updateData.metadata_description = seoDescription || '';
-    }
-
-    const response = await axios.put(
-      `https://api.salla.dev/admin/v2/products/${productId}`,
-      updateData,
-      { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
-    );
-    res.json({ success: true, product: response.data.data });
-  } catch (e) {
-    console.error('Update product error:', e.response?.data || e.message);
-    res.status(500).json({ error: e.response?.data?.message || e.message });
-  }
-});
-
-
-app.post('/webhook/salla', express.json(), (req, res) => {
-  console.log('Salla webhook:', req.body);
+// ===== WEBHOOK =====
+app.post('/webhook/salla', (req, res) => {
+  console.log('Webhook:', req.body?.event);
   res.json({ success: true });
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server on port ${PORT}`));
