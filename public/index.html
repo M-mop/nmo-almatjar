@@ -265,11 +265,6 @@ textarea { resize:vertical; min-height:100px; }
 <script>
 const API_BASE = window.location.origin;
 
-// Get store info from URL params (Salla OAuth)
-const urlParams = new URLSearchParams(window.location.search);
-const accessToken = urlParams.get('token') || localStorage.getItem('salla_token') || 'demo';
-if (accessToken && accessToken !== 'demo') localStorage.setItem('salla_token', accessToken);
-
 // Tab switching
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -283,9 +278,10 @@ function switchTab(tab) {
 let allProducts = [];
 
 async function loadProducts() {
+  const token = localStorage.getItem('salla_token') || 'demo';
   try {
     const res = await fetch(`${API_BASE}/api/products`, {
-      headers: { 'Authorization': `Bearer ${accessToken}` }
+      headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await res.json();
     if (data.products && data.products.length > 0) {
@@ -347,6 +343,8 @@ function toggleSelectAll(checked) {
 async function generateAndUploadAll() {
   const selected = [...document.querySelectorAll('.product-checkbox:checked')];
   if (selected.length === 0) return alert('اختر منتجاً على الأقل');
+  const token = localStorage.getItem('salla_token');
+  if (!token) return alert('لم يتم ربط المتجر');
   if (!confirm(`سيتم توليد الوصف ورفعه تلقائياً لـ ${selected.length} منتج. هل توافق؟`)) return;
 
   const progress = document.getElementById('bulk-progress');
@@ -383,7 +381,7 @@ async function generateAndUploadAll() {
           description: genData.description,
           seoTitle: genData.seoTitle,
           seoDescription: genData.seoDescription,
-          token: accessToken
+          token: token
         })
       });
       const upData = await upRes.json();
@@ -529,6 +527,8 @@ async function generateDescription() {
 
 async function approveAndUpload() {
   if (!lastDescProductId) return alert('ما في منتج مرتبط');
+  const token = localStorage.getItem('salla_token');
+  if (!token) return alert('لم يتم ربط المتجر');
   const btn = document.getElementById('approve-btn');
   btn.disabled = true;
   btn.textContent = 'جاري الرفع...';
@@ -541,7 +541,7 @@ async function approveAndUpload() {
         description: lastGeneratedDesc,
         seoTitle: lastSeoTitle,
         seoDescription: lastSeoDescription,
-        token: accessToken
+        token: token
       })
     });
     const data = await res.json();
@@ -626,8 +626,34 @@ async function translateText() {
 }
 
 // Init
-loadProducts();
-document.getElementById('store-name').textContent = 'متجرك في سلة';
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  const tokenFromUrl = params.get('token');
+  
+  if (tokenFromUrl) {
+    localStorage.setItem('salla_token', tokenFromUrl);
+    window.history.replaceState({}, '', '/');
+  }
+
+  const token = localStorage.getItem('salla_token');
+  
+  if (!token) {
+    document.getElementById('store-name').textContent = 'غير مرتبط';
+    document.getElementById('products-list').innerHTML = `
+      <div style="text-align:center;padding:40px;">
+        <p style="color:#a0a0c0;margin-bottom:16px;">لم يتم ربط المتجر بعد</p>
+        <a href="/auth/salla" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;">
+          🔗 ربط متجر سلة
+        </a>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('store-name').textContent = 'متجرك في سلة ✅';
+  await loadProducts();
+}
+
+init();
 </script>
 </body>
 </html>
