@@ -592,6 +592,7 @@ app.get('/api/templates', (req, res) => {
 });
 
 // ===== GENERATE IMAGE =====
+app.post('/api/generate-image', async (req, res) => {
   try {
     const { name, prompt, style } = req.body;
     const fullPrompt = `Professional product photo of ${name}. ${prompt || ''}. ${style}. High quality, commercial photography, sharp details, no text.`;
