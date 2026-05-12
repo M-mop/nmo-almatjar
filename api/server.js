@@ -44,15 +44,32 @@ async function sallaUpdate(productId, data, token) {
 }
 
 function textToHtml(text) {
-  return text.split('\n\n').filter(p => p.trim()).map(p => {
-    const t = p.trim();
-    if (t.startsWith('- ') || t.includes('\n- ')) {
-      const items = t.split('\n').filter(l => l.trim().startsWith('- '));
-      return `<ul>${items.map(i => `<li>${i.replace(/^-\s*/, '')}</li>`).join('')}</ul>`;
+  if (!text) return '';
+  const sections = text.split('\n\n').filter(s => s.trim());
+  let html = '';
+  let featuresAdded = false;
+
+  for (let i = 0; i < sections.length; i++) {
+    const s = sections[i].trim();
+    const lines = s.split('\n');
+    const isList = lines.some(l => l.trim().startsWith('- '));
+
+    if (isList) {
+      const items = lines.filter(l => l.trim().startsWith('- ')).map(l => l.replace(/^-\s*/, '').trim());
+      if (!featuresAdded) {
+        html += `<h3 style="font-size:16px;font-weight:700;margin:16px 0 8px;">مميزات المنتج</h3>`;
+        featuresAdded = true;
+      }
+      html += `<ul style="padding-right:20px;margin-bottom:12px;">${items.map(item => `<li style="margin-bottom:6px;line-height:1.7;">${item}</li>`).join('')}</ul>`;
+    } else if (i === 0) {
+      html += `<p style="font-size:16px;font-weight:600;line-height:1.8;margin-bottom:16px;">${s}</p>`;
+    } else {
+      html += `<p style="font-size:14px;line-height:1.9;margin-bottom:14px;">${s}</p>`;
     }
-    return `<p>${t}</p>`;
-  }).join('\n');
+  }
+  return html;
 }
+
 
 // ===== AUTH =====
 app.get('/auth/salla', (req, res) => {
@@ -156,40 +173,44 @@ app.post('/api/generate-description', async (req, res) => {
       max_tokens: 2000,
       messages: [{
         role: 'user',
-        content: `أنت كاتب محتوى للتجارة الإلكترونية. اكتب بالعربية بدون markdown.
+        content: `أنت كاتب محتوى للتجارة الإلكترونية. اكتب بالعربية فقط بدون رموز markdown.
 
 المنتج: ${name}
 ${currentDesc}الفئة المستهدفة: ${audience || 'العملاء السعوديين'}
 الأسلوب: ${toneMap[tone] || 'احترافي'}
 المنصة: ${platformMap[platform] || 'متجر سلة'}
-التعليمات: ${instructions || modeInst}
+التعليمات الإضافية: ${instructions || modeInst}
 
-اكتب بهذا الترتيب بالضبط:
+اكتب بهذا الترتيب بالضبط — لا تتجاوز أي قسم:
 
 SEO_TITLE:
-[عنوان منتج قوي ومحسّن لمحركات البحث — 50-60 حرف — يتضمن الكلمة الرئيسية وميزة مهمة]
+[عنوان المنتج المحسّن لـ SEO — 50-60 حرف — يتضمن الكلمة الرئيسية وميزة مهمة]
 
 SEO_DESC:
-[وصف محركات البحث — 150-160 حرف — يحفز النقر]
+[وصف محركات البحث — 150 حرف بالضبط — يحفز النقر ويتضمن الكلمة المفتاحية]
 
 SHORT_DESC:
-[وصف قصير للمنتج — جملتين فقط — مناسب لبطاقة المنتج]
+[وصف قصير مقنع — جملتان فقط — يوضح الفائدة الرئيسية للمنتج]
 
 LONG_DESC:
-[وصف طويل مقنع — 3 فقرات — يصف تجربة الاستخدام ويحفز الشراء]
+[فقرة افتتاحية مقنعة تصف المنتج وقيمته]
+
+[فقرة ثانية تصف تجربة الاستخدام والفرق الذي يحدثه]
+
+[فقرة ختامية تحفز على الشراء مع ذكر القيمة]
 
 FEATURES:
-- [ميزة 1 مع فائدتها]
-- [ميزة 2 مع فائدتها]
-- [ميزة 3 مع فائدتها]
-- [ميزة 4 مع فائدتها]
-- [ميزة 5 مع فائدتها]
+- [الميزة الأولى: وصف موجز لفائدتها]
+- [الميزة الثانية: وصف موجز لفائدتها]
+- [الميزة الثالثة: وصف موجز لفائدتها]
+- [الميزة الرابعة: وصف موجز لفائدتها]
+- [الميزة الخامسة: وصف موجز لفائدتها]
 
 TIKTOK_CAPTION:
-[كابشن TikTok جذاب — جملة أو جملتين + هاشتاقات]
+[كابشن TikTok جذاب — جملة واحدة تشد الانتباه + 5 هاشتاقات]
 
 GOOGLE_TITLE:
-[عنوان Google Shopping — 70 حرف كحد أقصى]`
+[عنوان Google Shopping — 70 حرف كحد أقصى — وصفي ودقيق]`
       }]
     });
 
@@ -440,27 +461,137 @@ app.post('/api/update-product', async (req, res) => {
 app.post('/api/add-tags', async (req, res) => {
   try {
     const { productId, tags, token } = req.body;
-    const created = [];
-    for (const tag of tags) {
+    if (!productId || !tags?.length || !token) {
+      return res.status(400).json({ error: 'بيانات ناقصة' });
+    }
+
+    // Get existing tags first to avoid duplicates
+    let existingTagIds = [];
+    try {
+      const existing = await sallaGet(`products/${productId}`, token);
+      existingTagIds = (existing.data?.tags || []).map(t => t.id).filter(Boolean);
+    } catch(e) {}
+
+    // Create new tags
+    const newTagIds = [];
+    for (const tagName of tags) {
       try {
-        const r = await axios.post('https://api.salla.dev/admin/v2/products/tags',
-          { name: tag },
+        // Try to create tag
+        const r = await axios.post(
+          'https://api.salla.dev/admin/v2/tags',
+          { name: tagName, type: 'product' },
           { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
         );
-        if (r.data?.data?.id) created.push(r.data.data.id);
-      } catch (e) {}
+        if (r.data?.data?.id) newTagIds.push(r.data.data.id);
+      } catch(e) {
+        // Tag might exist, search for it
+        try {
+          const search = await axios.get(
+            `https://api.salla.dev/admin/v2/tags?search=${encodeURIComponent(tagName)}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          const found = search.data?.data?.find(t => t.name === tagName);
+          if (found?.id) newTagIds.push(found.id);
+        } catch(e2) {}
+      }
     }
-    if (created.length) {
-      await sallaUpdate(productId, { tags: created }, token);
+
+    // Combine existing + new tag IDs
+    const allTagIds = [...new Set([...existingTagIds, ...newTagIds])];
+
+    if (allTagIds.length > 0) {
+      await sallaUpdate(productId, { tags: allTagIds }, token);
     }
-    res.json({ success: true, added: created.length });
+
+    res.json({ success: true, added: newTagIds.length, total: allTagIds.length });
   } catch (e) {
+    console.error('Add tags error:', e.response?.data || e.message);
     res.status(500).json({ error: e.message });
   }
 });
 
+// ===== OPTIMIZE PRODUCT TITLE =====
+app.post('/api/optimize-title', async (req, res) => {
+  try {
+    const { name, description, category } = req.body;
+    const msg = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6', max_tokens: 400,
+      messages: [{ role: 'user', content: `حسّن عنوان المنتج للـ SEO. العنوان الحالي: ${name}. الفئة: ${category||'عام'}. الوصف: ${description||''}
+
+اكتب 3 عناوين محسّنة مختلفة بالعربية، كل عنوان:
+- يحتوي كلمة مفتاحية رئيسية
+- يذكر ميزة مهمة
+- لا يتجاوز 70 حرفاً
+
+TITLE1:
+[العنوان الأول]
+TITLE2:
+[العنوان الثاني]
+TITLE3:
+[العنوان الثالث]` }]
+    });
+    const text = msg.content[0].text;
+    const ex = k => { const m = text.match(new RegExp(`${k}:\\n([^\\n]+)`)); return m ? m[1].trim() : ''; };
+    res.json({ original: name, title1: ex('TITLE1'), title2: ex('TITLE2'), title3: ex('TITLE3') });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ===== GENERATE ALT TEXT =====
+app.post('/api/generate-alt', async (req, res) => {
+  try {
+    const { productName, count } = req.body;
+    const altTexts = [];
+    for (let i = 1; i <= (count || 1); i++) {
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-4-6', max_tokens: 100,
+        messages: [{ role: 'user', content: `اكتب Alt Text للصورة رقم ${i} للمنتج: ${productName}. 50-100 حرف بالعربية. الـ Alt Text فقط:` }]
+      });
+      altTexts.push(msg.content[0].text.trim());
+    }
+    res.json({ altTexts });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ===== SEO CATEGORY PAGES =====
+app.post('/api/seo-pages', async (req, res) => {
+  try {
+    const { products, storeName } = req.body;
+    const msg = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6', max_tokens: 800,
+      messages: [{ role: 'user', content: `من هذه المنتجات: ${products.map(p=>p.name).join('، ')} لمتجر: ${storeName||'المتجر'}
+
+اقترح 5 صفحات SEO تلقائية لجلب زيارات Google. لكل صفحة:
+PAGE1_TITLE:
+PAGE1_URL:
+PAGE1_DESC:
+
+(حتى PAGE5)` }]
+    });
+    const text = msg.content[0].text;
+    const pages = [];
+    for (let i = 1; i <= 5; i++) {
+      const t = text.match(new RegExp(`PAGE${i}_TITLE:\\n([^\\n]+)`))?.[1]?.trim();
+      const u = text.match(new RegExp(`PAGE${i}_URL:\\n([^\\n]+)`))?.[1]?.trim();
+      const d = text.match(new RegExp(`PAGE${i}_DESC:\\n([^\\n]+)`))?.[1]?.trim();
+      if (t) pages.push({ title: t, url: u, description: d });
+    }
+    res.json({ pages });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ===== TEMPLATES =====
+app.get('/api/templates', (req, res) => {
+  res.json({ templates: [
+    { id: 'fashion', name: '👗 ملابس وأزياء', tone: 'youth', instructions: 'ركز على الأناقة والتناسق، اذكر المقاسات والألوان، أسلوب شبابي' },
+    { id: 'electronics', name: '📱 إلكترونيات', tone: 'professional', instructions: 'ركز على المواصفات التقنية والأداء، اذكر الضمان، أسلوب احترافي' },
+    { id: 'perfume', name: '🌸 عطور ومستحضرات', tone: 'luxury', instructions: 'ركز على الرائحة والثبات، اجعله فاخراً شاعرياً، اذكر المناسبات' },
+    { id: 'food', name: '🍃 غذاء وصحة', tone: 'friendly', instructions: 'ركز على الفوائد الصحية والمكونات الطبيعية، أسلوب ودي' },
+    { id: 'home', name: '🏠 منزل وديكور', tone: 'professional', instructions: 'ركز على الجودة والتصميم، اذكر الأبعاد والمواد' },
+    { id: 'jewelry', name: '💍 مجوهرات', tone: 'luxury', instructions: 'ركز على المواد والتصميم الفريد، اذكر المناسبات والهدايا' }
+  ]});
+});
+
 // ===== GENERATE IMAGE =====
-app.post('/api/generate-image', async (req, res) => {
   try {
     const { name, prompt, style } = req.body;
     const fullPrompt = `Professional product photo of ${name}. ${prompt || ''}. ${style}. High quality, commercial photography, sharp details, no text.`;
