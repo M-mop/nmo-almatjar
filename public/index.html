@@ -315,7 +315,10 @@ function renderProducts(products) {
         تحديد الكل
       </label>
       <button class="btn-small" onclick="updateAllDescriptions()" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;">
-        ✨ تحديث الوصف للمحدد
+        ✨ توليد الوصف للمحدد
+      </button>
+      <button class="btn-small" onclick="generateAndUploadAll()" style="background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;">
+        🚀 توليد ورفع الكل تلقائياً
       </button>
     </div>
     <div id="bulk-progress" style="display:none;margin-bottom:12px;padding:12px;background:rgba(99,102,241,0.1);border-radius:10px;font-size:13px;color:#a5b4fc;"></div>
@@ -341,7 +344,65 @@ function toggleSelectAll(checked) {
   document.querySelectorAll('.product-checkbox').forEach(cb => cb.checked = checked);
 }
 
-async function updateAllDescriptions() {
+async function generateAndUploadAll() {
+  const selected = [...document.querySelectorAll('.product-checkbox:checked')];
+  if (selected.length === 0) return alert('اختر منتجاً على الأقل');
+  if (!confirm(`سيتم توليد الوصف ورفعه تلقائياً لـ ${selected.length} منتج. هل توافق؟`)) return;
+
+  const progress = document.getElementById('bulk-progress');
+  progress.style.display = 'block';
+
+  let success = 0, failed = 0;
+
+  for (let i = 0; i < selected.length; i++) {
+    const idx = selected[i].dataset.index;
+    const p = allProducts[idx];
+    progress.innerHTML = `⏳ جاري المعالجة ${i+1} من ${selected.length}: <b>${p.name}</b>`;
+
+    try {
+      // 1. Generate description
+      const genRes = await fetch(`${API_BASE}/api/generate-description`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: p.name,
+          features: p.description || p.name,
+          audience: 'العملاء',
+          price: getPrice(p)
+        })
+      });
+      const genData = await genRes.json();
+      if (!genData.description) throw new Error('فشل توليد الوصف');
+
+      // 2. Upload to Salla
+      const upRes = await fetch(`${API_BASE}/api/update-product`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: p.id,
+          description: genData.description,
+          seoTitle: genData.seoTitle,
+          seoDescription: genData.seoDescription,
+          token: accessToken
+        })
+      });
+      const upData = await upRes.json();
+      if (upData.success) {
+        success++;
+        progress.innerHTML = `✅ تم: ${p.name} (${success} ناجح، ${failed} فاشل)`;
+      } else {
+        throw new Error(upData.error || 'فشل الرفع');
+      }
+    } catch(e) {
+      failed++;
+      progress.innerHTML = `❌ فشل: ${p.name} — ${e.message}`;
+    }
+
+    await new Promise(r => setTimeout(r, 1500));
+  }
+
+  progress.innerHTML = `🎉 اكتملت العملية! ${success} منتج تم رفعه بنجاح${failed > 0 ? ` — ${failed} فشل` : ''}`;
+}
   const selected = [...document.querySelectorAll('.product-checkbox:checked')];
   if (selected.length === 0) return alert('اختر منتجاً على الأقل');
   
@@ -422,6 +483,8 @@ async function generateImage() {
 // Generate Description
 let lastGeneratedDesc = '';
 let lastDescProductId = '';
+let lastSeoTitle = '';
+let lastSeoDescription = '';
 
 async function generateDescription() {
   const name = document.getElementById('desc-name').value;
@@ -447,6 +510,8 @@ async function generateDescription() {
     if (data.description) {
       lastGeneratedDesc = data.description;
       lastDescProductId = productId;
+      lastSeoTitle = data.seoTitle || '';
+      lastSeoDescription = data.seoDescription || '';
       document.getElementById('desc-result').textContent = data.description;
       document.getElementById('desc-result').classList.add('visible');
       if (productId) {
@@ -474,6 +539,8 @@ async function approveAndUpload() {
       body: JSON.stringify({
         productId: lastDescProductId,
         description: lastGeneratedDesc,
+        seoTitle: lastSeoTitle,
+        seoDescription: lastSeoDescription,
         token: accessToken
       })
     });
