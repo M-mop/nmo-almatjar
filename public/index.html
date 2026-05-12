@@ -1,0 +1,454 @@
+bash
+
+cat /home/claude/salla-ai-app/public/index.html
+Output
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مصمم المنتجات بالذكاء الاصطناعي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Cairo',sans-serif; background:#0f0f14; color:#f0f0ff; min-height:100vh; }
+
+/* NAV */
+nav {
+  background:rgba(15,15,20,0.95);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(99,102,241,0.15);
+  padding:14px 32px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:100;
+}
+.nav-logo { font-size:20px; font-weight:900; background:linear-gradient(135deg,#6366f1,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.nav-store { font-size:13px; color:#a0a0c0; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.2); border-radius:8px; padding:6px 14px; }
+
+/* HERO */
+.hero { text-align:center; padding:60px 20px 40px; }
+.hero h1 { font-size:clamp(28px,5vw,48px); font-weight:900; line-height:1.2; margin-bottom:12px; }
+.hero h1 span { background:linear-gradient(135deg,#6366f1,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.hero p { color:#a0a0c0; font-size:16px; max-width:480px; margin:0 auto 32px; line-height:1.7; }
+
+/* TABS */
+.tabs { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:40px; padding:0 20px; }
+.tab { background:#1a1a24; border:1px solid rgba(99,102,241,0.2); border-radius:100px; padding:10px 20px; font-size:14px; font-weight:600; color:#a0a0c0; cursor:pointer; font-family:'Cairo',sans-serif; transition:all 0.2s; }
+.tab.active, .tab:hover { background:rgba(99,102,241,0.15); border-color:rgba(99,102,241,0.5); color:#a5b4fc; }
+
+/* MAIN CONTENT */
+.container { max-width:900px; margin:0 auto; padding:0 20px 60px; }
+
+/* TOOL PANELS */
+.tool-panel { display:none; }
+.tool-panel.active { display:block; }
+
+/* CARD */
+.card { background:#1a1a24; border:1px solid rgba(99,102,241,0.15); border-radius:16px; padding:28px; margin-bottom:20px; }
+.card h2 { font-size:18px; font-weight:700; margin-bottom:6px; }
+.card p { color:#a0a0c0; font-size:14px; margin-bottom:20px; line-height:1.6; }
+
+/* FORM ELEMENTS */
+label { display:block; font-size:13px; font-weight:600; color:#a0a0c0; margin-bottom:8px; }
+input, textarea, select {
+  width:100%; background:#111118; border:1px solid rgba(99,102,241,0.2); border-radius:10px;
+  padding:12px 16px; color:#f0f0ff; font-family:'Cairo',sans-serif; font-size:14px;
+  outline:none; transition:border-color 0.2s;
+}
+input:focus, textarea:focus, select:focus { border-color:rgba(99,102,241,0.5); }
+textarea { resize:vertical; min-height:100px; }
+.form-group { margin-bottom:16px; }
+
+/* BUTTONS */
+.btn-primary {
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:white; border:none; border-radius:12px;
+  padding:14px 28px; font-size:15px; font-weight:700;
+  font-family:'Cairo',sans-serif; cursor:pointer;
+  transition:all 0.2s; width:100%;
+  box-shadow:0 0 20px rgba(99,102,241,0.3);
+}
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 0 40px rgba(99,102,241,0.5); }
+.btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+/* RESULT */
+.result-box {
+  background:#111118; border:1px solid rgba(99,102,241,0.2);
+  border-radius:12px; padding:20px; margin-top:20px;
+  min-height:80px; white-space:pre-wrap; line-height:1.8;
+  font-size:14px; color:#e0e0ff; display:none;
+}
+.result-box.visible { display:block; }
+
+/* IMAGE RESULT */
+.img-result { text-align:center; margin-top:20px; display:none; }
+.img-result.visible { display:block; }
+.img-result img { max-width:100%; border-radius:12px; border:1px solid rgba(99,102,241,0.2); }
+.img-download { display:inline-block; margin-top:12px; background:rgba(99,102,241,0.15); color:#a5b4fc; border:1px solid rgba(99,102,241,0.3); border-radius:8px; padding:8px 20px; text-decoration:none; font-size:14px; font-weight:600; }
+
+/* LOADING */
+.loading { display:none; text-align:center; padding:20px; color:#a0a0c0; font-size:14px; }
+.loading.visible { display:block; }
+.spinner { display:inline-block; width:20px; height:20px; border:2px solid rgba(99,102,241,0.3); border-top-color:#6366f1; border-radius:50%; animation:spin 0.8s linear infinite; margin-left:8px; vertical-align:middle; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* STATS */
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:32px; }
+.stat-card { background:#1a1a24; border:1px solid rgba(99,102,241,0.15); border-radius:12px; padding:16px; text-align:center; }
+.stat-num { font-size:28px; font-weight:900; background:linear-gradient(135deg,#6366f1,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.stat-label { font-size:12px; color:#606080; margin-top:4px; }
+
+/* PRODUCT LIST */
+.product-item { background:#111118; border:1px solid rgba(99,102,241,0.15); border-radius:10px; padding:14px 16px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.product-name { font-size:14px; font-weight:600; }
+.product-price { font-size:13px; color:#a5b4fc; }
+.btn-small { background:rgba(99,102,241,0.15); color:#a5b4fc; border:1px solid rgba(99,102,241,0.3); border-radius:8px; padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer; font-family:'Cairo',sans-serif; transition:all 0.2s; white-space:nowrap; }
+.btn-small:hover { background:rgba(99,102,241,0.3); }
+
+/* ALERT */
+.alert { padding:12px 16px; border-radius:10px; font-size:13px; margin-bottom:16px; }
+.alert-info { background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.2); color:#67e8f9; }
+.alert-success { background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:#34d399; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">✦ مصمم المنتجات AI</div>
+  <div class="nav-store" id="store-name">جاري التحميل...</div>
+</nav>
+
+<div class="hero">
+  <h1>أدوات <span>الذكاء الاصطناعي</span><br>لمتجرك في سلة</h1>
+  <p>صمّم صور منتجاتك، اكتب أوصافاً تزيد مبيعاتك، وحسّن ظهورك في محركات البحث — كل هذا بضغطة زر</p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('products')">📦 المنتجات</button>
+  <button class="tab" onclick="switchTab('image-gen')">🖼️ توليد الصور</button>
+  <button class="tab" onclick="switchTab('description')">✍️ الوصف والـ SEO</button>
+  <button class="tab" onclick="switchTab('image-edit')">🎨 تحرير الصور</button>
+  <button class="tab" onclick="switchTab('translate')">🌐 الترجمة</button>
+</div>
+
+<div class="container">
+
+  <!-- PRODUCTS TAB -->
+  <div class="tool-panel active" id="tab-products">
+    <div class="stats">
+      <div class="stat-card"><div class="stat-num" id="products-count">-</div><div class="stat-label">منتج في المتجر</div></div>
+      <div class="stat-card"><div class="stat-num" id="orders-count">-</div><div class="stat-label">طلب اليوم</div></div>
+      <div class="stat-card"><div class="stat-num">AI</div><div class="stat-label">أداة متاحة</div></div>
+    </div>
+    <div class="card">
+      <h2>منتجاتك في سلة</h2>
+      <p>اختر منتجاً لتطبيق أدوات الذكاء الاصطناعي عليه مباشرة</p>
+      <div class="alert alert-info">🔗 يتم جلب منتجاتك من سلة تلقائياً</div>
+      <div id="products-list">
+        <div style="text-align:center;padding:30px;color:#606080;">جاري تحميل المنتجات...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMAGE GEN TAB -->
+  <div class="tool-panel" id="tab-image-gen">
+    <div class="card">
+      <h2>🖼️ توليد صورة منتج احترافية</h2>
+      <p>صف منتجك وسيولّد الذكاء الاصطناعي صورة احترافية جاهزة للمتجر</p>
+      <div class="form-group">
+        <label>اسم المنتج</label>
+        <input type="text" id="img-product-name" placeholder="مثال: عطر ورد الطائف" />
+      </div>
+      <div class="form-group">
+        <label>وصف المنتج والخلفية المطلوبة</label>
+        <textarea id="img-prompt" placeholder="مثال: زجاجة عطر فاخرة ذهبية على خلفية بيضاء نظيفة، إضاءة استوديو احترافية، جودة عالية"></textarea>
+      </div>
+      <div class="form-group">
+        <label>نوع الصورة</label>
+        <select id="img-style">
+          <option value="product photography, white background, studio lighting">صورة منتج احترافية - خلفية بيضاء</option>
+          <option value="lifestyle product photography, natural lighting">صورة لايف ستايل - بيئة طبيعية</option>
+          <option value="luxury product photography, dark background, dramatic lighting">صورة فاخرة - خلفية داكنة</option>
+          <option value="flat lay product photography, minimal background">فلات لاي - تصوير من أعلى</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="generateImage()">✨ توليد الصورة</button>
+      <div class="loading" id="img-loading">جاري توليد الصورة... <span class="spinner"></span></div>
+      <div class="img-result" id="img-result">
+        <img id="generated-img" src="" alt="صورة المنتج" />
+        <br>
+        <a id="img-download" href="#" download="product-image.png" class="img-download">⬇️ تحميل الصورة</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESCRIPTION TAB -->
+  <div class="tool-panel" id="tab-description">
+    <div class="card">
+      <h2>✍️ كتابة وصف المنتج + SEO</h2>
+      <p>أدخل معلومات المنتج وسيكتب الذكاء الاصطناعي وصفاً مقنعاً يزيد المبيعات</p>
+      <div class="form-group">
+        <label>اسم المنتج</label>
+        <input type="text" id="desc-name" placeholder="مثال: ساعة يد ذكية" />
+      </div>
+      <div class="form-group">
+        <label>الميزات الرئيسية (افصل بينها بفاصلة)</label>
+        <input type="text" id="desc-features" placeholder="مثال: مقاوم للماء، شاشة AMOLED، بطارية 7 أيام" />
+      </div>
+      <div class="form-group">
+        <label>الفئة المستهدفة</label>
+        <input type="text" id="desc-audience" placeholder="مثال: رجال الأعمال، الرياضيين" />
+      </div>
+      <div class="form-group">
+        <label>السعر (ريال)</label>
+        <input type="number" id="desc-price" placeholder="مثال: 299" />
+      </div>
+      <button class="btn-primary" onclick="generateDescription()">✍️ كتابة الوصف والـ SEO</button>
+      <div class="loading" id="desc-loading">جاري كتابة الوصف... <span class="spinner"></span></div>
+      <div class="result-box" id="desc-result"></div>
+    </div>
+  </div>
+
+  <!-- IMAGE EDIT TAB -->
+  <div class="tool-panel" id="tab-image-edit">
+    <div class="card">
+      <h2>🎨 تحرير صورة بالذكاء الاصطناعي</h2>
+      <p>ارفع صورة منتجك وعدّلها بأمر نصي بسيط</p>
+      <div class="form-group">
+        <label>ارفع صورة المنتج</label>
+        <input type="file" id="edit-image" accept="image/*" />
+      </div>
+      <div class="form-group">
+        <label>ماذا تريد أن تعدّل؟</label>
+        <textarea id="edit-prompt" placeholder="مثال: احذف الخلفية واجعلها بيضاء نظيفة&#10;أو: أضف إضاءة درامية احترافية&#10;أو: حسّن الألوان واجعل المنتج أكثر وضوحاً"></textarea>
+      </div>
+      <button class="btn-primary" onclick="editImage()">🎨 تحرير الصورة</button>
+      <div class="loading" id="edit-loading">جاري تحرير الصورة... <span class="spinner"></span></div>
+      <div class="img-result" id="edit-result">
+        <img id="edited-img" src="" alt="الصورة المعدّلة" />
+        <br>
+        <a id="edit-download" href="#" download="edited-image.png" class="img-download">⬇️ تحميل الصورة المعدّلة</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSLATE TAB -->
+  <div class="tool-panel" id="tab-translate">
+    <div class="card">
+      <h2>🌐 ترجمة المنتجات</h2>
+      <p>ترجم أسماء وأوصاف منتجاتك لاستهداف عملاء من دول مختلفة</p>
+      <div class="form-group">
+        <label>النص العربي</label>
+        <textarea id="translate-text" placeholder="ادخل اسم أو وصف المنتج بالعربي..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>الترجمة إلى</label>
+        <select id="translate-lang">
+          <option value="English">الإنجليزية</option>
+          <option value="French">الفرنسية</option>
+          <option value="Turkish">التركية</option>
+          <option value="Urdu">الأردية</option>
+          <option value="Chinese">الصينية</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="translateText()">🌐 ترجمة الآن</button>
+      <div class="loading" id="trans-loading">جاري الترجمة... <span class="spinner"></span></div>
+      <div class="result-box" id="trans-result"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API_BASE = window.location.origin;
+
+// Get store info from URL params (Salla OAuth)
+const urlParams = new URLSearchParams(window.location.search);
+const accessToken = urlParams.get('token') || localStorage.getItem('salla_token') || 'demo';
+if (accessToken && accessToken !== 'demo') localStorage.setItem('salla_token', accessToken);
+
+// Tab switching
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  if (tab === 'products') loadProducts();
+}
+
+// Load products from Salla
+async function loadProducts() {
+  try {
+    const res = await fetch(`${API_BASE}/api/products`, {
+      headers: { 'Authorization': `Bearer ${accessToken}` }
+    });
+    const data = await res.json();
+    if (data.products && data.products.length > 0) {
+      document.getElementById('products-count').textContent = data.products.length;
+      const list = document.getElementById('products-list');
+      list.innerHTML = data.products.map(p => `
+        <div class="product-item">
+          <div>
+            <div class="product-name">${p.name}</div>
+            <div class="product-price">${p.price} ريال</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-small" onclick="autoFill('image-gen','${p.name.replace(/'/g,"\\'")}')">صورة</button>
+            <button class="btn-small" onclick="autoFill('description','${p.name.replace(/'/g,"\\'")}')">وصف</button>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      document.getElementById('products-list').innerHTML = '<div style="text-align:center;padding:30px;color:#606080;">لا توجد منتجات أو غير مرتبط بسلة بعد</div>';
+    }
+  } catch(e) {
+    document.getElementById('products-list').innerHTML = '<div style="text-align:center;padding:30px;color:#606080;">تعذّر تحميل المنتجات</div>';
+  }
+}
+
+function autoFill(tab, productName) {
+  switchTab(tab);
+  if (tab === 'image-gen') document.getElementById('img-product-name').value = productName;
+  if (tab === 'description') document.getElementById('desc-name').value = productName;
+}
+
+// Generate Image
+async function generateImage() {
+  const name = document.getElementById('img-product-name').value;
+  const prompt = document.getElementById('img-prompt').value;
+  const style = document.getElementById('img-style').value;
+  if (!name) return alert('أدخل اسم المنتج');
+
+  const btn = document.querySelector('#tab-image-gen .btn-primary');
+  btn.disabled = true;
+  document.getElementById('img-loading').classList.add('visible');
+  document.getElementById('img-result').classList.remove('visible');
+
+  try {
+    const res = await fetch(`${API_BASE}/api/generate-image`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, prompt: `${name}: ${prompt}`, style })
+    });
+    const data = await res.json();
+    if (data.imageUrl) {
+      document.getElementById('generated-img').src = data.imageUrl;
+      document.getElementById('img-download').href = data.imageUrl;
+      document.getElementById('img-result').classList.add('visible');
+    } else {
+      alert('حدث خطأ: ' + (data.error || 'حاول مرة أخرى'));
+    }
+  } catch(e) {
+    alert('تعذّر الاتصال بالخادم');
+  }
+  btn.disabled = false;
+  document.getElementById('img-loading').classList.remove('visible');
+}
+
+// Generate Description
+async function generateDescription() {
+  const name = document.getElementById('desc-name').value;
+  const features = document.getElementById('desc-features').value;
+  const audience = document.getElementById('desc-audience').value;
+  const price = document.getElementById('desc-price').value;
+  if (!name) return alert('أدخل اسم المنتج');
+
+  const btn = document.querySelector('#tab-description .btn-primary');
+  btn.disabled = true;
+  document.getElementById('desc-loading').classList.add('visible');
+  document.getElementById('desc-result').classList.remove('visible');
+
+  try {
+    const res = await fetch(`${API_BASE}/api/generate-description`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, features, audience, price })
+    });
+    const data = await res.json();
+    if (data.description) {
+      document.getElementById('desc-result').textContent = data.description;
+      document.getElementById('desc-result').classList.add('visible');
+    } else {
+      alert('حدث خطأ: ' + (data.error || 'حاول مرة أخرى'));
+    }
+  } catch(e) {
+    alert('تعذّر الاتصال بالخادم');
+  }
+  btn.disabled = false;
+  document.getElementById('desc-loading').classList.remove('visible');
+}
+
+// Edit Image
+async function editImage() {
+  const file = document.getElementById('edit-image').files[0];
+  const prompt = document.getElementById('edit-prompt').value;
+  if (!file) return alert('ارفع صورة أولاً');
+  if (!prompt) return alert('أدخل التعديل المطلوب');
+
+  const btn = document.querySelector('#tab-image-edit .btn-primary');
+  btn.disabled = true;
+  document.getElementById('edit-loading').classList.add('visible');
+  document.getElementById('edit-result').classList.remove('visible');
+
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('prompt', prompt);
+
+  try {
+    const res = await fetch(`${API_BASE}/api/edit-image`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (data.imageUrl) {
+      document.getElementById('edited-img').src = data.imageUrl;
+      document.getElementById('edit-download').href = data.imageUrl;
+      document.getElementById('edit-result').classList.add('visible');
+    } else {
+      alert('حدث خطأ: ' + (data.error || 'حاول مرة أخرى'));
+    }
+  } catch(e) {
+    alert('تعذّر الاتصال بالخادم');
+  }
+  btn.disabled = false;
+  document.getElementById('edit-loading').classList.remove('visible');
+}
+
+// Translate
+async function translateText() {
+  const text = document.getElementById('translate-text').value;
+  const lang = document.getElementById('translate-lang').value;
+  if (!text) return alert('أدخل النص');
+
+  const btn = document.querySelector('#tab-translate .btn-primary');
+  btn.disabled = true;
+  document.getElementById('trans-loading').classList.add('visible');
+  document.getElementById('trans-result').classList.remove('visible');
+
+  try {
+    const res = await fetch(`${API_BASE}/api/translate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, language: lang })
+    });
+    const data = await res.json();
+    if (data.translation) {
+      document.getElementById('trans-result').textContent = data.translation;
+      document.getElementById('trans-result').classList.add('visible');
+    } else {
+      alert('حدث خطأ: ' + (data.error || 'حاول مرة أخرى'));
+    }
+  } catch(e) {
+    alert('تعذّر الاتصال بالخادم');
+  }
+  btn.disabled = false;
+  document.getElementById('trans-loading').classList.remove('visible');
+}
+
+// Init
+loadProducts();
+document.getElementById('store-name').textContent = 'متجرك في سلة';
+</script>
+</body>
+</html>
