@@ -19,9 +19,11 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ===== SALLA OAUTH =====
+const REDIRECT_URI = 'https://salla-ai-app-indol.vercel.app/auth/callback';
+
 app.get('/auth/salla', (req, res) => {
   const state = Math.random().toString(36).substring(2, 15);
-  const url = `https://accounts.salla.sa/oauth2/auth?client_id=${process.env.SALLA_CLIENT_ID}&redirect_uri=${process.env.APP_URL}/auth/callback&response_type=code&scope=offline_access&state=${state}`;
+  const url = `https://accounts.salla.sa/oauth2/auth?client_id=${process.env.SALLA_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=offline_access&state=${state}`;
   res.redirect(url);
 });
 
@@ -34,7 +36,7 @@ app.get('/auth/callback', async (req, res) => {
       client_secret: process.env.SALLA_CLIENT_SECRET,
       grant_type: 'authorization_code',
       code,
-      redirect_uri: `${process.env.APP_URL}/auth/callback`
+      redirect_uri: REDIRECT_URI
     });
     const token = response.data.access_token;
     res.redirect(`/?token=${token}`);
