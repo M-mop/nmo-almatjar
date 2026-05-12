@@ -193,6 +193,12 @@ textarea{resize:vertical;min-height:75px}
   <div class="sb-it" onclick="go('social')" id="nav-social"><span class="ic">📱</span> محتوى سوشال</div>
   <div class="sb-it" onclick="go('blog')" id="nav-blog"><span class="ic">📝</span> مقالات AI</div>
 
+  <div class="sb-sec">أدوات إضافية</div>
+  <div class="sb-it" onclick="go('title')" id="nav-title"><span class="ic">🔤</span> تحسين العنوان</div>
+  <div class="sb-it" onclick="go('alttext')" id="nav-alttext"><span class="ic">🖼️</span> Alt Text للصور</div>
+  <div class="sb-it" onclick="go('seopages')" id="nav-seopages"><span class="ic">📄</span> صفحات SEO</div>
+  <div class="sb-it" onclick="go('templates')" id="nav-templates"><span class="ic">📋</span> القوالب الجاهزة</div>
+
   <div class="sb-sec">الصور</div>
   <div class="sb-it" onclick="go('imggen')" id="nav-imggen"><span class="ic">🖼️</span> توليد الصور</div>
   <div class="sb-it" onclick="go('imgedit')" id="nav-imgedit"><span class="ic">🎨</span> تحرير الصور</div>
@@ -540,13 +546,72 @@ textarea{resize:vertical;min-height:75px}
   </div>
 </div>
 
-</div></div><!-- main, content -->
+<!-- ===== تحسين العنوان ===== -->
+<div class="page" id="page-title">
+  <div class="card">
+    <div class="ch"><div class="ct">🔤 تحسين عنوان المنتج</div><div class="cd">يولّد 3 عناوين محسّنة لمحركات البحث — اختر الأفضل</div></div>
+    <div class="cb">
+      <div class="fg"><label class="lbl">المنتج</label><select id="tt-prod" onchange="fillTitle()"><option value="">-- اختر منتجاً --</option></select></div>
+      <div class="fg"><label class="lbl">أو أدخل العنوان الحالي</label><input type="text" id="tt-name" placeholder="العنوان الحالي للمنتج..."></div>
+      <div class="fg"><label class="lbl">الفئة (اختياري)</label><input type="text" id="tt-cat" placeholder="مثال: عطور، ملابس، إلكترونيات..."></div>
+      <button class="btn bp" onclick="runTitle()" id="ttbtn">🔤 توليد عناوين محسّنة</button>
+      <div class="prog" id="ttp"><span class="spin"></span><div class="prog-t">جاري التوليد...</div></div>
+      <div id="ttr" style="display:none;margin-top:14px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Alt Text ===== -->
+<div class="page" id="page-alttext">
+  <div class="card">
+    <div class="ch"><div class="ct">🖼️ توليد Alt Text للصور</div><div class="cd">يحسّن ظهور صور منتجاتك في محركات البحث تلقائياً</div></div>
+    <div class="cb">
+      <div class="slbar"><input type="checkbox" class="pr-cb" id="alta" onchange="sa('alt',this.checked)"><span class="slcnt" id="altc">0 محدد</span></div>
+      <div class="pl" id="altpl"></div>
+      <div class="brow">
+        <button class="btn bp" onclick="runAlt()" id="altbtn">🖼️ توليد Alt Text</button>
+      </div>
+      <div class="prog" id="altp"><span class="spin"></span><div class="prog-t" id="altpt">جاري التوليد...</div></div>
+      <div id="altr" style="display:none;margin-top:14px"><div id="altrl"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== صفحات SEO ===== -->
+<div class="page" id="page-seopages">
+  <div class="card">
+    <div class="ch"><div class="ct">📄 صفحات SEO تلقائية</div><div class="cd">يقترح صفحات فئات SEO تجلب زيارات Google مجاناً</div></div>
+    <div class="cb">
+      <div class="fg"><label class="lbl">اسم المتجر</label><input type="text" id="sp-store" placeholder="مثال: متجر العطور الفاخرة"></div>
+      <div class="al ai" style="margin-bottom:12px">سيحلل منتجاتك ويقترح صفحات فئات مثل "عطور رجالية" أو "عطور شتوية"</div>
+      <button class="btn bp" onclick="runSEOPages()" id="spbtn">📄 توليد الصفحات</button>
+      <div class="prog" id="spp"><span class="spin"></span><div class="prog-t">جاري التحليل...</div></div>
+      <div id="spr" style="display:none;margin-top:14px"><div id="sprl"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== القوالب ===== -->
+<div class="page" id="page-templates">
+  <div class="card">
+    <div class="ch"><div class="ct">📋 القوالب الجاهزة</div><div class="cd">اختر قالباً جاهزاً يناسب فئة منتجاتك — يُطبَّق تلقائياً على وصف بالجملة</div></div>
+    <div class="cb">
+      <div id="tmpl-list" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+      <div id="tmpl-selected" style="display:none;margin-top:14px">
+        <div class="al ag" id="tmpl-msg"></div>
+        <button class="btn bp" onclick="go('desc')">← انتقل لوصف بالجملة</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div></div><!-- content, main -->
 
 <script>
 const B = window.location.origin;
 let prods = [], sel = {desc:{},improve:{},seo:{},tags:{}}, res = {desc:[],improve:[],seo:[],tags:[]};
 
-const titles = {desc:'وصف بالجملة',improve:'تحسين الوصف',seo:'SEO بالجملة',tags:'وسوم بالجملة',score:'تقييم SEO',social:'محتوى سوشال',blog:'مقالات AI',imggen:'توليد الصور',imgedit:'تحرير الصور',trans:'الترجمة'};
+const titles = {desc:'وصف بالجملة',improve:'تحسين الوصف',seo:'SEO بالجملة',tags:'وسوم بالجملة',score:'تقييم SEO',social:'محتوى سوشال',blog:'مقالات AI',imggen:'توليد الصور',imgedit:'تحرير الصور',trans:'الترجمة',title:'تحسين العنوان',alttext:'Alt Text للصور',seopages:'صفحات SEO',templates:'القوالب الجاهزة'};
 
 // ===== INIT =====
 async function init() {
@@ -567,6 +632,7 @@ async function loadProds() {
     document.getElementById('sn').textContent = `${prods.length} منتج`;
     document.getElementById('pm').textContent = `${prods.length} منتج`;
     ['desc','improve','seo','tags'].forEach(renderPL);
+    renderAltPL && renderAltPL();
     renderSelects();
   } catch(e) { document.getElementById('sn').textContent = 'خطأ'; }
 }
@@ -975,7 +1041,140 @@ async function runTrans() {
   document.getElementById('trp').classList.remove('on');
 }
 
-document.addEventListener('DOMContentLoaded', init);
+// ===== TITLE OPTIMIZER =====
+function fillTitle() {
+  const idx = document.getElementById('tt-prod').value;
+  if (idx !== '') document.getElementById('tt-name').value = prods[idx]?.name || '';
+}
+
+async function runTitle() {
+  const idx = document.getElementById('tt-prod').value;
+  const name = idx !== '' ? prods[idx]?.name : document.getElementById('tt-name').value;
+  const cat = document.getElementById('tt-cat').value;
+  if (!name) return alert('أدخل العنوان أو اختر منتجاً');
+  const btn = document.getElementById('ttbtn');
+  btn.disabled = true;
+  document.getElementById('ttp').classList.add('on');
+  document.getElementById('ttr').style.display = 'none';
+  try {
+    const d = await api('/api/optimize-title', { name, category: cat, description: idx !== '' ? prods[idx]?.description : '' });
+    document.getElementById('ttp').classList.remove('on');
+    document.getElementById('ttr').style.display = 'block';
+    document.getElementById('ttr').innerHTML = `
+      <div class="rc" style="margin-bottom:8px">
+        <div style="font-size:10px;color:var(--t3);margin-bottom:8px">العنوان الحالي</div>
+        <div style="font-size:13px;color:var(--rd)">${d.original}</div>
+      </div>
+      ${[d.title1, d.title2, d.title3].map((t,i) => t ? `
+        <div class="rc" style="cursor:pointer;margin-bottom:6px" onclick="copyTitle('${encodeURIComponent(t)}',this)">
+          <div style="font-size:10px;color:var(--t3);margin-bottom:4px">اقتراح ${i+1}</div>
+          <div style="font-size:13px;font-weight:600;color:var(--gr)">${t}</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:4px">${t.length} حرف • انقر للنسخ</div>
+        </div>` : '').join('')}`;
+  } catch(e) { document.getElementById('ttp').classList.remove('on'); alert('خطأ'); }
+  btn.disabled = false;
+}
+
+function copyTitle(encoded, el) {
+  navigator.clipboard.writeText(decodeURIComponent(encoded));
+  el.style.borderColor = 'var(--gr)';
+  setTimeout(() => el.style.borderColor = '', 1500);
+}
+
+// ===== ALT TEXT =====
+sel.alt = {};
+function renderAltPL() {
+  const el = document.getElementById('altpl');
+  if (!el) return;
+  el.innerHTML = prods.map((p,i) => `
+    <div class="pr" id="alt-p-${i}" onclick="togP('alt',${i})">
+      <input type="checkbox" class="pr-cb alt-cb" data-i="${i}" onclick="event.stopPropagation();togP('alt',${i})">
+      <div class="pr-n">${p.name}</div>
+      <div class="pr-p">${gp(p)} ر.س</div>
+    </div>`).join('');
+}
+
+async function runAlt() {
+  const ps = Object.entries(sel.alt).filter(([,v])=>v).map(([i])=>prods[parseInt(i)]).filter(Boolean);
+  if (!ps.length) return alert('اختر منتجاً على الأقل');
+  const btn = document.getElementById('altbtn');
+  btn.disabled = true;
+  document.getElementById('altp').classList.add('on');
+  const results = [];
+  for (let i = 0; i < ps.length; i++) {
+    document.getElementById('altpt').textContent = `${i+1}/${ps.length}: ${ps[i].name}`;
+    try {
+      const d = await api('/api/generate-alt', { productName: ps[i].name, count: 1 });
+      results.push({ product: ps[i], altText: d.altTexts?.[0] || '' });
+    } catch(e) { results.push({ product: ps[i], altText: '' }); }
+    await new Promise(r=>setTimeout(r,500));
+  }
+  document.getElementById('altp').classList.remove('on');
+  document.getElementById('altr').style.display = 'block';
+  document.getElementById('altrl').innerHTML = results.map(r => `
+    <div class="rc">
+      <div class="rn">${r.product.name} <span class="rbadge">جاهز</span></div>
+      <div style="font-size:12px;color:var(--t2);background:var(--s3);border-radius:6px;padding:8px;margin-top:6px">${r.altText}</div>
+      <button class="soc-copy" onclick="copy(this,'${encodeURIComponent(r.altText)}')">نسخ</button>
+    </div>`).join('');
+  btn.disabled = false;
+}
+
+// ===== SEO PAGES =====
+async function runSEOPages() {
+  const store = document.getElementById('sp-store').value || 'المتجر';
+  const btn = document.getElementById('spbtn');
+  btn.disabled = true;
+  document.getElementById('spp').classList.add('on');
+  try {
+    const d = await api('/api/seo-pages', { products: prods, storeName: store });
+    document.getElementById('spp').classList.remove('on');
+    document.getElementById('spr').style.display = 'block';
+    document.getElementById('sprl').innerHTML = (d.pages || []).map(p => `
+      <div class="rc">
+        <div class="rn">${p.title} <span class="rbadge">مقترح</span></div>
+        <div style="font-size:11px;color:var(--gr);margin-bottom:4px">/${p.url || ''}</div>
+        <div style="font-size:11px;color:var(--t2)">${p.description || ''}</div>
+      </div>`).join('');
+  } catch(e) { document.getElementById('spp').classList.remove('on'); alert('خطأ'); }
+  btn.disabled = false;
+}
+
+// ===== TEMPLATES =====
+async function loadTemplates() {
+  try {
+    const r = await fetch(`${B}/api/templates`);
+    const d = await r.json();
+    document.getElementById('tmpl-list').innerHTML = (d.templates || []).map(t => `
+      <div class="rc" style="cursor:pointer" onclick="applyTemplate('${t.id}','${encodeURIComponent(t.instructions)}','${t.tone}','${t.name}')">
+        <div style="font-size:14px;margin-bottom:4px">${t.name}</div>
+        <div style="font-size:10px;color:var(--t3)">انقر للتطبيق</div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+function applyTemplate(id, instrEncoded, tone, name) {
+  const instructions = decodeURIComponent(instrEncoded);
+  // Apply to desc page
+  const instEl = document.getElementById('d-inst');
+  const toneEl = document.getElementById('d-tone');
+  if (instEl) instEl.value = instructions;
+  if (toneEl) toneEl.value = tone;
+  document.getElementById('tmpl-selected').style.display = 'block';
+  document.getElementById('tmpl-msg').textContent = `✅ تم تطبيق قالب: ${name}`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  init();
+  loadTemplates();
+  renderAltPL();
+  // Populate title select
+  setTimeout(() => {
+    const el = document.getElementById('tt-prod');
+    if (el) el.innerHTML = '<option value="">-- اختر منتجاً --</option>' + prods.map((p,i) => `<option value="${i}">${p.name}</option>`).join('');
+  }, 2000);
+});
+
 </script>
 </body>
 </html>
