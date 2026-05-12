@@ -401,9 +401,10 @@ textarea{resize:vertical;min-height:75px}
     <div class="prog on" id="all-prog"><span class="spin"></span><div class="prog-t" id="all-prog-t">جاري التوليد...</div></div>
     <div id="all-results" style="display:none">
       <div id="all-results-list"></div>
-      <div class="brow">
+      <div class="btn-row">
         <button class="btn bg" onclick="uploadAll()" id="all-up-btn">🚀 رفع الكل للمتجر</button>
         <button class="btn bs" onclick="gs('all',2)">← تعديل الخيارات</button>
+        <button class="btn bs" onclick="gs('all',3);runAll()">🔄 إعادة التوليد</button>
       </div>
       <div id="all-up-status" style="margin-top:10px"></div>
     </div>
@@ -518,10 +519,12 @@ function renderPL(type) {
 function togP(type, idx) {
   const cb = document.querySelector(`.${type}-cb[data-i="${idx}"]`);
   const el = document.getElementById(`${type}-p-${idx}`);
-  if (!cb) return;
-  cb.checked = !cb.checked;
-  el.classList.toggle('sl', cb.checked);
-  sel[type][idx] = cb.checked;
+  if (!cb || !el) return;
+  // Only toggle if click is on the item div, not the checkbox itself
+  const newState = !sel[type][idx];
+  cb.checked = newState;
+  el.classList.toggle('sl', newState);
+  sel[type][idx] = newState;
   updC(type);
 }
 
@@ -903,8 +906,12 @@ async function runAll() {
   const tone = document.getElementById('all-tone').value;
   const inst = document.getElementById('all-inst').value;
 
+  // Reset UI for re-run
   document.getElementById('all-prog').classList.add('on');
   document.getElementById('all-results').style.display = 'none';
+  const upBtn = document.getElementById('all-up-btn');
+  if (upBtn) { upBtn.disabled = false; upBtn.textContent = '🚀 رفع الكل للمتجر'; upBtn.className = 'btn bg'; }
+  document.getElementById('all-up-status').innerHTML = '';
   allResults = [];
 
   for (let i = 0; i < ps.length; i++) {
