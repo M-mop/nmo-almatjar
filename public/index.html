@@ -3,159 +3,187 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مصمم المنتجات بالذكاء الاصطناعي</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<title>ذكاء المتجر — أدوات AI لسلة</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+:root {
+  --bg: #08090d;
+  --surface: #0e1018;
+  --surface2: #141620;
+  --surface3: #1a1d2a;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.1);
+  --accent: #4f8ef7;
+  --accent2: #7c6df8;
+  --green: #22d3a0;
+  --text: #f0f2ff;
+  --text2: #8b90a8;
+  --text3: #4a4f66;
+  --radius: 12px;
+  --sidebar: 240px;
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Cairo',sans-serif;background:#0f0f14;color:#f0f0ff;min-height:100vh;display:flex}
+body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;font-size:14px;line-height:1.5}
 
 /* SIDEBAR */
-.sidebar{width:260px;background:#111118;border-left:1px solid rgba(99,102,241,0.15);display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:100}
-.sidebar-logo{padding:20px;border-bottom:1px solid rgba(99,102,241,0.1);font-size:18px;font-weight:900;background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.sidebar-store{padding:12px 20px;font-size:12px;color:#606080;border-bottom:1px solid rgba(99,102,241,0.1)}
-.sidebar-store span{color:#a5b4fc;font-weight:600}
-.sidebar-section{padding:12px 20px 4px;font-size:11px;font-weight:700;color:#606080;letter-spacing:1px;text-transform:uppercase}
-.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:14px;color:#a0a0c0;cursor:pointer;transition:all 0.2s;border-right:3px solid transparent}
-.sidebar-item:hover{background:rgba(99,102,241,0.08);color:#e0e0ff}
-.sidebar-item.active{background:rgba(99,102,241,0.12);color:#a5b4fc;border-right-color:#6366f1}
-.sidebar-item .icon{font-size:16px;width:20px;text-align:center}
+.sb{width:var(--sidebar);background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:50}
+.sb-logo{padding:18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.sb-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sb-logo-text{font-size:15px;font-weight:700;color:var(--text)}
+.sb-store{padding:10px 16px;font-size:12px;color:var(--text3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.sb-store-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.sb-section{padding:16px 16px 6px;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:8px;padding:9px 16px;font-size:13px;color:var(--text2);cursor:pointer;transition:all 0.15s;border-radius:8px;margin:1px 8px}
+.sb-item:hover{background:var(--surface2);color:var(--text)}
+.sb-item.on{background:rgba(79,142,247,0.1);color:var(--accent)}
+.sb-item .ico{width:18px;text-align:center;font-size:14px;flex-shrink:0}
+.sb-bottom{margin-top:auto;padding:12px;border-top:1px solid var(--border)}
+.sb-connect{display:block;text-align:center;padding:8px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text2);text-decoration:none;font-size:12px;transition:all 0.15s}
+.sb-connect:hover{border-color:var(--accent);color:var(--accent)}
 
 /* MAIN */
-.main{margin-right:260px;flex:1;padding:0}
+.main{margin-right:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh}
 
-/* TOP BAR */
-.topbar{background:#111118;border-bottom:1px solid rgba(99,102,241,0.15);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-.topbar-title{font-size:18px;font-weight:700}
-.topbar-actions{display:flex;gap:10px}
-.btn-link{background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Cairo',sans-serif;text-decoration:none;transition:all 0.2s}
-.btn-link:hover{background:rgba(99,102,241,0.2)}
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.topbar-title{font-size:15px;font-weight:600}
+.topbar-meta{font-size:12px;color:var(--text3)}
 
 /* CONTENT */
-.content{padding:32px;max-width:900px}
+.content{padding:24px;max-width:820px;flex:1}
+
+/* PAGE */
+.page{display:none;animation:fadeIn 0.2s ease}
+.page.on{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 /* WIZARD */
-.wizard-steps{display:flex;gap:0;margin-bottom:32px;background:#1a1a24;border-radius:12px;overflow:hidden;border:1px solid rgba(99,102,241,0.15)}
-.wizard-step{flex:1;padding:14px 16px;text-align:center;font-size:13px;font-weight:600;color:#606080;cursor:pointer;transition:all 0.2s;position:relative}
-.wizard-step.active{background:rgba(99,102,241,0.15);color:#a5b4fc}
-.wizard-step.done{color:#34d399}
-.wizard-step .step-num{display:block;font-size:11px;margin-bottom:2px;opacity:0.6}
+.steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
+.step{display:flex;align-items:center;gap:8px;padding:0 16px 0 0;position:relative}
+.step:not(:last-child)::after{content:'';width:24px;height:1px;background:var(--border2);margin-left:8px}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--surface3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text3);flex-shrink:0;transition:all 0.2s}
+.step-label{font-size:12px;color:var(--text3);white-space:nowrap;transition:color 0.2s}
+.step.on .step-num{background:var(--accent);border-color:var(--accent);color:white}
+.step.on .step-label{color:var(--text)}
+.step.done .step-num{background:var(--green);border-color:var(--green);color:white}
+.step.done .step-label{color:var(--green)}
 
 /* CARDS */
-.card{background:#1a1a24;border:1px solid rgba(99,102,241,0.15);border-radius:16px;padding:24px;margin-bottom:16px}
-.card-title{font-size:16px;font-weight:700;margin-bottom:4px}
-.card-desc{font-size:13px;color:#a0a0c0;margin-bottom:20px;line-height:1.6}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
+.card-head{padding:16px 18px;border-bottom:1px solid var(--border)}
+.card-title{font-size:14px;font-weight:600;margin-bottom:2px}
+.card-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.card-body{padding:18px}
+.card-tip{background:rgba(79,142,247,0.06);border-bottom:1px solid rgba(79,142,247,0.12);padding:12px 18px;font-size:12px;color:#7aacff;line-height:1.6}
 
 /* FORM */
-label{display:block;font-size:12px;font-weight:700;color:#a0a0c0;margin-bottom:6px;letter-spacing:0.5px}
-input,textarea,select{width:100%;background:#111118;border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:11px 14px;color:#f0f0ff;font-family:'Cairo',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s}
-input:focus,textarea:focus,select:focus{border-color:rgba(99,102,241,0.5)}
-textarea{resize:vertical;min-height:90px}
-.form-group{margin-bottom:16px}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.label{font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px;display:block;letter-spacing:0.5px;text-transform:uppercase}
+input,textarea,select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;outline:none;transition:border-color 0.15s}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px}
+.fg{margin-bottom:14px}
 
 /* TOGGLE */
-.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(99,102,241,0.08)}
+.toggle-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
 .toggle-row:last-child{border-bottom:none}
-.toggle-label{font-size:13px;color:#a0a0c0}
-.toggle{position:relative;width:40px;height:22px;flex-shrink:0}
-.toggle input{opacity:0;width:0;height:0}
-.toggle-slider{position:absolute;inset:0;background:#2a2a3a;border-radius:22px;cursor:pointer;transition:0.2s}
-.toggle-slider:before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.2s}
-.toggle input:checked+.toggle-slider{background:#6366f1}
-.toggle input:checked+.toggle-slider:before{transform:translateX(18px)}
+.toggle-info .tl{font-size:13px;color:var(--text2)}
+.toggle-info .th{font-size:11px;color:var(--text3);margin-top:2px}
+.tog{position:relative;width:36px;height:20px;flex-shrink:0;margin-top:2px}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-s{position:absolute;inset:0;background:var(--surface3);border-radius:20px;cursor:pointer;transition:0.15s;border:1px solid var(--border2)}
+.tog-s:before{content:'';position:absolute;height:14px;width:14px;left:2px;bottom:2px;background:var(--text3);border-radius:50%;transition:0.15s}
+.tog input:checked+.tog-s{background:var(--accent);border-color:var(--accent)}
+.tog input:checked+.tog-s:before{transform:translateX(16px);background:white}
 
-/* BUTTONS */
-.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;border-radius:10px;padding:13px 24px;font-size:15px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;transition:all 0.2s;box-shadow:0 0 20px rgba(99,102,241,0.25)}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 0 30px rgba(99,102,241,0.4)}
-.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none}
-.btn-secondary{background:#1a1a24;color:#a0a0c0;border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:13px 24px;font-size:15px;font-weight:600;font-family:'Cairo',sans-serif;cursor:pointer;transition:all 0.2s}
-.btn-secondary:hover{border-color:rgba(99,102,241,0.4);color:#e0e0ff}
-.btn-success{background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;border-radius:10px;padding:13px 24px;font-size:15px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;transition:all 0.2s}
-.btn-actions{display:flex;gap:10px;margin-top:20px}
+/* SECTION HEADER */
+.sec-head{font-size:11px;font-weight:700;color:var(--text3);padding:10px 0 6px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border)}
 
 /* PRODUCT LIST */
-.product-item{background:#111118;border:1px solid rgba(99,102,241,0.12);border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:border-color 0.2s;cursor:pointer}
-.product-item:hover{border-color:rgba(99,102,241,0.3)}
-.product-item.selected{border-color:#6366f1;background:rgba(99,102,241,0.05)}
-.product-img{width:44px;height:44px;border-radius:8px;background:#2a2a3a;object-fit:cover;flex-shrink:0}
-.product-info{flex:1}
-.product-name{font-size:14px;font-weight:600;margin-bottom:2px}
-.product-meta{font-size:12px;color:#606080}
-.product-check{width:18px;height:18px;accent-color:#6366f1;cursor:pointer}
+.plist{max-height:380px;overflow-y:auto}
+.plist::-webkit-scrollbar{width:4px}
+.plist::-webkit-scrollbar-track{background:transparent}
+.plist::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:4px}
+.prod{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background 0.12s;border:1px solid transparent;margin-bottom:4px}
+.prod:hover{background:var(--surface2)}
+.prod.sel{background:rgba(79,142,247,0.07);border-color:rgba(79,142,247,0.2)}
+.prod-cb{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.prod-name{font-size:13px;font-weight:500;flex:1}
+.prod-price{font-size:12px;color:var(--text3)}
 
-/* PREVIEW */
-.preview-box{background:#111118;border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:20px;margin-top:16px}
-.preview-label{font-size:11px;font-weight:700;color:#606080;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
-.preview-content{font-size:14px;color:#e0e0ff;line-height:1.8;white-space:pre-wrap}
-.preview-seo{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:14px;margin-top:12px}
-.preview-seo-title{font-size:16px;color:#60a5fa;font-weight:600;margin-bottom:4px}
-.preview-seo-url{font-size:12px;color:#34d399;margin-bottom:6px}
-.preview-seo-desc{font-size:13px;color:#a0a0c0;line-height:1.5}
+/* RESULT CARD */
+.res-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+.res-name{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.res-badge{font-size:10px;padding:2px 8px;border-radius:100px;background:rgba(34,211,160,0.12);color:var(--green);font-weight:700}
+.res-seo{background:rgba(79,142,247,0.06);border:1px solid rgba(79,142,247,0.12);border-radius:8px;padding:12px;margin-bottom:8px}
+.res-seo-title{font-size:14px;color:#60a5fa;font-weight:600;margin-bottom:3px}
+.res-seo-url{font-size:11px;color:var(--green);margin-bottom:5px}
+.res-seo-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.res-desc{font-size:12px;color:var(--text2);line-height:1.7;max-height:100px;overflow:hidden;margin-top:8px;white-space:pre-wrap}
+.res-tags{margin-top:8px;display:flex;flex-wrap:wrap;gap:5px}
+.tag-pill{background:var(--surface3);border:1px solid var(--border2);border-radius:100px;padding:3px 10px;font-size:11px;color:var(--text2)}
 
-/* LOADING */
-.loading-bar{display:none;background:#1a1a24;border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:20px;margin-top:16px;text-align:center}
-.loading-bar.visible{display:block}
-.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(99,102,241,0.3);border-top-color:#6366f1;border-radius:50%;animation:spin 0.8s linear infinite;margin-left:8px;vertical-align:middle}
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;font-family:'IBM Plex Sans Arabic',sans-serif;cursor:pointer;transition:all 0.15s;border:none;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--accent);color:white}
+.btn-p:hover{background:#6ba0ff;transform:translateY(-1px)}
+.btn-p:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.btn-s{background:var(--surface2);color:var(--text2);border:1px solid var(--border2)}
+.btn-s:hover{border-color:var(--border2);color:var(--text)}
+.btn-g{background:var(--green);color:#0a1a14}
+.btn-g:hover{background:#30e8b3}
+.btn-g:disabled{opacity:0.4;cursor:not-allowed}
+.btn-row{display:flex;gap:8px;margin-top:16px;align-items:center}
+
+/* PROGRESS */
+.prog{display:none;background:rgba(79,142,247,0.06);border:1px solid rgba(79,142,247,0.15);border-radius:10px;padding:14px;margin-top:12px;text-align:center}
+.prog.on{display:block}
+.prog-text{font-size:13px;color:#7aacff;margin-top:8px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(79,142,247,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
-.progress-text{font-size:14px;color:#a5b4fc;margin-top:8px}
 
-/* STATS */
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
-.stat-card{background:#1a1a24;border:1px solid rgba(99,102,241,0.15);border-radius:12px;padding:16px;text-align:center}
-.stat-num{font-size:28px;font-weight:900;background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.stat-label{font-size:11px;color:#606080;margin-top:4px}
+/* ALERTS */
+.alert{padding:10px 14px;border-radius:8px;font-size:12px;margin-bottom:12px;line-height:1.5}
+.a-info{background:rgba(79,142,247,0.06);border:1px solid rgba(79,142,247,0.15);color:#7aacff}
+.a-warn{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.15);color:#fbbf24}
+.a-ok{background:rgba(34,211,160,0.06);border:1px solid rgba(34,211,160,0.15);color:var(--green)}
 
-/* BADGE */
-.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px}
-.badge-new{background:rgba(16,185,129,0.15);color:#34d399}
-.badge-pro{background:rgba(99,102,241,0.15);color:#a5b4fc}
+/* SELECT BAR */
+.sel-bar{display:flex;align-items:center;gap:10px;padding:8px 0;margin-bottom:8px}
+.sel-count{font-size:12px;color:var(--text3)}
 
-/* ALERT */
-.alert{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:16px;line-height:1.5}
-.alert-info{background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);color:#67e8f9}
-.alert-success{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);color:#34d399}
-.alert-warning{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:#fbbf24}
-
-/* SELECT ALL BAR */
-.select-bar{display:flex;align-items:center;gap:12px;padding:10px 0;margin-bottom:8px}
-.select-count{font-size:13px;color:#a0a0c0}
-
-/* PAGE SECTIONS */
-.page{display:none}
-.page.active{display:block}
+/* STAT CARDS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center}
+.stat-n{font-size:24px;font-weight:700;color:var(--accent)}
+.stat-l{font-size:11px;color:var(--text3);margin-top:3px}
 </style>
 </head>
 <body>
 
 <!-- SIDEBAR -->
-<div class="sidebar">
-  <div class="sidebar-logo">✦ مصمم المنتجات AI</div>
-  <div class="sidebar-store">المتجر: <span id="store-name">جاري التحميل...</span></div>
-  
-  <div class="sidebar-section">العمليات بالجملة</div>
-  <div class="sidebar-item active" onclick="showPage('desc-bulk')" id="nav-desc-bulk">
-    <span class="icon">✍️</span> وصف بالجملة
+<div class="sb">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">✦</div>
+    <div class="sb-logo-text">ذكاء المتجر</div>
   </div>
-  <div class="sidebar-item" onclick="showPage('improve-bulk')" id="nav-improve-bulk">
-    <span class="icon">✨</span> تحسين الوصف
-  </div>
-  <div class="sidebar-item" onclick="showPage('seo-bulk')" id="nav-seo-bulk">
-    <span class="icon">🔍</span> SEO بالجملة
+  <div class="sb-store">
+    <div class="sb-store-dot"></div>
+    <span id="store-name" style="color:var(--text2);font-size:12px">جاري التحميل...</span>
   </div>
 
-  <div class="sidebar-section">أدوات منفردة</div>
-  <div class="sidebar-item" onclick="showPage('image-gen')" id="nav-image-gen">
-    <span class="icon">🖼️</span> توليد الصور
-  </div>
-  <div class="sidebar-item" onclick="showPage('image-edit')" id="nav-image-edit">
-    <span class="icon">🎨</span> تحرير الصور
-  </div>
-  <div class="sidebar-item" onclick="showPage('translate')" id="nav-translate">
-    <span class="icon">🌐</span> الترجمة
-  </div>
+  <div class="sb-section">العمليات بالجملة</div>
+  <div class="sb-item on" onclick="go('desc')" id="nav-desc"><span class="ico">✍️</span> وصف بالجملة</div>
+  <div class="sb-item" onclick="go('improve')" id="nav-improve"><span class="ico">✨</span> تحسين الوصف</div>
+  <div class="sb-item" onclick="go('seo')" id="nav-seo"><span class="ico">🔍</span> SEO بالجملة</div>
+  <div class="sb-item" onclick="go('tags')" id="nav-tags"><span class="ico">🏷️</span> وسوم بالجملة</div>
 
-  <div style="margin-top:auto;padding:16px 20px;border-top:1px solid rgba(99,102,241,0.1)">
-    <a href="/auth/salla" class="btn-link" style="display:block;text-align:center;font-size:12px">🔗 إعادة ربط المتجر</a>
+  <div class="sb-section">أدوات منفردة</div>
+  <div class="sb-item" onclick="go('imggen')" id="nav-imggen"><span class="ico">🖼️</span> توليد الصور</div>
+  <div class="sb-item" onclick="go('imgedit')" id="nav-imgedit"><span class="ico">🎨</span> تحرير الصور</div>
+  <div class="sb-item" onclick="go('trans')" id="nav-trans"><span class="ico">🌐</span> الترجمة</div>
+
+  <div class="sb-bottom">
+    <a href="/auth/salla" class="sb-connect">🔗 إعادة ربط المتجر</a>
   </div>
 </div>
 
@@ -163,714 +191,634 @@ textarea{resize:vertical;min-height:90px}
 <div class="main">
 <div class="topbar">
   <div class="topbar-title" id="page-title">وصف بالجملة</div>
-  <div class="topbar-actions">
-    <span style="font-size:12px;color:#606080" id="products-count-bar">0 منتج</span>
-  </div>
+  <div class="topbar-meta" id="topbar-meta">0 منتج</div>
 </div>
 
 <div class="content">
 
-<!-- ===== PAGE: وصف بالجملة ===== -->
-<div class="page active" id="page-desc-bulk">
-  <!-- Wizard Steps -->
-  <div class="wizard-steps">
-    <div class="wizard-step active" id="step-desc-1" onclick="goStep('desc',1)">
-      <span class="step-num">الخطوة ١</span>الإعدادات
-    </div>
-    <div class="wizard-step" id="step-desc-2" onclick="goStep('desc',2)">
-      <span class="step-num">الخطوة ٢</span>اختر المنتجات
-    </div>
-    <div class="wizard-step" id="step-desc-3" onclick="goStep('desc',3)">
-      <span class="step-num">الخطوة ٣</span>المعاينة والرفع
-    </div>
+<!-- ===== وصف بالجملة ===== -->
+<div class="page on" id="page-desc">
+  <div class="steps">
+    <div class="step on" id="s-desc-1"><div class="step-num">١</div><div class="step-label">الإعدادات</div></div>
+    <div class="step" id="s-desc-2"><div class="step-num">٢</div><div class="step-label">المنتجات</div></div>
+    <div class="step" id="s-desc-3"><div class="step-num">٣</div><div class="step-label">المعاينة والرفع</div></div>
   </div>
 
-  <!-- Step 1: Settings -->
-  <div id="desc-step-1">
+  <div id="desc-s1">
     <div class="card">
-      <div class="card-title">إعدادات الكتابة</div>
-      <div class="card-desc">خصّص كيف يكتب الذكاء الاصطناعي وصف منتجاتك</div>
-      
-      <div class="form-group">
-        <label>تعليمات إضافية (اختياري)</label>
-        <textarea id="desc-instructions" placeholder="مثال: اجعل الوصف موجهاً للشباب، استخدم لغة بسيطة، ركز على الجودة..."></textarea>
-      </div>
+      <div class="card-tip">يتم كتابة الوصف بالذكاء الاصطناعي من اسم المنتج والوصف الحالي. يمكنك إضافة تعليمات إضافية (اختياري).</div>
+      <div class="card-body">
+        <div class="fg"><label class="label">تعليمات أو تفاصيل إضافية (اختياري)</label>
+        <textarea id="desc-inst" placeholder="مثال: اجعل الوصف للنساء، استخدم لغة شبابية، ركز على الجودة..."></textarea></div>
+        <div class="fg"><label class="label">الفئة المستهدفة</label>
+        <input type="text" id="desc-aud" value="العملاء السعوديين"></div>
 
-      <div class="form-group">
-        <label>الفئة المستهدفة</label>
-        <input type="text" id="desc-audience" value="العملاء السعوديين" />
-      </div>
-
-      <div style="margin-top:8px">
+        <div class="sec-head" style="margin-bottom:10px">خيارات الوصف الحالي</div>
         <div class="toggle-row">
-          <span class="toggle-label">لا تستخدم ايموجي في الوصف</span>
-          <label class="toggle"><input type="checkbox" id="no-emoji"><span class="toggle-slider"></span></label>
+          <div class="toggle-info"><div class="tl">تضمين الوصف الحالي</div><div class="th">يبني على الوصف الموجود في المتجر</div></div>
+          <label class="tog"><input type="checkbox" id="d-include" checked><span class="tog-s"></span></label>
         </div>
         <div class="toggle-row">
-          <span class="toggle-label">تضمين الوصف الحالي في التحسين</span>
-          <label class="toggle"><input type="checkbox" id="include-current" checked><span class="toggle-slider"></span></label>
+          <div class="toggle-info"><div class="tl">تجديد الوصف كلياً</div><div class="th">يكتب وصفاً جديداً بدون الاعتماد على القديم</div></div>
+          <label class="tog"><input type="checkbox" id="d-renew"><span class="tog-s"></span></label>
         </div>
         <div class="toggle-row">
-          <span class="toggle-label">تحديث SEO تلقائياً مع الوصف</span>
-          <label class="toggle"><input type="checkbox" id="update-seo" checked><span class="toggle-slider"></span></label>
+          <div class="toggle-info"><div class="tl">تحسين الوصف الحالي</div><div class="th">يطوّر الوصف الموجود مع الحفاظ على روحه</div></div>
+          <label class="tog"><input type="checkbox" id="d-improve"><span class="tog-s"></span></label>
+        </div>
+
+        <div class="sec-head" style="margin:12px 0 10px">خيارات إضافية</div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="tl">لا تستخدم الإيموجي</div><div class="th">يمنع ظهور ✨💡🎁 في الوصف</div></div>
+          <label class="tog"><input type="checkbox" id="d-noemoji"><span class="tog-s"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="tl">تحديث SEO تلقائياً</div><div class="th">يولّد عنوان ووصف محركات البحث مع الوصف</div></div>
+          <label class="tog"><input type="checkbox" id="d-seo" checked><span class="tog-s"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="tl">توليد وسوم (Tags) تلقائياً</div><div class="th">يولّد وسوماً قريبة من اسم المنتج ويرفعها</div></div>
+          <label class="tog"><input type="checkbox" id="d-tags" checked><span class="tog-s"></span></label>
         </div>
       </div>
     </div>
-    <div class="btn-actions">
-      <button class="btn-primary" onclick="goStep('desc',2)">التالي: اختر المنتجات ←</button>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="goStep('desc',2)">التالي ←</button>
     </div>
   </div>
 
-  <!-- Step 2: Select Products -->
-  <div id="desc-step-2" style="display:none">
+  <div id="desc-s2" style="display:none">
     <div class="card">
-      <div class="card-title">اختر المنتجات</div>
-      <div class="card-desc">اختر المنتجات التي تريد كتابة وصف لها</div>
-      <div class="select-bar">
-        <input type="checkbox" id="desc-select-all" onchange="toggleAll('desc',this.checked)" style="width:18px;height:18px;accent-color:#6366f1">
-        <span class="select-count" id="desc-selected-count">0 منتج محدد</span>
-      </div>
-      <div id="desc-products-list">
-        <div style="text-align:center;padding:30px;color:#606080">جاري تحميل المنتجات...</div>
-      </div>
-    </div>
-    <div class="btn-actions">
-      <button class="btn-secondary" onclick="goStep('desc',1)">← رجوع</button>
-      <button class="btn-primary" onclick="goStep('desc',3)">التالي: معاينة ←</button>
-    </div>
-  </div>
-
-  <!-- Step 3: Preview & Upload -->
-  <div id="desc-step-3" style="display:none">
-    <div class="card">
-      <div class="card-title">معاينة ورفع</div>
-      <div class="card-desc">راجع النتائج قبل الرفع للمتجر</div>
-      <div class="alert alert-info">سيتم توليد الوصف لكل منتج وعرضه للمراجعة قبل الرفع</div>
-      
-      <div id="desc-preview-area">
-        <button class="btn-primary" onclick="generateAllDescriptions()" id="gen-desc-btn">
-          ✨ توليد الأوصاف الآن
-        </button>
-      </div>
-      
-      <div class="loading-bar" id="desc-loading">
-        <span class="spinner"></span>
-        <div class="progress-text" id="desc-progress-text">جاري التوليد...</div>
-      </div>
-      
-      <div id="desc-results-area" style="display:none;margin-top:20px">
-        <div id="desc-results-list"></div>
-        <div class="btn-actions">
-          <button class="btn-success" onclick="uploadAllDesc()" id="upload-desc-btn">
-            🚀 رفع الكل للمتجر
-          </button>
-          <button class="btn-secondary" onclick="goStep('desc',2)">← تعديل الاختيار</button>
+      <div class="card-head"><div class="card-title">اختر المنتجات</div><div class="card-desc">اختر المنتجات التي تريد كتابة وصف لها</div></div>
+      <div class="card-body">
+        <div class="sel-bar">
+          <input type="checkbox" class="prod-cb" id="desc-all" onchange="selAll('desc',this.checked)">
+          <span class="sel-count" id="desc-cnt">0 منتج محدد</span>
         </div>
+        <div class="plist" id="desc-plist"><div style="text-align:center;padding:30px;color:var(--text3)">جاري التحميل...</div></div>
       </div>
     </div>
-    <div class="btn-actions" id="desc-step3-back">
-      <button class="btn-secondary" onclick="goStep('desc',2)">← رجوع</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== PAGE: تحسين الوصف ===== -->
-<div class="page" id="page-improve-bulk">
-  <div class="wizard-steps">
-    <div class="wizard-step active" id="step-improve-1">
-      <span class="step-num">الخطوة ١</span>الإعدادات
-    </div>
-    <div class="wizard-step" id="step-improve-2">
-      <span class="step-num">الخطوة ٢</span>اختر المنتجات
-    </div>
-    <div class="wizard-step" id="step-improve-3">
-      <span class="step-num">الخطوة ٣</span>المعاينة والرفع
+    <div class="btn-row">
+      <button class="btn btn-s" onclick="goStep('desc',1)">← رجوع</button>
+      <button class="btn btn-p" onclick="goStep('desc',3)">التالي ←</button>
     </div>
   </div>
 
-  <div id="improve-step-1">
+  <div id="desc-s3" style="display:none">
     <div class="card">
-      <div class="card-title">إعدادات تحسين الوصف</div>
-      <div class="card-desc">سيجلب الذكاء الاصطناعي وصف كل منتج من سلة ويحسّنه</div>
-      <div class="form-group">
-        <label>تعليمات التحسين (اختياري)</label>
-        <textarea id="improve-instructions" placeholder="مثال: اجعل الوصف أكثر إقناعاً، أضف نقاط البيع، ركز على الفوائد..."></textarea>
-      </div>
-      <div class="toggle-row">
-        <span class="toggle-label">الحفاظ على بنية الوصف الحالي</span>
-        <label class="toggle"><input type="checkbox" id="keep-structure" checked><span class="toggle-slider"></span></label>
-      </div>
-      <div class="toggle-row">
-        <span class="toggle-label">تحديث SEO تلقائياً</span>
-        <label class="toggle"><input type="checkbox" id="improve-update-seo" checked><span class="toggle-slider"></span></label>
-      </div>
-    </div>
-    <div class="btn-actions">
-      <button class="btn-primary" onclick="goStep('improve',2)">التالي ←</button>
-    </div>
-  </div>
-
-  <div id="improve-step-2" style="display:none">
-    <div class="card">
-      <div class="card-title">اختر المنتجات للتحسين</div>
-      <div class="card-desc">اختر المنتجات التي تريد تحسين وصفها الحالي</div>
-      <div class="select-bar">
-        <input type="checkbox" id="improve-select-all" onchange="toggleAll('improve',this.checked)" style="width:18px;height:18px;accent-color:#6366f1">
-        <span class="select-count" id="improve-selected-count">0 منتج محدد</span>
-      </div>
-      <div id="improve-products-list">
-        <div style="text-align:center;padding:30px;color:#606080">جاري تحميل المنتجات...</div>
-      </div>
-    </div>
-    <div class="btn-actions">
-      <button class="btn-secondary" onclick="goStep('improve',1)">← رجوع</button>
-      <button class="btn-primary" onclick="goStep('improve',3)">التالي ←</button>
-    </div>
-  </div>
-
-  <div id="improve-step-3" style="display:none">
-    <div class="card">
-      <div class="card-title">معاينة التحسينات</div>
-      <div class="card-desc">راجع الوصف المحسّن قبل الرفع</div>
-      <div id="improve-preview-area">
-        <button class="btn-primary" onclick="generateAllImprovements()" id="gen-improve-btn">
-          ✨ تحسين الأوصاف الآن
-        </button>
-      </div>
-      <div class="loading-bar" id="improve-loading">
-        <span class="spinner"></span>
-        <div class="progress-text" id="improve-progress-text">جاري التحسين...</div>
-      </div>
-      <div id="improve-results-area" style="display:none;margin-top:20px">
-        <div id="improve-results-list"></div>
-        <div class="btn-actions">
-          <button class="btn-success" onclick="uploadAllImprove()" id="upload-improve-btn">🚀 رفع الكل للمتجر</button>
-          <button class="btn-secondary" onclick="goStep('improve',2)">← رجوع</button>
+      <div class="card-head"><div class="card-title">معاينة ورفع</div><div class="card-desc">راجع النتائج قبل الرفع للمتجر</div></div>
+      <div class="card-body">
+        <div id="desc-gen-area">
+          <button class="btn btn-p" onclick="runDescBulk()" id="desc-gen-btn">✨ توليد الأوصاف</button>
+        </div>
+        <div class="prog" id="desc-prog"><span class="spin"></span><div class="prog-text" id="desc-prog-txt">جاري التوليد...</div></div>
+        <div id="desc-results" style="display:none;margin-top:16px">
+          <div id="desc-res-list"></div>
+          <div class="btn-row">
+            <button class="btn btn-g" onclick="uploadDesc()" id="desc-up-btn">🚀 رفع الكل للمتجر</button>
+            <button class="btn btn-s" onclick="goStep('desc',2)">← تعديل</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ===== PAGE: SEO بالجملة ===== -->
-<div class="page" id="page-seo-bulk">
-  <div class="wizard-steps">
-    <div class="wizard-step active" id="step-seo-1">
-      <span class="step-num">الخطوة ١</span>الإعدادات
-    </div>
-    <div class="wizard-step" id="step-seo-2">
-      <span class="step-num">الخطوة ٢</span>اختر المنتجات
-    </div>
-    <div class="wizard-step" id="step-seo-3">
-      <span class="step-num">الخطوة ٣</span>المعاينة والرفع
-    </div>
+<!-- ===== تحسين الوصف ===== -->
+<div class="page" id="page-improve">
+  <div class="steps">
+    <div class="step on" id="s-improve-1"><div class="step-num">١</div><div class="step-label">الإعدادات</div></div>
+    <div class="step" id="s-improve-2"><div class="step-num">٢</div><div class="step-label">المنتجات</div></div>
+    <div class="step" id="s-improve-3"><div class="step-num">٣</div><div class="step-label">المعاينة والرفع</div></div>
   </div>
-
-  <div id="seo-step-1">
+  <div id="improve-s1">
     <div class="card">
-      <div class="card-title">إعدادات SEO</div>
-      <div class="card-desc">سيولّد الذكاء الاصطناعي عنوان SEO + وصف SEO + كلمات مفتاحية لكل منتج</div>
-      <div class="form-group">
-        <label>كلمات مفتاحية عامة (اختياري)</label>
-        <input type="text" id="seo-keywords" placeholder="مثال: شراء اونلاين، توصيل سريع، السعودية..." />
-      </div>
-      <div class="toggle-row">
-        <span class="toggle-label">إضافة كلمات مفتاحية باللغتين</span>
-        <label class="toggle"><input type="checkbox" id="seo-bilingual"><span class="toggle-slider"></span></label>
+      <div class="card-tip">يجلب الذكاء الاصطناعي الوصف الحالي من سلة ويحسّنه. يمكنك إضافة تعليمات للتحسين.</div>
+      <div class="card-body">
+        <div class="fg"><label class="label">تعليمات التحسين (اختياري)</label>
+        <textarea id="imp-inst" placeholder="مثال: اجعله أكثر إقناعاً، أضف نقاط البيع، ركز على الفوائد..."></textarea></div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="tl">لا تكتب رابطاً جديداً</div><div class="th">يحافظ على رابط المنتج الحالي</div></div>
+          <label class="tog"><input type="checkbox" id="imp-nourl" checked><span class="tog-s"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="tl">إضافة الكلمات المفتاحية (بالعربية والإنجليزية)</div><div class="th">يضيف وسوماً ثنائية اللغة</div></div>
+          <label class="tog"><input type="checkbox" id="imp-bilang"><span class="tog-s"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="tl">إضافة الوسوم السابقة</div><div class="th">يضيف الوسوم القديمة للوسوم الجديدة</div></div>
+          <label class="tog"><input type="checkbox" id="imp-oldtags"><span class="tog-s"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="tl">تحديث SEO تلقائياً</div><div class="th">يحدّث عنوان ووصف محركات البحث</div></div>
+          <label class="tog"><input type="checkbox" id="imp-seo" checked><span class="tog-s"></span></label>
+        </div>
       </div>
     </div>
-    <div class="btn-actions">
-      <button class="btn-primary" onclick="goStep('seo',2)">التالي ←</button>
-    </div>
+    <div class="btn-row"><button class="btn btn-p" onclick="goStep('improve',2)">التالي ←</button></div>
   </div>
-
-  <div id="seo-step-2" style="display:none">
+  <div id="improve-s2" style="display:none">
     <div class="card">
-      <div class="card-title">اختر المنتجات</div>
-      <div class="select-bar">
-        <input type="checkbox" id="seo-select-all" onchange="toggleAll('seo',this.checked)" style="width:18px;height:18px;accent-color:#6366f1">
-        <span class="select-count" id="seo-selected-count">0 منتج محدد</span>
-      </div>
-      <div id="seo-products-list">
-        <div style="text-align:center;padding:30px;color:#606080">جاري تحميل المنتجات...</div>
+      <div class="card-head"><div class="card-title">اختر المنتجات</div></div>
+      <div class="card-body">
+        <div class="sel-bar"><input type="checkbox" class="prod-cb" id="improve-all" onchange="selAll('improve',this.checked)"><span class="sel-count" id="improve-cnt">0 منتج محدد</span></div>
+        <div class="plist" id="improve-plist"></div>
       </div>
     </div>
-    <div class="btn-actions">
-      <button class="btn-secondary" onclick="goStep('seo',1)">← رجوع</button>
-      <button class="btn-primary" onclick="goStep('seo',3)">التالي ←</button>
-    </div>
+    <div class="btn-row"><button class="btn btn-s" onclick="goStep('improve',1)">← رجوع</button><button class="btn btn-p" onclick="goStep('improve',3)">التالي ←</button></div>
   </div>
-
-  <div id="seo-step-3" style="display:none">
+  <div id="improve-s3" style="display:none">
     <div class="card">
-      <div class="card-title">معاينة نتائج SEO</div>
-      <div id="seo-preview-area">
-        <button class="btn-primary" onclick="generateAllSEO()" id="gen-seo-btn">🔍 توليد SEO الآن</button>
-      </div>
-      <div class="loading-bar" id="seo-loading">
-        <span class="spinner"></span>
-        <div class="progress-text" id="seo-progress-text">جاري توليد SEO...</div>
-      </div>
-      <div id="seo-results-area" style="display:none;margin-top:20px">
-        <div id="seo-results-list"></div>
-        <div class="btn-actions">
-          <button class="btn-success" onclick="uploadAllSEO()" id="upload-seo-btn">🚀 رفع SEO للمتجر</button>
-          <button class="btn-secondary" onclick="goStep('seo',2)">← رجوع</button>
+      <div class="card-head"><div class="card-title">معاينة التحسينات</div></div>
+      <div class="card-body">
+        <div id="improve-gen-area"><button class="btn btn-p" onclick="runImproveBulk()" id="improve-gen-btn">✨ تحسين الأوصاف</button></div>
+        <div class="prog" id="improve-prog"><span class="spin"></span><div class="prog-text" id="improve-prog-txt">جاري التحسين...</div></div>
+        <div id="improve-results" style="display:none;margin-top:16px">
+          <div id="improve-res-list"></div>
+          <div class="btn-row"><button class="btn btn-g" onclick="uploadImprove()" id="improve-up-btn">🚀 رفع الكل</button><button class="btn btn-s" onclick="goStep('improve',2)">← رجوع</button></div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ===== PAGE: توليد الصور ===== -->
-<div class="page" id="page-image-gen">
+<!-- ===== SEO بالجملة ===== -->
+<div class="page" id="page-seo">
+  <div class="steps">
+    <div class="step on" id="s-seo-1"><div class="step-num">١</div><div class="step-label">الإعدادات</div></div>
+    <div class="step" id="s-seo-2"><div class="step-num">٢</div><div class="step-label">المنتجات</div></div>
+    <div class="step" id="s-seo-3"><div class="step-num">٣</div><div class="step-label">المعاينة والرفع</div></div>
+  </div>
+  <div id="seo-s1">
+    <div class="card">
+      <div class="card-tip">يتم كتابة SEO بالذكاء الاصطناعي من اسم المنتج والوصف الحالي. الحقول: عنوان الصفحة + وصف الصفحة.</div>
+      <div class="card-body">
+        <div class="fg"><label class="label">كلمات مفتاحية إضافية (اختياري)</label>
+        <input type="text" id="seo-kw" placeholder="مثال: شراء اونلاين، السعودية، توصيل سريع"></div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="tl">لا تكتب رابطاً جديداً</div><div class="th">يحافظ على رابط المنتج الحالي</div></div>
+          <label class="tog"><input type="checkbox" id="seo-nourl" checked><span class="tog-s"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="tl">الرابط باللغة الإنجليزية</div><div class="th">يجعل رابط المنتج إنجليزياً</div></div>
+          <label class="tog"><input type="checkbox" id="seo-enurl"><span class="tog-s"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="tl">إضافة الكلمات المفتاحية (عربي + إنجليزي)</div><div class="th">يضيف وسوماً ثنائية اللغة</div></div>
+          <label class="tog"><input type="checkbox" id="seo-bilang"><span class="tog-s"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="tl">إضافة الوسوم السابقة</div><div class="th">يضم الوسوم القديمة للجديدة</div></div>
+          <label class="tog"><input type="checkbox" id="seo-oldtags"><span class="tog-s"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn btn-p" onclick="goStep('seo',2)">التالي ←</button></div>
+  </div>
+  <div id="seo-s2" style="display:none">
+    <div class="card">
+      <div class="card-head"><div class="card-title">اختر المنتجات</div></div>
+      <div class="card-body">
+        <div class="sel-bar"><input type="checkbox" class="prod-cb" id="seo-all" onchange="selAll('seo',this.checked)"><span class="sel-count" id="seo-cnt">0 منتج محدد</span></div>
+        <div class="plist" id="seo-plist"></div>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn btn-s" onclick="goStep('seo',1)">← رجوع</button><button class="btn btn-p" onclick="goStep('seo',3)">التالي ←</button></div>
+  </div>
+  <div id="seo-s3" style="display:none">
+    <div class="card">
+      <div class="card-head"><div class="card-title">معاينة نتائج SEO</div></div>
+      <div class="card-body">
+        <div id="seo-gen-area"><button class="btn btn-p" onclick="runSEOBulk()" id="seo-gen-btn">🔍 توليد SEO</button></div>
+        <div class="prog" id="seo-prog"><span class="spin"></span><div class="prog-text" id="seo-prog-txt">جاري توليد SEO...</div></div>
+        <div id="seo-results" style="display:none;margin-top:16px">
+          <div id="seo-res-list"></div>
+          <div class="btn-row"><button class="btn btn-g" onclick="uploadSEO()" id="seo-up-btn">🚀 رفع SEO للمتجر</button><button class="btn btn-s" onclick="goStep('seo',2)">← رجوع</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== وسوم بالجملة ===== -->
+<div class="page" id="page-tags">
+  <div class="steps">
+    <div class="step on" id="s-tags-1"><div class="step-num">١</div><div class="step-label">المنتجات</div></div>
+    <div class="step" id="s-tags-2"><div class="step-num">٢</div><div class="step-label">المعاينة والرفع</div></div>
+  </div>
+  <div id="tags-s1">
+    <div class="card">
+      <div class="card-tip">يولّد وسوماً (Tags) مناسبة لكل منتج قريبة من اسمه وفئته، ثم يرفعها لسلة مباشرة.</div>
+      <div class="card-body">
+        <div class="sel-bar"><input type="checkbox" class="prod-cb" id="tags-all" onchange="selAll('tags',this.checked)"><span class="sel-count" id="tags-cnt">0 منتج محدد</span></div>
+        <div class="plist" id="tags-plist"></div>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn btn-p" onclick="goStep('tags',2)">التالي ←</button></div>
+  </div>
+  <div id="tags-s2" style="display:none">
+    <div class="card">
+      <div class="card-head"><div class="card-title">معاينة الوسوم</div></div>
+      <div class="card-body">
+        <div id="tags-gen-area"><button class="btn btn-p" onclick="runTagsBulk()" id="tags-gen-btn">🏷️ توليد الوسوم</button></div>
+        <div class="prog" id="tags-prog"><span class="spin"></span><div class="prog-text" id="tags-prog-txt">جاري التوليد...</div></div>
+        <div id="tags-results" style="display:none;margin-top:16px">
+          <div id="tags-res-list"></div>
+          <div class="btn-row"><button class="btn btn-g" onclick="uploadTags()" id="tags-up-btn">🚀 رفع الوسوم</button><button class="btn btn-s" onclick="goStep('tags',1)">← رجوع</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== توليد الصور ===== -->
+<div class="page" id="page-imggen">
   <div class="card">
-    <div class="card-title">🖼️ توليد صورة منتج احترافية</div>
-    <div class="card-desc">صف منتجك وسيولّد الذكاء الاصطناعي صورة احترافية</div>
-    <div class="form-group"><label>اسم المنتج</label><input type="text" id="img-name" placeholder="مثال: عطر ورد الطائف"></div>
-    <div class="form-group"><label>وصف الصورة المطلوبة</label><textarea id="img-prompt" placeholder="مثال: زجاجة عطر فاخرة على خلفية بيضاء نظيفة"></textarea></div>
-    <div class="form-group">
-      <label>نوع الصورة</label>
-      <select id="img-style">
-        <option value="product photography, white background, studio lighting">صورة منتج - خلفية بيضاء</option>
-        <option value="lifestyle product photography, natural lighting">لايف ستايل - بيئة طبيعية</option>
-        <option value="luxury product photography, dark background, dramatic lighting">فاخرة - خلفية داكنة</option>
-        <option value="flat lay product photography">فلات لاي - تصوير من أعلى</option>
-      </select>
-    </div>
-    <button class="btn-primary" onclick="generateImage()">✨ توليد الصورة</button>
-    <div class="loading-bar" id="img-loading"><span class="spinner"></span><div class="progress-text">جاري توليد الصورة...</div></div>
-    <div id="img-result" style="display:none;margin-top:16px;text-align:center">
-      <img id="generated-img" src="" style="max-width:100%;border-radius:12px;border:1px solid rgba(99,102,241,0.2)">
-      <br><a id="img-download" href="#" download="product.png" class="btn-link" style="display:inline-block;margin-top:12px">⬇️ تحميل</a>
-    </div>
-  </div>
-</div>
-
-<!-- ===== PAGE: تحرير الصور ===== -->
-<div class="page" id="page-image-edit">
-  <div class="card">
-    <div class="card-title">🎨 تحرير صورة بالذكاء الاصطناعي</div>
-    <div class="card-desc">ارفع صورة منتجك وعدّلها بأمر نصي</div>
-    <div class="form-group"><label>ارفع الصورة</label><input type="file" id="edit-file" accept="image/*"></div>
-    <div class="form-group"><label>التعديل المطلوب</label><textarea id="edit-prompt" placeholder="مثال: احذف الخلفية واجعلها بيضاء، أضف إضاءة احترافية..."></textarea></div>
-    <button class="btn-primary" onclick="editImage()">🎨 تحرير الصورة</button>
-    <div class="loading-bar" id="edit-loading"><span class="spinner"></span><div class="progress-text">جاري التحرير...</div></div>
-    <div id="edit-result" style="display:none;margin-top:16px;text-align:center">
-      <img id="edited-img" src="" style="max-width:100%;border-radius:12px">
-      <br><a id="edit-download" href="#" download="edited.png" class="btn-link" style="display:inline-block;margin-top:12px">⬇️ تحميل</a>
+    <div class="card-head"><div class="card-title">🖼️ توليد صورة منتج احترافية</div><div class="card-desc">صف منتجك وسيولّد الذكاء الاصطناعي صورة احترافية جاهزة</div></div>
+    <div class="card-body">
+      <div class="fg"><label class="label">اسم المنتج</label><input type="text" id="ig-name" placeholder="مثال: عطر ورد الطائف"></div>
+      <div class="fg"><label class="label">وصف الصورة</label><textarea id="ig-prompt" placeholder="مثال: زجاجة عطر فاخرة على خلفية بيضاء نظيفة، إضاءة استوديو"></textarea></div>
+      <div class="fg"><label class="label">نوع الصورة</label>
+      <select id="ig-style">
+        <option value="product photography, white background, studio lighting">خلفية بيضاء — استوديو</option>
+        <option value="lifestyle product photography, natural lighting">لايف ستايل — طبيعي</option>
+        <option value="luxury product photography, dark background, dramatic lighting">فاخر — خلفية داكنة</option>
+        <option value="flat lay product photography">فلات لاي — من أعلى</option>
+      </select></div>
+      <button class="btn btn-p" onclick="genImg()">✨ توليد الصورة</button>
+      <div class="prog" id="ig-prog"><span class="spin"></span><div class="prog-text">جاري توليد الصورة...</div></div>
+      <div id="ig-res" style="display:none;margin-top:14px;text-align:center">
+        <img id="ig-img" src="" style="max-width:100%;border-radius:10px;border:1px solid var(--border2)">
+        <div style="margin-top:10px"><a id="ig-dl" href="#" download="product.png" class="btn btn-s" style="text-decoration:none">⬇️ تحميل</a></div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ===== PAGE: الترجمة ===== -->
-<div class="page" id="page-translate">
+<!-- ===== تحرير الصور ===== -->
+<div class="page" id="page-imgedit">
   <div class="card">
-    <div class="card-title">🌐 ترجمة المنتجات</div>
-    <div class="card-desc">ترجم أسماء وأوصاف منتجاتك</div>
-    <div class="form-group"><label>النص</label><textarea id="trans-text" placeholder="أدخل النص..."></textarea></div>
-    <div class="form-group">
-      <label>الترجمة إلى</label>
-      <select id="trans-lang">
+    <div class="card-head"><div class="card-title">🎨 تحرير صورة بالذكاء الاصطناعي</div><div class="card-desc">ارفع صورة منتجك وعدّلها بأمر نصي بسيط</div></div>
+    <div class="card-body">
+      <div class="fg"><label class="label">ارفع الصورة</label><input type="file" id="ie-file" accept="image/*"></div>
+      <div class="fg"><label class="label">التعديل المطلوب</label><textarea id="ie-prompt" placeholder="مثال: احذف الخلفية واجعلها بيضاء، أضف إضاءة احترافية..."></textarea></div>
+      <button class="btn btn-p" onclick="editImg()">🎨 تحرير الصورة</button>
+      <div class="prog" id="ie-prog"><span class="spin"></span><div class="prog-text">جاري التحرير...</div></div>
+      <div id="ie-res" style="display:none;margin-top:14px;text-align:center">
+        <img id="ie-img" src="" style="max-width:100%;border-radius:10px">
+        <div style="margin-top:10px"><a id="ie-dl" href="#" download="edited.png" class="btn btn-s" style="text-decoration:none">⬇️ تحميل</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== الترجمة ===== -->
+<div class="page" id="page-trans">
+  <div class="card">
+    <div class="card-head"><div class="card-title">🌐 ترجمة المنتجات</div><div class="card-desc">ترجم أسماء وأوصاف منتجاتك بدقة احترافية</div></div>
+    <div class="card-body">
+      <div class="fg"><label class="label">النص المراد ترجمته</label><textarea id="tr-text" placeholder="أدخل النص..."></textarea></div>
+      <div class="fg"><label class="label">ترجمة إلى</label>
+      <select id="tr-lang">
         <option value="English">الإنجليزية</option>
         <option value="French">الفرنسية</option>
         <option value="Turkish">التركية</option>
         <option value="Urdu">الأردية</option>
-      </select>
+      </select></div>
+      <button class="btn btn-p" onclick="runTrans()">🌐 ترجمة</button>
+      <div class="prog" id="tr-prog"><span class="spin"></span></div>
+      <div id="tr-res" style="display:none;margin-top:14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:13px;line-height:1.8;color:var(--text2)"></div>
     </div>
-    <button class="btn-primary" onclick="translateText()">🌐 ترجمة</button>
-    <div class="loading-bar" id="trans-loading"><span class="spinner"></span></div>
-    <div id="trans-result" style="display:none;margin-top:16px;background:#111118;border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:16px;font-size:14px;line-height:1.8"></div>
   </div>
 </div>
 
-</div><!-- end content -->
-</div><!-- end main -->
+</div><!-- content -->
+</div><!-- main -->
 
 <script>
-const API_BASE = window.location.origin;
-let allProducts = [];
-let selectedProducts = {desc:{}, improve:{}, seo:{}};
-let generatedResults = {desc:[], improve:[], seo:[]};
+const BASE = window.location.origin;
+let products = [];
+let sel = {desc:{}, improve:{}, seo:{}, tags:{}};
+let results = {desc:[], improve:[], seo:[], tags:[]};
 
 // ===== INIT =====
 async function init() {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const tokenFromUrl = params.get('token');
-    if (tokenFromUrl) {
-      localStorage.setItem('salla_token', tokenFromUrl);
-      window.history.replaceState({}, '', '/');
-    }
-    const token = localStorage.getItem('salla_token');
-    if (!token) {
-      document.getElementById('store-name').textContent = 'غير مرتبط';
-      return;
-    }
-    document.getElementById('store-name').textContent = 'جاري التحميل...';
-    await loadProducts();
-  } catch(e) {
-    console.error('Init error:', e);
-  }
+  const p = new URLSearchParams(window.location.search);
+  const t = p.get('token');
+  if (t) { localStorage.setItem('st', t); window.history.replaceState({}, '', '/'); }
+  const token = localStorage.getItem('st');
+  if (!token) { document.getElementById('store-name').textContent = 'غير مرتبط'; return; }
+  await loadProducts();
 }
 
 async function loadProducts() {
-  const token = localStorage.getItem('salla_token') || 'demo';
+  const token = localStorage.getItem('st') || 'demo';
   try {
-    const res = await fetch(`${API_BASE}/api/products`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const data = await res.json();
-    allProducts = data.products || [];
-    document.getElementById('store-name').textContent = `${allProducts.length} منتج`;
-    document.getElementById('products-count-bar').textContent = `${allProducts.length} منتج`;
-    renderProductsList('desc');
-    renderProductsList('improve');
-    renderProductsList('seo');
-  } catch(e) {
-    document.getElementById('store-name').textContent = 'خطأ في التحميل';
-  }
+    const r = await fetch(`${BASE}/api/products`, { headers: { Authorization: `Bearer ${token}` } });
+    const d = await r.json();
+    products = d.products || [];
+    document.getElementById('store-name').textContent = `${products.length} منتج`;
+    document.getElementById('topbar-meta').textContent = `${products.length} منتج`;
+    ['desc','improve','seo','tags'].forEach(renderList);
+  } catch(e) { document.getElementById('store-name').textContent = 'خطأ'; }
 }
 
 // ===== NAVIGATION =====
-function showPage(pageId) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-  document.getElementById('page-' + pageId).classList.add('active');
-  document.getElementById('nav-' + pageId).classList.add('active');
-  const titles = {'desc-bulk':'وصف بالجملة','improve-bulk':'تحسين الوصف','seo-bulk':'SEO بالجملة','image-gen':'توليد الصور','image-edit':'تحرير الصور','translate':'الترجمة'};
-  document.getElementById('page-title').textContent = titles[pageId] || pageId;
+const titles = {desc:'وصف بالجملة',improve:'تحسين الوصف',seo:'SEO بالجملة',tags:'وسوم بالجملة',imggen:'توليد الصور',imgedit:'تحرير الصور',trans:'الترجمة'};
+
+function go(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('on'));
+  document.getElementById('page-'+id).classList.add('on');
+  document.getElementById('nav-'+id).classList.add('on');
+  document.getElementById('page-title').textContent = titles[id] || id;
 }
 
+// ===== WIZARD STEPS =====
 function goStep(type, step) {
-  for(let i=1;i<=3;i++) {
-    const stepEl = document.getElementById(`${type}-step-${i}`);
-    const wizEl = document.getElementById(`step-${type}-${i}`);
-    if(stepEl) stepEl.style.display = i===step ? 'block' : 'none';
-    if(wizEl) {
-      wizEl.classList.remove('active','done');
-      if(i===step) wizEl.classList.add('active');
-      else if(i<step) wizEl.classList.add('done');
-    }
+  const max = type === 'tags' ? 2 : 3;
+  for (let i = 1; i <= max; i++) {
+    const s = document.getElementById(`${type}-s${i}`);
+    const w = document.getElementById(`s-${type}-${i}`);
+    if (s) s.style.display = i === step ? 'block' : 'none';
+    if (w) { w.classList.remove('on','done'); if(i===step) w.classList.add('on'); else if(i<step) w.classList.add('done'); }
   }
 }
 
-// ===== PRODUCTS LIST =====
+// ===== PRODUCTS =====
 function getPrice(p) {
   if (!p.price) return '0';
   if (typeof p.price === 'object') return p.price.amount || p.price.regular || '0';
   return p.price;
 }
 
-function renderProductsList(type) {
-  const el = document.getElementById(`${type}-products-list`);
-  if (!el || allProducts.length === 0) return;
-  el.innerHTML = allProducts.map((p,i) => `
-    <div class="product-item" onclick="toggleProduct('${type}',${i},this)" id="${type}-prod-${i}">
-      <input type="checkbox" class="${type}-checkbox" data-index="${i}" style="width:18px;height:18px;accent-color:#6366f1" onclick="event.stopPropagation();toggleProduct('${type}',${i},document.getElementById('${type}-prod-${i}'))">
-      <div class="product-info">
-        <div class="product-name">${p.name}</div>
-        <div class="product-meta">${getPrice(p)} ريال</div>
-      </div>
-    </div>
-  `).join('');
+function renderList(type) {
+  const el = document.getElementById(`${type}-plist`);
+  if (!el || !products.length) return;
+  el.innerHTML = products.map((p, i) => `
+    <div class="prod" id="${type}-p-${i}" onclick="togProd('${type}',${i})">
+      <input type="checkbox" class="prod-cb ${type}-cb" data-i="${i}" onclick="event.stopPropagation();togProd('${type}',${i})">
+      <div class="prod-name">${p.name}</div>
+      <div class="prod-price">${getPrice(p)} ر.س</div>
+    </div>`).join('');
 }
 
-function toggleProduct(type, idx, el) {
-  const cb = el.querySelector('input[type=checkbox]') || el;
-  if(el.classList && el.classList.contains('product-item')) {
-    const checkbox = el.querySelector('input');
-    checkbox.checked = !checkbox.checked;
-    el.classList.toggle('selected', checkbox.checked);
-    selectedProducts[type][idx] = checkbox.checked;
-  }
-  updateSelectedCount(type);
+function togProd(type, idx) {
+  const cb = document.querySelector(`.${type}-cb[data-i="${idx}"]`);
+  const el = document.getElementById(`${type}-p-${idx}`);
+  if (!cb) return;
+  cb.checked = !cb.checked;
+  el.classList.toggle('sel', cb.checked);
+  sel[type][idx] = cb.checked;
+  updCnt(type);
 }
 
-function toggleAll(type, checked) {
-  document.querySelectorAll(`.${type}-checkbox`).forEach(cb => {
+function selAll(type, checked) {
+  document.querySelectorAll(`.${type}-cb`).forEach(cb => {
     cb.checked = checked;
-    const idx = cb.dataset.index;
-    const item = document.getElementById(`${type}-prod-${idx}`);
-    if(item) item.classList.toggle('selected', checked);
-    selectedProducts[type][idx] = checked;
+    const i = cb.dataset.i;
+    const el = document.getElementById(`${type}-p-${i}`);
+    if (el) el.classList.toggle('sel', checked);
+    sel[type][i] = checked;
   });
-  updateSelectedCount(type);
+  updCnt(type);
 }
 
-function updateSelectedCount(type) {
-  const count = Object.values(selectedProducts[type]).filter(Boolean).length;
-  const el = document.getElementById(`${type}-selected-count`);
-  if(el) el.textContent = `${count} منتج محدد`;
+function updCnt(type) {
+  const n = Object.values(sel[type]).filter(Boolean).length;
+  const el = document.getElementById(`${type}-cnt`);
+  if (el) el.textContent = `${n} منتج محدد`;
 }
 
 function getSelected(type) {
-  return Object.entries(selectedProducts[type])
-    .filter(([,v]) => v)
-    .map(([i]) => allProducts[parseInt(i)])
-    .filter(Boolean);
+  return Object.entries(sel[type]).filter(([,v]) => v).map(([i]) => products[parseInt(i)]).filter(Boolean);
 }
 
 // ===== RESULT CARD =====
-function renderResultCard(type, idx, p, data) {
-  return `
-    <div style="background:#111118;border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:16px;margin-bottom:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div style="font-weight:700;font-size:14px">${p.name}</div>
-        <span class="badge badge-new">جاهز للرفع</span>
-      </div>
-      ${data.seoTitle ? `
-        <div class="preview-seo">
-          <div class="preview-seo-title">${data.seoTitle}</div>
-          <div class="preview-seo-url">سلة.com › ${p.name.replace(/\s+/g,'-').toLowerCase()}</div>
-          <div class="preview-seo-desc">${data.seoDescription || ''}</div>
-        </div>` : ''}
-      ${data.description ? `
-        <div class="preview-box" style="margin-top:12px">
-          <div class="preview-label">الوصف</div>
-          <div class="preview-content" style="max-height:120px;overflow:hidden">${data.description.substring(0,300)}${data.description.length>300?'...':''}</div>
-        </div>` : ''}
-      ${data.seoKeywords ? `
-        <div style="margin-top:10px;font-size:12px;color:#606080">
-          <b style="color:#a0a0c0">الكلمات المفتاحية:</b> ${data.seoKeywords}
-        </div>` : ''}
-    </div>
-  `;
+function resCard(p, d) {
+  return `<div class="res-card">
+    <div class="res-name">${p.name} <span class="res-badge">جاهز</span></div>
+    ${d.seoTitle ? `<div class="res-seo">
+      <div class="res-seo-title">${d.seoTitle}</div>
+      <div class="res-seo-url">salla.sa › ${p.name.replace(/\s+/g,'-')}</div>
+      <div class="res-seo-desc">${d.seoDescription||''}</div>
+    </div>` : ''}
+    ${d.description ? `<div class="res-desc">${d.description.substring(0,250)}${d.description.length>250?'...':''}</div>` : ''}
+    ${d.tags ? `<div class="res-tags">${d.tags.map(t=>`<span class="tag-pill">${t}</span>`).join('')}</div>` : ''}
+    ${d.seoKeywords ? `<div style="margin-top:8px;font-size:11px;color:var(--text3)">🔑 ${d.seoKeywords}</div>` : ''}
+  </div>`;
 }
 
 // ===== DESC BULK =====
-async function generateAllDescriptions() {
-  const products = getSelected('desc');
-  if(products.length === 0) return alert('اختر منتجاً على الأقل في الخطوة ٢');
-  
-  document.getElementById('gen-desc-btn').style.display = 'none';
-  document.getElementById('desc-loading').classList.add('visible');
-  generatedResults.desc = [];
-
-  for(let i=0; i<products.length; i++) {
-    const p = products[i];
-    document.getElementById('desc-progress-text').textContent = `جاري توليد وصف (${i+1}/${products.length}): ${p.name}`;
+async function runDescBulk() {
+  const prods = getSelected('desc');
+  if (!prods.length) return alert('اختر منتجاً على الأقل');
+  document.getElementById('desc-gen-btn').style.display = 'none';
+  document.getElementById('desc-prog').classList.add('on');
+  results.desc = [];
+  for (let i = 0; i < prods.length; i++) {
+    const p = prods[i];
+    document.getElementById('desc-prog-txt').textContent = `${i+1}/${prods.length}: ${p.name}`;
     try {
-      const res = await fetch(`${API_BASE}/api/generate-description`, {
+      const r = await fetch(`${BASE}/api/generate-description`, {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({
-          name: p.name,
-          features: p.description || p.name,
-          audience: document.getElementById('desc-audience').value,
-          price: getPrice(p)
-        })
+        body: JSON.stringify({ name: p.name, features: p.description||p.name, audience: document.getElementById('d-aud').value, price: getPrice(p) })
       });
-      const data = await res.json();
-      generatedResults.desc.push({product: p, ...data});
-    } catch(e) {
-      generatedResults.desc.push({product: p, error: e.message});
-    }
-    await new Promise(r => setTimeout(r, 800));
+      const d = await r.json();
+      let tags = [];
+      if (document.getElementById('d-tags').checked) {
+        const tr = await fetch(`${BASE}/api/generate-tags`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name:p.name, description:p.description||''}) });
+        const td = await tr.json();
+        tags = td.tags || [];
+      }
+      results.desc.push({product:p, ...d, tags});
+    } catch(e) { results.desc.push({product:p, error:e.message}); }
+    await new Promise(r=>setTimeout(r,600));
   }
-
-  document.getElementById('desc-loading').classList.remove('visible');
-  document.getElementById('desc-results-area').style.display = 'block';
-  document.getElementById('desc-results-list').innerHTML = generatedResults.desc
-    .map((r,i) => r.error ? `<div class="alert alert-warning">❌ ${r.product.name}: ${r.error}</div>` : renderResultCard('desc', i, r.product, r))
-    .join('');
+  document.getElementById('desc-prog').classList.remove('on');
+  document.getElementById('desc-results').style.display = 'block';
+  document.getElementById('desc-res-list').innerHTML = results.desc.map(r => r.error ? `<div class="alert a-warn">❌ ${r.product.name}: ${r.error}</div>` : resCard(r.product, r)).join('');
 }
 
-async function uploadAllDesc() {
-  const token = localStorage.getItem('salla_token');
-  if(!token) return alert('لم يتم ربط المتجر');
-  const btn = document.getElementById('upload-desc-btn');
-  btn.disabled = true;
-  btn.textContent = 'جاري الرفع...';
-  let success = 0;
-  for(const r of generatedResults.desc) {
-    if(r.error) continue;
+async function uploadDesc() {
+  const token = localStorage.getItem('st');
+  if (!token) return alert('لم يتم ربط المتجر');
+  const btn = document.getElementById('desc-up-btn');
+  btn.disabled = true; btn.textContent = 'جاري الرفع...';
+  let ok = 0;
+  for (const r of results.desc) {
+    if (r.error) continue;
     try {
-      await fetch(`${API_BASE}/api/update-product`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({productId: r.product.id, description: r.description, seoTitle: r.seoTitle, seoDescription: r.seoDescription, token})
-      });
-      success++;
+      await fetch(`${BASE}/api/update-product`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({productId:r.product.id, description:r.description, seoTitle:r.seoTitle, seoDescription:r.seoDescription, token}) });
+      if (r.tags?.length) await fetch(`${BASE}/api/add-tags`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({productId:r.product.id, tags:r.tags, token}) });
+      ok++;
     } catch(e) {}
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r=>setTimeout(r,400));
   }
-  btn.textContent = `✅ تم رفع ${success} منتج بنجاح!`;
-  btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+  btn.textContent = `✅ تم رفع ${ok} منتج`;
+  btn.className = 'btn btn-g'; btn.disabled = false;
 }
 
 // ===== IMPROVE BULK =====
-async function generateAllImprovements() {
-  const products = getSelected('improve');
-  if(products.length === 0) return alert('اختر منتجاً على الأقل');
-  document.getElementById('gen-improve-btn').style.display = 'none';
-  document.getElementById('improve-loading').classList.add('visible');
-  generatedResults.improve = [];
-
-  for(let i=0; i<products.length; i++) {
-    const p = products[i];
-    document.getElementById('improve-progress-text').textContent = `جاري تحسين (${i+1}/${products.length}): ${p.name}`;
+async function runImproveBulk() {
+  const prods = getSelected('improve');
+  if (!prods.length) return alert('اختر منتجاً على الأقل');
+  document.getElementById('improve-gen-btn').style.display = 'none';
+  document.getElementById('improve-prog').classList.add('on');
+  results.improve = [];
+  for (let i = 0; i < prods.length; i++) {
+    const p = prods[i];
+    document.getElementById('improve-prog-txt').textContent = `${i+1}/${prods.length}: ${p.name}`;
     try {
-      const res = await fetch(`${API_BASE}/api/improve-description`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({name: p.name, currentDescription: p.description || '', instructions: document.getElementById('improve-instructions').value})
-      });
-      const data = await res.json();
-      generatedResults.improve.push({product: p, ...data});
-    } catch(e) {
-      generatedResults.improve.push({product: p, error: e.message});
-    }
-    await new Promise(r => setTimeout(r, 800));
+      const r = await fetch(`${BASE}/api/improve-description`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name:p.name, currentDescription:p.description||'', instructions:document.getElementById('imp-inst').value}) });
+      const d = await r.json();
+      results.improve.push({product:p, ...d});
+    } catch(e) { results.improve.push({product:p, error:e.message}); }
+    await new Promise(r=>setTimeout(r,600));
   }
-
-  document.getElementById('improve-loading').classList.remove('visible');
-  document.getElementById('improve-results-area').style.display = 'block';
-  document.getElementById('improve-results-list').innerHTML = generatedResults.improve
-    .map((r,i) => r.error ? `<div class="alert alert-warning">❌ ${r.product.name}: ${r.error}</div>` : renderResultCard('improve', i, r.product, r))
-    .join('');
+  document.getElementById('improve-prog').classList.remove('on');
+  document.getElementById('improve-results').style.display = 'block';
+  document.getElementById('improve-res-list').innerHTML = results.improve.map(r => r.error ? `<div class="alert a-warn">❌ ${r.product.name}: ${r.error}</div>` : resCard(r.product, r)).join('');
 }
 
-async function uploadAllImprove() {
-  const token = localStorage.getItem('salla_token');
-  if(!token) return alert('لم يتم ربط المتجر');
-  const btn = document.getElementById('upload-improve-btn');
+async function uploadImprove() {
+  const token = localStorage.getItem('st');
+  if (!token) return alert('لم يتم ربط المتجر');
+  const btn = document.getElementById('improve-up-btn');
   btn.disabled = true; btn.textContent = 'جاري الرفع...';
-  let success = 0;
-  for(const r of generatedResults.improve) {
-    if(r.error) continue;
-    try {
-      await fetch(`${API_BASE}/api/update-product`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({productId: r.product.id, description: r.description, seoTitle: r.seoTitle, seoDescription: r.seoDescription, token})
-      });
-      success++;
-    } catch(e) {}
-    await new Promise(r => setTimeout(r, 500));
+  let ok = 0;
+  for (const r of results.improve) {
+    if (r.error) continue;
+    try { await fetch(`${BASE}/api/update-product`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({productId:r.product.id, description:r.description, seoTitle:r.seoTitle, seoDescription:r.seoDescription, token}) }); ok++; } catch(e) {}
+    await new Promise(r=>setTimeout(r,400));
   }
-  btn.textContent = `✅ تم رفع ${success} منتج!`;
-  btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+  btn.textContent = `✅ تم رفع ${ok} منتج`;
+  btn.className = 'btn btn-g'; btn.disabled = false;
 }
 
 // ===== SEO BULK =====
-async function generateAllSEO() {
-  const products = getSelected('seo');
-  if(products.length === 0) return alert('اختر منتجاً على الأقل');
-  document.getElementById('gen-seo-btn').style.display = 'none';
-  document.getElementById('seo-loading').classList.add('visible');
-  generatedResults.seo = [];
-
-  for(let i=0; i<products.length; i++) {
-    const p = products[i];
-    document.getElementById('seo-progress-text').textContent = `جاري توليد SEO (${i+1}/${products.length}): ${p.name}`;
+async function runSEOBulk() {
+  const prods = getSelected('seo');
+  if (!prods.length) return alert('اختر منتجاً على الأقل');
+  document.getElementById('seo-gen-btn').style.display = 'none';
+  document.getElementById('seo-prog').classList.add('on');
+  results.seo = [];
+  for (let i = 0; i < prods.length; i++) {
+    const p = prods[i];
+    document.getElementById('seo-prog-txt').textContent = `${i+1}/${prods.length}: ${p.name}`;
     try {
-      const res = await fetch(`${API_BASE}/api/generate-seo`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({name: p.name, description: p.description || '', keywords: document.getElementById('seo-keywords').value})
-      });
-      const data = await res.json();
-      generatedResults.seo.push({product: p, ...data});
-    } catch(e) {
-      generatedResults.seo.push({product: p, error: e.message});
-    }
-    await new Promise(r => setTimeout(r, 800));
+      const r = await fetch(`${BASE}/api/generate-seo`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name:p.name, description:p.description||'', keywords:document.getElementById('seo-kw').value}) });
+      const d = await r.json();
+      results.seo.push({product:p, ...d});
+    } catch(e) { results.seo.push({product:p, error:e.message}); }
+    await new Promise(r=>setTimeout(r,600));
   }
-
-  document.getElementById('seo-loading').classList.remove('visible');
-  document.getElementById('seo-results-area').style.display = 'block';
-  document.getElementById('seo-results-list').innerHTML = generatedResults.seo
-    .map((r,i) => r.error ? `<div class="alert alert-warning">❌ ${r.product.name}: ${r.error}</div>` : renderResultCard('seo', i, r.product, r))
-    .join('');
+  document.getElementById('seo-prog').classList.remove('on');
+  document.getElementById('seo-results').style.display = 'block';
+  document.getElementById('seo-res-list').innerHTML = results.seo.map(r => r.error ? `<div class="alert a-warn">❌ ${r.product.name}: ${r.error}</div>` : resCard(r.product, r)).join('');
 }
 
-async function uploadAllSEO() {
-  const token = localStorage.getItem('salla_token');
-  if(!token) return alert('لم يتم ربط المتجر');
-  const btn = document.getElementById('upload-seo-btn');
+async function uploadSEO() {
+  const token = localStorage.getItem('st');
+  const btn = document.getElementById('seo-up-btn');
   btn.disabled = true; btn.textContent = 'جاري الرفع...';
-  let success = 0;
-  for(const r of generatedResults.seo) {
-    if(r.error) continue;
-    try {
-      await fetch(`${API_BASE}/api/update-product`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({productId: r.product.id, seoTitle: r.seoTitle, seoDescription: r.seoDescription, token})
-      });
-      success++;
-    } catch(e) {}
-    await new Promise(r => setTimeout(r, 500));
+  let ok = 0;
+  for (const r of results.seo) {
+    if (r.error) continue;
+    try { await fetch(`${BASE}/api/update-product`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({productId:r.product.id, seoTitle:r.seoTitle, seoDescription:r.seoDescription, token}) }); ok++; } catch(e) {}
+    await new Promise(r=>setTimeout(r,400));
   }
-  btn.textContent = `✅ تم رفع SEO لـ ${success} منتج!`;
-  btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+  btn.textContent = `✅ تم رفع SEO لـ ${ok} منتج`;
+  btn.className = 'btn btn-g'; btn.disabled = false;
+}
+
+// ===== TAGS BULK =====
+async function runTagsBulk() {
+  const prods = getSelected('tags');
+  if (!prods.length) return alert('اختر منتجاً على الأقل');
+  document.getElementById('tags-gen-btn').style.display = 'none';
+  document.getElementById('tags-prog').classList.add('on');
+  results.tags = [];
+  for (let i = 0; i < prods.length; i++) {
+    const p = prods[i];
+    document.getElementById('tags-prog-txt').textContent = `${i+1}/${prods.length}: ${p.name}`;
+    try {
+      const r = await fetch(`${BASE}/api/generate-tags`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name:p.name, description:p.description||''}) });
+      const d = await r.json();
+      results.tags.push({product:p, tags:d.tags||[]});
+    } catch(e) { results.tags.push({product:p, tags:[], error:e.message}); }
+    await new Promise(r=>setTimeout(r,500));
+  }
+  document.getElementById('tags-prog').classList.remove('on');
+  document.getElementById('tags-results').style.display = 'block';
+  document.getElementById('tags-res-list').innerHTML = results.tags.map(r => `<div class="res-card"><div class="res-name">${r.product.name} <span class="res-badge">جاهز</span></div><div class="res-tags">${(r.tags||[]).map(t=>`<span class="tag-pill">${t}</span>`).join('')}</div></div>`).join('');
+}
+
+async function uploadTags() {
+  const token = localStorage.getItem('st');
+  const btn = document.getElementById('tags-up-btn');
+  btn.disabled = true; btn.textContent = 'جاري الرفع...';
+  let ok = 0;
+  for (const r of results.tags) {
+    if (!r.tags?.length) continue;
+    try { await fetch(`${BASE}/api/add-tags`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({productId:r.product.id, tags:r.tags, token}) }); ok++; } catch(e) {}
+    await new Promise(r=>setTimeout(r,400));
+  }
+  btn.textContent = `✅ تم رفع وسوم ${ok} منتج`;
+  btn.className = 'btn btn-g'; btn.disabled = false;
 }
 
 // ===== IMAGE GEN =====
-async function generateImage() {
-  const name = document.getElementById('img-name').value;
-  if(!name) return alert('أدخل اسم المنتج');
-  const btn = document.querySelector('#page-image-gen .btn-primary');
+async function genImg() {
+  const name = document.getElementById('ig-name').value;
+  if (!name) return alert('أدخل اسم المنتج');
+  const btn = document.querySelector('#page-imggen .btn-p');
   btn.disabled = true;
-  document.getElementById('img-loading').classList.add('visible');
-  document.getElementById('img-result').style.display = 'none';
+  document.getElementById('ig-prog').classList.add('on');
+  document.getElementById('ig-res').style.display = 'none';
   try {
-    const res = await fetch(`${API_BASE}/api/generate-image`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({name, prompt: document.getElementById('img-prompt').value, style: document.getElementById('img-style').value})
-    });
-    const data = await res.json();
-    if(data.imageUrl) {
-      document.getElementById('generated-img').src = data.imageUrl;
-      document.getElementById('img-download').href = data.imageUrl;
-      document.getElementById('img-result').style.display = 'block';
-    } else alert('خطأ: ' + (data.error || 'حاول مرة أخرى'));
-  } catch(e) { alert('تعذر الاتصال'); }
+    const r = await fetch(`${BASE}/api/generate-image`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, prompt:document.getElementById('ig-prompt').value, style:document.getElementById('ig-style').value}) });
+    const d = await r.json();
+    if (d.imageUrl) { document.getElementById('ig-img').src = d.imageUrl; document.getElementById('ig-dl').href = d.imageUrl; document.getElementById('ig-res').style.display = 'block'; }
+    else alert('خطأ: ' + (d.error||'حاول مرة أخرى'));
+  } catch(e) { alert('خطأ في الاتصال'); }
   btn.disabled = false;
-  document.getElementById('img-loading').classList.remove('visible');
+  document.getElementById('ig-prog').classList.remove('on');
 }
 
 // ===== EDIT IMAGE =====
-async function editImage() {
-  const file = document.getElementById('edit-file').files[0];
-  const prompt = document.getElementById('edit-prompt').value;
-  if(!file || !prompt) return alert('ارفع صورة وأدخل التعديل');
-  const btn = document.querySelector('#page-image-edit .btn-primary');
+async function editImg() {
+  const file = document.getElementById('ie-file').files[0];
+  const prompt = document.getElementById('ie-prompt').value;
+  if (!file || !prompt) return alert('ارفع صورة وأدخل التعديل');
+  const btn = document.querySelector('#page-imgedit .btn-p');
   btn.disabled = true;
-  document.getElementById('edit-loading').classList.add('visible');
-  document.getElementById('edit-result').style.display = 'none';
-  const formData = new FormData();
-  formData.append('image', file);
-  formData.append('prompt', prompt);
+  document.getElementById('ie-prog').classList.add('on');
+  const fd = new FormData(); fd.append('image', file); fd.append('prompt', prompt);
   try {
-    const res = await fetch(`${API_BASE}/api/edit-image`, {method:'POST', body: formData});
-    const data = await res.json();
-    if(data.imageUrl) {
-      document.getElementById('edited-img').src = data.imageUrl;
-      document.getElementById('edit-download').href = data.imageUrl;
-      document.getElementById('edit-result').style.display = 'block';
-    } else alert('خطأ: ' + (data.error || 'حاول مرة أخرى'));
-  } catch(e) { alert('تعذر الاتصال'); }
+    const r = await fetch(`${BASE}/api/edit-image`, {method:'POST', body:fd});
+    const d = await r.json();
+    if (d.imageUrl) { document.getElementById('ie-img').src = d.imageUrl; document.getElementById('ie-dl').href = d.imageUrl; document.getElementById('ie-res').style.display = 'block'; }
+  } catch(e) { alert('خطأ في الاتصال'); }
   btn.disabled = false;
-  document.getElementById('edit-loading').classList.remove('visible');
+  document.getElementById('ie-prog').classList.remove('on');
 }
 
 // ===== TRANSLATE =====
-async function translateText() {
-  const text = document.getElementById('trans-text').value;
-  if(!text) return alert('أدخل النص');
-  const btn = document.querySelector('#page-translate .btn-primary');
+async function runTrans() {
+  const text = document.getElementById('tr-text').value;
+  if (!text) return alert('أدخل النص');
+  const btn = document.querySelector('#page-trans .btn-p');
   btn.disabled = true;
-  document.getElementById('trans-loading').classList.add('visible');
-  document.getElementById('trans-result').style.display = 'none';
+  document.getElementById('tr-prog').classList.add('on');
+  document.getElementById('tr-res').style.display = 'none';
   try {
-    const res = await fetch(`${API_BASE}/api/translate`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({text, language: document.getElementById('trans-lang').value})
-    });
-    const data = await res.json();
-    if(data.translation) {
-      document.getElementById('trans-result').textContent = data.translation;
-      document.getElementById('trans-result').style.display = 'block';
-    }
-  } catch(e) { alert('تعذر الاتصال'); }
+    const r = await fetch(`${BASE}/api/translate`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text, language:document.getElementById('tr-lang').value}) });
+    const d = await r.json();
+    if (d.translation) { document.getElementById('tr-res').textContent = d.translation; document.getElementById('tr-res').style.display = 'block'; }
+  } catch(e) { alert('خطأ'); }
   btn.disabled = false;
-  document.getElementById('trans-loading').classList.remove('visible');
+  document.getElementById('tr-prog').classList.remove('on');
 }
 
 document.addEventListener('DOMContentLoaded', init);
