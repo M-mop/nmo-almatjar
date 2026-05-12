@@ -174,7 +174,74 @@ SEO_KEYWORDS:
 });
 
 
-app.post('/api/generate-image', async (req, res) => {
+// ===== GENERATE TAGS =====
+app.post('/api/generate-tags', async (req, res) => {
+  try {
+    const { name, description, existingTags } = req.body;
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 300,
+      messages: [{
+        role: 'user',
+        content: `أنت خبير SEO وتجارة إلكترونية. اكتب وسوم (tags) للمنتج التالي.
+
+المنتج: ${name}
+الوصف: ${description || name}
+
+القواعد:
+- كل وسم من 1-3 كلمات فقط
+- الوسوم يجب أن تكون قريبة جداً من اسم المنتج وفئته
+- أضف وسوم عربية وإنجليزية
+- تجنب الوسوم العامة جداً
+
+أعطني 10 وسوم مفصولة بفاصلة فقط، بدون شرح:`
+      }]
+    });
+    const tagsText = message.content[0].text.trim();
+    const tags = tagsText.split(',').map(t => t.trim()).filter(t => t.length > 0 && t.length < 50);
+    res.json({ tags });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ===== ADD TAGS TO PRODUCT =====
+app.post('/api/add-tags', async (req, res) => {
+  try {
+    const { productId, tags, token } = req.body;
+    if (!productId || !tags || !token) {
+      return res.status(400).json({ error: 'بيانات ناقصة' });
+    }
+    // Create tags first, then attach to product
+    const createdTags = [];
+    for (const tagName of tags) {
+      try {
+        const tagRes = await axios.post(
+          'https://api.salla.dev/admin/v2/products/tags',
+          { name: tagName },
+          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
+        );
+        if (tagRes.data?.data?.id) {
+          createdTags.push(tagRes.data.data.id);
+        }
+      } catch (e) { /* tag might already exist */ }
+    }
+    // Update product with tags
+    if (createdTags.length > 0) {
+      await axios.put(
+        `https://api.salla.dev/admin/v2/products/${productId}`,
+        { tags: createdTags },
+        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
+      );
+    }
+    res.json({ success: true, tagsAdded: createdTags.length });
+  } catch (e) {
+    console.error('Add tags error:', e.response?.data || e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+
   try {
     const { name, prompt, style } = req.body;
     const fullPrompt = `Professional product photo of ${name}. ${prompt}. ${style}. High quality, commercial photography, sharp details, no text.`;
