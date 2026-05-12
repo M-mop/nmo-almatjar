@@ -6,276 +6,513 @@
 <title>مصمم المنتجات بالذكاء الاصطناعي</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Cairo',sans-serif; background:#0f0f14; color:#f0f0ff; min-height:100vh; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;background:#0f0f14;color:#f0f0ff;min-height:100vh;display:flex}
 
-/* NAV */
-nav {
-  background:rgba(15,15,20,0.95);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(99,102,241,0.15);
-  padding:14px 32px;
-  display:flex; align-items:center; justify-content:space-between;
-  position:sticky; top:0; z-index:100;
-}
-.nav-logo { font-size:20px; font-weight:900; background:linear-gradient(135deg,#6366f1,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.nav-store { font-size:13px; color:#a0a0c0; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.2); border-radius:8px; padding:6px 14px; }
+/* SIDEBAR */
+.sidebar{width:260px;background:#111118;border-left:1px solid rgba(99,102,241,0.15);display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:100}
+.sidebar-logo{padding:20px;border-bottom:1px solid rgba(99,102,241,0.1);font-size:18px;font-weight:900;background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sidebar-store{padding:12px 20px;font-size:12px;color:#606080;border-bottom:1px solid rgba(99,102,241,0.1)}
+.sidebar-store span{color:#a5b4fc;font-weight:600}
+.sidebar-section{padding:12px 20px 4px;font-size:11px;font-weight:700;color:#606080;letter-spacing:1px;text-transform:uppercase}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:14px;color:#a0a0c0;cursor:pointer;transition:all 0.2s;border-right:3px solid transparent}
+.sidebar-item:hover{background:rgba(99,102,241,0.08);color:#e0e0ff}
+.sidebar-item.active{background:rgba(99,102,241,0.12);color:#a5b4fc;border-right-color:#6366f1}
+.sidebar-item .icon{font-size:16px;width:20px;text-align:center}
 
-/* HERO */
-.hero { text-align:center; padding:60px 20px 40px; }
-.hero h1 { font-size:clamp(28px,5vw,48px); font-weight:900; line-height:1.2; margin-bottom:12px; }
-.hero h1 span { background:linear-gradient(135deg,#6366f1,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.hero p { color:#a0a0c0; font-size:16px; max-width:480px; margin:0 auto 32px; line-height:1.7; }
+/* MAIN */
+.main{margin-right:260px;flex:1;padding:0}
 
-/* TABS */
-.tabs { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:40px; padding:0 20px; }
-.tab { background:#1a1a24; border:1px solid rgba(99,102,241,0.2); border-radius:100px; padding:10px 20px; font-size:14px; font-weight:600; color:#a0a0c0; cursor:pointer; font-family:'Cairo',sans-serif; transition:all 0.2s; }
-.tab.active, .tab:hover { background:rgba(99,102,241,0.15); border-color:rgba(99,102,241,0.5); color:#a5b4fc; }
+/* TOP BAR */
+.topbar{background:#111118;border-bottom:1px solid rgba(99,102,241,0.15);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:18px;font-weight:700}
+.topbar-actions{display:flex;gap:10px}
+.btn-link{background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Cairo',sans-serif;text-decoration:none;transition:all 0.2s}
+.btn-link:hover{background:rgba(99,102,241,0.2)}
 
-/* MAIN CONTENT */
-.container { max-width:900px; margin:0 auto; padding:0 20px 60px; }
+/* CONTENT */
+.content{padding:32px;max-width:900px}
 
-/* TOOL PANELS */
-.tool-panel { display:none; }
-.tool-panel.active { display:block; }
+/* WIZARD */
+.wizard-steps{display:flex;gap:0;margin-bottom:32px;background:#1a1a24;border-radius:12px;overflow:hidden;border:1px solid rgba(99,102,241,0.15)}
+.wizard-step{flex:1;padding:14px 16px;text-align:center;font-size:13px;font-weight:600;color:#606080;cursor:pointer;transition:all 0.2s;position:relative}
+.wizard-step.active{background:rgba(99,102,241,0.15);color:#a5b4fc}
+.wizard-step.done{color:#34d399}
+.wizard-step .step-num{display:block;font-size:11px;margin-bottom:2px;opacity:0.6}
 
-/* CARD */
-.card { background:#1a1a24; border:1px solid rgba(99,102,241,0.15); border-radius:16px; padding:28px; margin-bottom:20px; }
-.card h2 { font-size:18px; font-weight:700; margin-bottom:6px; }
-.card p { color:#a0a0c0; font-size:14px; margin-bottom:20px; line-height:1.6; }
+/* CARDS */
+.card{background:#1a1a24;border:1px solid rgba(99,102,241,0.15);border-radius:16px;padding:24px;margin-bottom:16px}
+.card-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.card-desc{font-size:13px;color:#a0a0c0;margin-bottom:20px;line-height:1.6}
 
-/* FORM ELEMENTS */
-label { display:block; font-size:13px; font-weight:600; color:#a0a0c0; margin-bottom:8px; }
-input, textarea, select {
-  width:100%; background:#111118; border:1px solid rgba(99,102,241,0.2); border-radius:10px;
-  padding:12px 16px; color:#f0f0ff; font-family:'Cairo',sans-serif; font-size:14px;
-  outline:none; transition:border-color 0.2s;
-}
-input:focus, textarea:focus, select:focus { border-color:rgba(99,102,241,0.5); }
-textarea { resize:vertical; min-height:100px; }
-.form-group { margin-bottom:16px; }
+/* FORM */
+label{display:block;font-size:12px;font-weight:700;color:#a0a0c0;margin-bottom:6px;letter-spacing:0.5px}
+input,textarea,select{width:100%;background:#111118;border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:11px 14px;color:#f0f0ff;font-family:'Cairo',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s}
+input:focus,textarea:focus,select:focus{border-color:rgba(99,102,241,0.5)}
+textarea{resize:vertical;min-height:90px}
+.form-group{margin-bottom:16px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(99,102,241,0.08)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:13px;color:#a0a0c0}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:#2a2a3a;border-radius:22px;cursor:pointer;transition:0.2s}
+.toggle-slider:before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.2s}
+.toggle input:checked+.toggle-slider{background:#6366f1}
+.toggle input:checked+.toggle-slider:before{transform:translateX(18px)}
 
 /* BUTTONS */
-.btn-primary {
-  background:linear-gradient(135deg,#6366f1,#8b5cf6);
-  color:white; border:none; border-radius:12px;
-  padding:14px 28px; font-size:15px; font-weight:700;
-  font-family:'Cairo',sans-serif; cursor:pointer;
-  transition:all 0.2s; width:100%;
-  box-shadow:0 0 20px rgba(99,102,241,0.3);
-}
-.btn-primary:hover { transform:translateY(-2px); box-shadow:0 0 40px rgba(99,102,241,0.5); }
-.btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-
-/* RESULT */
-.result-box {
-  background:#111118; border:1px solid rgba(99,102,241,0.2);
-  border-radius:12px; padding:20px; margin-top:20px;
-  min-height:80px; white-space:pre-wrap; line-height:1.8;
-  font-size:14px; color:#e0e0ff; display:none;
-}
-.result-box.visible { display:block; }
-
-/* IMAGE RESULT */
-.img-result { text-align:center; margin-top:20px; display:none; }
-.img-result.visible { display:block; }
-.img-result img { max-width:100%; border-radius:12px; border:1px solid rgba(99,102,241,0.2); }
-.img-download { display:inline-block; margin-top:12px; background:rgba(99,102,241,0.15); color:#a5b4fc; border:1px solid rgba(99,102,241,0.3); border-radius:8px; padding:8px 20px; text-decoration:none; font-size:14px; font-weight:600; }
-
-/* LOADING */
-.loading { display:none; text-align:center; padding:20px; color:#a0a0c0; font-size:14px; }
-.loading.visible { display:block; }
-.spinner { display:inline-block; width:20px; height:20px; border:2px solid rgba(99,102,241,0.3); border-top-color:#6366f1; border-radius:50%; animation:spin 0.8s linear infinite; margin-left:8px; vertical-align:middle; }
-@keyframes spin { to { transform:rotate(360deg); } }
-
-/* STATS */
-.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:32px; }
-.stat-card { background:#1a1a24; border:1px solid rgba(99,102,241,0.15); border-radius:12px; padding:16px; text-align:center; }
-.stat-num { font-size:28px; font-weight:900; background:linear-gradient(135deg,#6366f1,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.stat-label { font-size:12px; color:#606080; margin-top:4px; }
+.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;border-radius:10px;padding:13px 24px;font-size:15px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;transition:all 0.2s;box-shadow:0 0 20px rgba(99,102,241,0.25)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 0 30px rgba(99,102,241,0.4)}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.btn-secondary{background:#1a1a24;color:#a0a0c0;border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:13px 24px;font-size:15px;font-weight:600;font-family:'Cairo',sans-serif;cursor:pointer;transition:all 0.2s}
+.btn-secondary:hover{border-color:rgba(99,102,241,0.4);color:#e0e0ff}
+.btn-success{background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;border-radius:10px;padding:13px 24px;font-size:15px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;transition:all 0.2s}
+.btn-actions{display:flex;gap:10px;margin-top:20px}
 
 /* PRODUCT LIST */
-.product-item { background:#111118; border:1px solid rgba(99,102,241,0.15); border-radius:10px; padding:14px 16px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
-.product-name { font-size:14px; font-weight:600; }
-.product-price { font-size:13px; color:#a5b4fc; }
-.btn-small { background:rgba(99,102,241,0.15); color:#a5b4fc; border:1px solid rgba(99,102,241,0.3); border-radius:8px; padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer; font-family:'Cairo',sans-serif; transition:all 0.2s; white-space:nowrap; }
-.btn-small:hover { background:rgba(99,102,241,0.3); }
+.product-item{background:#111118;border:1px solid rgba(99,102,241,0.12);border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:border-color 0.2s;cursor:pointer}
+.product-item:hover{border-color:rgba(99,102,241,0.3)}
+.product-item.selected{border-color:#6366f1;background:rgba(99,102,241,0.05)}
+.product-img{width:44px;height:44px;border-radius:8px;background:#2a2a3a;object-fit:cover;flex-shrink:0}
+.product-info{flex:1}
+.product-name{font-size:14px;font-weight:600;margin-bottom:2px}
+.product-meta{font-size:12px;color:#606080}
+.product-check{width:18px;height:18px;accent-color:#6366f1;cursor:pointer}
+
+/* PREVIEW */
+.preview-box{background:#111118;border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:20px;margin-top:16px}
+.preview-label{font-size:11px;font-weight:700;color:#606080;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.preview-content{font-size:14px;color:#e0e0ff;line-height:1.8;white-space:pre-wrap}
+.preview-seo{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:14px;margin-top:12px}
+.preview-seo-title{font-size:16px;color:#60a5fa;font-weight:600;margin-bottom:4px}
+.preview-seo-url{font-size:12px;color:#34d399;margin-bottom:6px}
+.preview-seo-desc{font-size:13px;color:#a0a0c0;line-height:1.5}
+
+/* LOADING */
+.loading-bar{display:none;background:#1a1a24;border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:20px;margin-top:16px;text-align:center}
+.loading-bar.visible{display:block}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(99,102,241,0.3);border-top-color:#6366f1;border-radius:50%;animation:spin 0.8s linear infinite;margin-left:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress-text{font-size:14px;color:#a5b4fc;margin-top:8px}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:#1a1a24;border:1px solid rgba(99,102,241,0.15);border-radius:12px;padding:16px;text-align:center}
+.stat-num{font-size:28px;font-weight:900;background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-label{font-size:11px;color:#606080;margin-top:4px}
+
+/* BADGE */
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px}
+.badge-new{background:rgba(16,185,129,0.15);color:#34d399}
+.badge-pro{background:rgba(99,102,241,0.15);color:#a5b4fc}
 
 /* ALERT */
-.alert { padding:12px 16px; border-radius:10px; font-size:13px; margin-bottom:16px; }
-.alert-info { background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.2); color:#67e8f9; }
-.alert-success { background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:#34d399; }
+.alert{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:16px;line-height:1.5}
+.alert-info{background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);color:#67e8f9}
+.alert-success{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);color:#34d399}
+.alert-warning{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:#fbbf24}
+
+/* SELECT ALL BAR */
+.select-bar{display:flex;align-items:center;gap:12px;padding:10px 0;margin-bottom:8px}
+.select-count{font-size:13px;color:#a0a0c0}
+
+/* PAGE SECTIONS */
+.page{display:none}
+.page.active{display:block}
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo">✦ مصمم المنتجات AI</div>
-  <div class="nav-store" id="store-name">جاري التحميل...</div>
-</nav>
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">✦ مصمم المنتجات AI</div>
+  <div class="sidebar-store">المتجر: <span id="store-name">جاري التحميل...</span></div>
+  
+  <div class="sidebar-section">العمليات بالجملة</div>
+  <div class="sidebar-item active" onclick="showPage('desc-bulk')" id="nav-desc-bulk">
+    <span class="icon">✍️</span> وصف بالجملة
+  </div>
+  <div class="sidebar-item" onclick="showPage('improve-bulk')" id="nav-improve-bulk">
+    <span class="icon">✨</span> تحسين الوصف
+  </div>
+  <div class="sidebar-item" onclick="showPage('seo-bulk')" id="nav-seo-bulk">
+    <span class="icon">🔍</span> SEO بالجملة
+  </div>
 
-<div class="hero">
-  <h1>أدوات <span>الذكاء الاصطناعي</span><br>لمتجرك في سلة</h1>
-  <p>صمّم صور منتجاتك، اكتب أوصافاً تزيد مبيعاتك، وحسّن ظهورك في محركات البحث — كل هذا بضغطة زر</p>
+  <div class="sidebar-section">أدوات منفردة</div>
+  <div class="sidebar-item" onclick="showPage('image-gen')" id="nav-image-gen">
+    <span class="icon">🖼️</span> توليد الصور
+  </div>
+  <div class="sidebar-item" onclick="showPage('image-edit')" id="nav-image-edit">
+    <span class="icon">🎨</span> تحرير الصور
+  </div>
+  <div class="sidebar-item" onclick="showPage('translate')" id="nav-translate">
+    <span class="icon">🌐</span> الترجمة
+  </div>
+
+  <div style="margin-top:auto;padding:16px 20px;border-top:1px solid rgba(99,102,241,0.1)">
+    <a href="/auth/salla" class="btn-link" style="display:block;text-align:center;font-size:12px">🔗 إعادة ربط المتجر</a>
+  </div>
 </div>
 
-<div class="tabs">
-  <button class="tab active" onclick="switchTab('products')">📦 المنتجات</button>
-  <button class="tab" onclick="switchTab('image-gen')">🖼️ توليد الصور</button>
-  <button class="tab" onclick="switchTab('description')">✍️ الوصف والـ SEO</button>
-  <button class="tab" onclick="switchTab('image-edit')">🎨 تحرير الصور</button>
-  <button class="tab" onclick="switchTab('translate')">🌐 الترجمة</button>
+<!-- MAIN -->
+<div class="main">
+<div class="topbar">
+  <div class="topbar-title" id="page-title">وصف بالجملة</div>
+  <div class="topbar-actions">
+    <span style="font-size:12px;color:#606080" id="products-count-bar">0 منتج</span>
+  </div>
 </div>
 
-<div class="container">
+<div class="content">
 
-  <!-- PRODUCTS TAB -->
-  <div class="tool-panel active" id="tab-products">
-    <div class="stats">
-      <div class="stat-card"><div class="stat-num" id="products-count">-</div><div class="stat-label">منتج في المتجر</div></div>
-      <div class="stat-card"><div class="stat-num" id="orders-count">-</div><div class="stat-label">طلب اليوم</div></div>
-      <div class="stat-card"><div class="stat-num">AI</div><div class="stat-label">أداة متاحة</div></div>
+<!-- ===== PAGE: وصف بالجملة ===== -->
+<div class="page active" id="page-desc-bulk">
+  <!-- Wizard Steps -->
+  <div class="wizard-steps">
+    <div class="wizard-step active" id="step-desc-1" onclick="goStep('desc',1)">
+      <span class="step-num">الخطوة ١</span>الإعدادات
     </div>
-    <div class="card">
-      <h2>منتجاتك في سلة</h2>
-      <p>اختر منتجاً لتطبيق أدوات الذكاء الاصطناعي عليه مباشرة</p>
-      <div class="alert alert-info">🔗 يتم جلب منتجاتك من سلة تلقائياً</div>
-      <div id="products-list">
-        <div style="text-align:center;padding:30px;color:#606080;">جاري تحميل المنتجات...</div>
-      </div>
+    <div class="wizard-step" id="step-desc-2" onclick="goStep('desc',2)">
+      <span class="step-num">الخطوة ٢</span>اختر المنتجات
+    </div>
+    <div class="wizard-step" id="step-desc-3" onclick="goStep('desc',3)">
+      <span class="step-num">الخطوة ٣</span>المعاينة والرفع
     </div>
   </div>
 
-  <!-- IMAGE GEN TAB -->
-  <div class="tool-panel" id="tab-image-gen">
+  <!-- Step 1: Settings -->
+  <div id="desc-step-1">
     <div class="card">
-      <h2>🖼️ توليد صورة منتج احترافية</h2>
-      <p>صف منتجك وسيولّد الذكاء الاصطناعي صورة احترافية جاهزة للمتجر</p>
+      <div class="card-title">إعدادات الكتابة</div>
+      <div class="card-desc">خصّص كيف يكتب الذكاء الاصطناعي وصف منتجاتك</div>
+      
       <div class="form-group">
-        <label>اسم المنتج</label>
-        <input type="text" id="img-product-name" placeholder="مثال: عطر ورد الطائف" />
+        <label>تعليمات إضافية (اختياري)</label>
+        <textarea id="desc-instructions" placeholder="مثال: اجعل الوصف موجهاً للشباب، استخدم لغة بسيطة، ركز على الجودة..."></textarea>
       </div>
-      <div class="form-group">
-        <label>وصف المنتج والخلفية المطلوبة</label>
-        <textarea id="img-prompt" placeholder="مثال: زجاجة عطر فاخرة ذهبية على خلفية بيضاء نظيفة، إضاءة استوديو احترافية، جودة عالية"></textarea>
-      </div>
-      <div class="form-group">
-        <label>نوع الصورة</label>
-        <select id="img-style">
-          <option value="product photography, white background, studio lighting">صورة منتج احترافية - خلفية بيضاء</option>
-          <option value="lifestyle product photography, natural lighting">صورة لايف ستايل - بيئة طبيعية</option>
-          <option value="luxury product photography, dark background, dramatic lighting">صورة فاخرة - خلفية داكنة</option>
-          <option value="flat lay product photography, minimal background">فلات لاي - تصوير من أعلى</option>
-        </select>
-      </div>
-      <button class="btn-primary" onclick="generateImage()">✨ توليد الصورة</button>
-      <div class="loading" id="img-loading">جاري توليد الصورة... <span class="spinner"></span></div>
-      <div class="img-result" id="img-result">
-        <img id="generated-img" src="" alt="صورة المنتج" />
-        <br>
-        <a id="img-download" href="#" download="product-image.png" class="img-download">⬇️ تحميل الصورة</a>
-      </div>
-    </div>
-  </div>
 
-  <!-- DESCRIPTION TAB -->
-  <div class="tool-panel" id="tab-description">
-    <div class="card">
-      <h2>✍️ كتابة وصف المنتج + SEO</h2>
-      <p>أدخل معلومات المنتج وسيكتب الذكاء الاصطناعي وصفاً مقنعاً يزيد المبيعات</p>
-      <div class="form-group">
-        <label>اسم المنتج</label>
-        <input type="text" id="desc-name" placeholder="مثال: ساعة يد ذكية" />
-      </div>
-      <div class="form-group">
-        <label>الميزات الرئيسية (افصل بينها بفاصلة)</label>
-        <input type="text" id="desc-features" placeholder="مثال: مقاوم للماء، شاشة AMOLED، بطارية 7 أيام" />
-      </div>
       <div class="form-group">
         <label>الفئة المستهدفة</label>
-        <input type="text" id="desc-audience" placeholder="مثال: رجال الأعمال، الرياضيين" />
+        <input type="text" id="desc-audience" value="العملاء السعوديين" />
       </div>
-      <div class="form-group">
-        <label>السعر (ريال)</label>
-        <input type="number" id="desc-price" placeholder="مثال: 299" />
+
+      <div style="margin-top:8px">
+        <div class="toggle-row">
+          <span class="toggle-label">لا تستخدم ايموجي في الوصف</span>
+          <label class="toggle"><input type="checkbox" id="no-emoji"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">تضمين الوصف الحالي في التحسين</span>
+          <label class="toggle"><input type="checkbox" id="include-current" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">تحديث SEO تلقائياً مع الوصف</span>
+          <label class="toggle"><input type="checkbox" id="update-seo" checked><span class="toggle-slider"></span></label>
+        </div>
       </div>
-      <button class="btn-primary" onclick="generateDescription()">✍️ كتابة الوصف والـ SEO</button>
-      <div class="loading" id="desc-loading">جاري كتابة الوصف... <span class="spinner"></span></div>
-      <div class="result-box" id="desc-result"></div>
-      <input type="hidden" id="desc-product-id" value="">
-      <div id="desc-approve-box" style="display:none;margin-top:16px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:16px;text-align:center;">
-        <p style="font-size:14px;color:#34d399;margin-bottom:12px;">✅ الوصف جاهز — هل تريد رفعه للمتجر؟</p>
-        <button id="approve-btn" onclick="approveAndUpload()" style="background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;">
-          🚀 موافق — ارفع للمتجر
+    </div>
+    <div class="btn-actions">
+      <button class="btn-primary" onclick="goStep('desc',2)">التالي: اختر المنتجات ←</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Select Products -->
+  <div id="desc-step-2" style="display:none">
+    <div class="card">
+      <div class="card-title">اختر المنتجات</div>
+      <div class="card-desc">اختر المنتجات التي تريد كتابة وصف لها</div>
+      <div class="select-bar">
+        <input type="checkbox" id="desc-select-all" onchange="toggleAll('desc',this.checked)" style="width:18px;height:18px;accent-color:#6366f1">
+        <span class="select-count" id="desc-selected-count">0 منتج محدد</span>
+      </div>
+      <div id="desc-products-list">
+        <div style="text-align:center;padding:30px;color:#606080">جاري تحميل المنتجات...</div>
+      </div>
+    </div>
+    <div class="btn-actions">
+      <button class="btn-secondary" onclick="goStep('desc',1)">← رجوع</button>
+      <button class="btn-primary" onclick="goStep('desc',3)">التالي: معاينة ←</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Preview & Upload -->
+  <div id="desc-step-3" style="display:none">
+    <div class="card">
+      <div class="card-title">معاينة ورفع</div>
+      <div class="card-desc">راجع النتائج قبل الرفع للمتجر</div>
+      <div class="alert alert-info">سيتم توليد الوصف لكل منتج وعرضه للمراجعة قبل الرفع</div>
+      
+      <div id="desc-preview-area">
+        <button class="btn-primary" onclick="generateAllDescriptions()" id="gen-desc-btn">
+          ✨ توليد الأوصاف الآن
         </button>
       </div>
-    </div>
-  </div>
-
-  <!-- IMAGE EDIT TAB -->
-  <div class="tool-panel" id="tab-image-edit">
-    <div class="card">
-      <h2>🎨 تحرير صورة بالذكاء الاصطناعي</h2>
-      <p>ارفع صورة منتجك وعدّلها بأمر نصي بسيط</p>
-      <div class="form-group">
-        <label>ارفع صورة المنتج</label>
-        <input type="file" id="edit-image" accept="image/*" />
+      
+      <div class="loading-bar" id="desc-loading">
+        <span class="spinner"></span>
+        <div class="progress-text" id="desc-progress-text">جاري التوليد...</div>
       </div>
-      <div class="form-group">
-        <label>ماذا تريد أن تعدّل؟</label>
-        <textarea id="edit-prompt" placeholder="مثال: احذف الخلفية واجعلها بيضاء نظيفة&#10;أو: أضف إضاءة درامية احترافية&#10;أو: حسّن الألوان واجعل المنتج أكثر وضوحاً"></textarea>
-      </div>
-      <button class="btn-primary" onclick="editImage()">🎨 تحرير الصورة</button>
-      <div class="loading" id="edit-loading">جاري تحرير الصورة... <span class="spinner"></span></div>
-      <div class="img-result" id="edit-result">
-        <img id="edited-img" src="" alt="الصورة المعدّلة" />
-        <br>
-        <a id="edit-download" href="#" download="edited-image.png" class="img-download">⬇️ تحميل الصورة المعدّلة</a>
+      
+      <div id="desc-results-area" style="display:none;margin-top:20px">
+        <div id="desc-results-list"></div>
+        <div class="btn-actions">
+          <button class="btn-success" onclick="uploadAllDesc()" id="upload-desc-btn">
+            🚀 رفع الكل للمتجر
+          </button>
+          <button class="btn-secondary" onclick="goStep('desc',2)">← تعديل الاختيار</button>
+        </div>
       </div>
     </div>
-  </div>
-
-  <!-- TRANSLATE TAB -->
-  <div class="tool-panel" id="tab-translate">
-    <div class="card">
-      <h2>🌐 ترجمة المنتجات</h2>
-      <p>ترجم أسماء وأوصاف منتجاتك لاستهداف عملاء من دول مختلفة</p>
-      <div class="form-group">
-        <label>النص العربي</label>
-        <textarea id="translate-text" placeholder="ادخل اسم أو وصف المنتج بالعربي..."></textarea>
-      </div>
-      <div class="form-group">
-        <label>الترجمة إلى</label>
-        <select id="translate-lang">
-          <option value="English">الإنجليزية</option>
-          <option value="French">الفرنسية</option>
-          <option value="Turkish">التركية</option>
-          <option value="Urdu">الأردية</option>
-          <option value="Chinese">الصينية</option>
-        </select>
-      </div>
-      <button class="btn-primary" onclick="translateText()">🌐 ترجمة الآن</button>
-      <div class="loading" id="trans-loading">جاري الترجمة... <span class="spinner"></span></div>
-      <div class="result-box" id="trans-result"></div>
+    <div class="btn-actions" id="desc-step3-back">
+      <button class="btn-secondary" onclick="goStep('desc',2)">← رجوع</button>
     </div>
   </div>
-
 </div>
+
+<!-- ===== PAGE: تحسين الوصف ===== -->
+<div class="page" id="page-improve-bulk">
+  <div class="wizard-steps">
+    <div class="wizard-step active" id="step-improve-1">
+      <span class="step-num">الخطوة ١</span>الإعدادات
+    </div>
+    <div class="wizard-step" id="step-improve-2">
+      <span class="step-num">الخطوة ٢</span>اختر المنتجات
+    </div>
+    <div class="wizard-step" id="step-improve-3">
+      <span class="step-num">الخطوة ٣</span>المعاينة والرفع
+    </div>
+  </div>
+
+  <div id="improve-step-1">
+    <div class="card">
+      <div class="card-title">إعدادات تحسين الوصف</div>
+      <div class="card-desc">سيجلب الذكاء الاصطناعي وصف كل منتج من سلة ويحسّنه</div>
+      <div class="form-group">
+        <label>تعليمات التحسين (اختياري)</label>
+        <textarea id="improve-instructions" placeholder="مثال: اجعل الوصف أكثر إقناعاً، أضف نقاط البيع، ركز على الفوائد..."></textarea>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">الحفاظ على بنية الوصف الحالي</span>
+        <label class="toggle"><input type="checkbox" id="keep-structure" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">تحديث SEO تلقائياً</span>
+        <label class="toggle"><input type="checkbox" id="improve-update-seo" checked><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+    <div class="btn-actions">
+      <button class="btn-primary" onclick="goStep('improve',2)">التالي ←</button>
+    </div>
+  </div>
+
+  <div id="improve-step-2" style="display:none">
+    <div class="card">
+      <div class="card-title">اختر المنتجات للتحسين</div>
+      <div class="card-desc">اختر المنتجات التي تريد تحسين وصفها الحالي</div>
+      <div class="select-bar">
+        <input type="checkbox" id="improve-select-all" onchange="toggleAll('improve',this.checked)" style="width:18px;height:18px;accent-color:#6366f1">
+        <span class="select-count" id="improve-selected-count">0 منتج محدد</span>
+      </div>
+      <div id="improve-products-list">
+        <div style="text-align:center;padding:30px;color:#606080">جاري تحميل المنتجات...</div>
+      </div>
+    </div>
+    <div class="btn-actions">
+      <button class="btn-secondary" onclick="goStep('improve',1)">← رجوع</button>
+      <button class="btn-primary" onclick="goStep('improve',3)">التالي ←</button>
+    </div>
+  </div>
+
+  <div id="improve-step-3" style="display:none">
+    <div class="card">
+      <div class="card-title">معاينة التحسينات</div>
+      <div class="card-desc">راجع الوصف المحسّن قبل الرفع</div>
+      <div id="improve-preview-area">
+        <button class="btn-primary" onclick="generateAllImprovements()" id="gen-improve-btn">
+          ✨ تحسين الأوصاف الآن
+        </button>
+      </div>
+      <div class="loading-bar" id="improve-loading">
+        <span class="spinner"></span>
+        <div class="progress-text" id="improve-progress-text">جاري التحسين...</div>
+      </div>
+      <div id="improve-results-area" style="display:none;margin-top:20px">
+        <div id="improve-results-list"></div>
+        <div class="btn-actions">
+          <button class="btn-success" onclick="uploadAllImprove()" id="upload-improve-btn">🚀 رفع الكل للمتجر</button>
+          <button class="btn-secondary" onclick="goStep('improve',2)">← رجوع</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: SEO بالجملة ===== -->
+<div class="page" id="page-seo-bulk">
+  <div class="wizard-steps">
+    <div class="wizard-step active" id="step-seo-1">
+      <span class="step-num">الخطوة ١</span>الإعدادات
+    </div>
+    <div class="wizard-step" id="step-seo-2">
+      <span class="step-num">الخطوة ٢</span>اختر المنتجات
+    </div>
+    <div class="wizard-step" id="step-seo-3">
+      <span class="step-num">الخطوة ٣</span>المعاينة والرفع
+    </div>
+  </div>
+
+  <div id="seo-step-1">
+    <div class="card">
+      <div class="card-title">إعدادات SEO</div>
+      <div class="card-desc">سيولّد الذكاء الاصطناعي عنوان SEO + وصف SEO + كلمات مفتاحية لكل منتج</div>
+      <div class="form-group">
+        <label>كلمات مفتاحية عامة (اختياري)</label>
+        <input type="text" id="seo-keywords" placeholder="مثال: شراء اونلاين، توصيل سريع، السعودية..." />
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">إضافة كلمات مفتاحية باللغتين</span>
+        <label class="toggle"><input type="checkbox" id="seo-bilingual"><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+    <div class="btn-actions">
+      <button class="btn-primary" onclick="goStep('seo',2)">التالي ←</button>
+    </div>
+  </div>
+
+  <div id="seo-step-2" style="display:none">
+    <div class="card">
+      <div class="card-title">اختر المنتجات</div>
+      <div class="select-bar">
+        <input type="checkbox" id="seo-select-all" onchange="toggleAll('seo',this.checked)" style="width:18px;height:18px;accent-color:#6366f1">
+        <span class="select-count" id="seo-selected-count">0 منتج محدد</span>
+      </div>
+      <div id="seo-products-list">
+        <div style="text-align:center;padding:30px;color:#606080">جاري تحميل المنتجات...</div>
+      </div>
+    </div>
+    <div class="btn-actions">
+      <button class="btn-secondary" onclick="goStep('seo',1)">← رجوع</button>
+      <button class="btn-primary" onclick="goStep('seo',3)">التالي ←</button>
+    </div>
+  </div>
+
+  <div id="seo-step-3" style="display:none">
+    <div class="card">
+      <div class="card-title">معاينة نتائج SEO</div>
+      <div id="seo-preview-area">
+        <button class="btn-primary" onclick="generateAllSEO()" id="gen-seo-btn">🔍 توليد SEO الآن</button>
+      </div>
+      <div class="loading-bar" id="seo-loading">
+        <span class="spinner"></span>
+        <div class="progress-text" id="seo-progress-text">جاري توليد SEO...</div>
+      </div>
+      <div id="seo-results-area" style="display:none;margin-top:20px">
+        <div id="seo-results-list"></div>
+        <div class="btn-actions">
+          <button class="btn-success" onclick="uploadAllSEO()" id="upload-seo-btn">🚀 رفع SEO للمتجر</button>
+          <button class="btn-secondary" onclick="goStep('seo',2)">← رجوع</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: توليد الصور ===== -->
+<div class="page" id="page-image-gen">
+  <div class="card">
+    <div class="card-title">🖼️ توليد صورة منتج احترافية</div>
+    <div class="card-desc">صف منتجك وسيولّد الذكاء الاصطناعي صورة احترافية</div>
+    <div class="form-group"><label>اسم المنتج</label><input type="text" id="img-name" placeholder="مثال: عطر ورد الطائف"></div>
+    <div class="form-group"><label>وصف الصورة المطلوبة</label><textarea id="img-prompt" placeholder="مثال: زجاجة عطر فاخرة على خلفية بيضاء نظيفة"></textarea></div>
+    <div class="form-group">
+      <label>نوع الصورة</label>
+      <select id="img-style">
+        <option value="product photography, white background, studio lighting">صورة منتج - خلفية بيضاء</option>
+        <option value="lifestyle product photography, natural lighting">لايف ستايل - بيئة طبيعية</option>
+        <option value="luxury product photography, dark background, dramatic lighting">فاخرة - خلفية داكنة</option>
+        <option value="flat lay product photography">فلات لاي - تصوير من أعلى</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="generateImage()">✨ توليد الصورة</button>
+    <div class="loading-bar" id="img-loading"><span class="spinner"></span><div class="progress-text">جاري توليد الصورة...</div></div>
+    <div id="img-result" style="display:none;margin-top:16px;text-align:center">
+      <img id="generated-img" src="" style="max-width:100%;border-radius:12px;border:1px solid rgba(99,102,241,0.2)">
+      <br><a id="img-download" href="#" download="product.png" class="btn-link" style="display:inline-block;margin-top:12px">⬇️ تحميل</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: تحرير الصور ===== -->
+<div class="page" id="page-image-edit">
+  <div class="card">
+    <div class="card-title">🎨 تحرير صورة بالذكاء الاصطناعي</div>
+    <div class="card-desc">ارفع صورة منتجك وعدّلها بأمر نصي</div>
+    <div class="form-group"><label>ارفع الصورة</label><input type="file" id="edit-file" accept="image/*"></div>
+    <div class="form-group"><label>التعديل المطلوب</label><textarea id="edit-prompt" placeholder="مثال: احذف الخلفية واجعلها بيضاء، أضف إضاءة احترافية..."></textarea></div>
+    <button class="btn-primary" onclick="editImage()">🎨 تحرير الصورة</button>
+    <div class="loading-bar" id="edit-loading"><span class="spinner"></span><div class="progress-text">جاري التحرير...</div></div>
+    <div id="edit-result" style="display:none;margin-top:16px;text-align:center">
+      <img id="edited-img" src="" style="max-width:100%;border-radius:12px">
+      <br><a id="edit-download" href="#" download="edited.png" class="btn-link" style="display:inline-block;margin-top:12px">⬇️ تحميل</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: الترجمة ===== -->
+<div class="page" id="page-translate">
+  <div class="card">
+    <div class="card-title">🌐 ترجمة المنتجات</div>
+    <div class="card-desc">ترجم أسماء وأوصاف منتجاتك</div>
+    <div class="form-group"><label>النص</label><textarea id="trans-text" placeholder="أدخل النص..."></textarea></div>
+    <div class="form-group">
+      <label>الترجمة إلى</label>
+      <select id="trans-lang">
+        <option value="English">الإنجليزية</option>
+        <option value="French">الفرنسية</option>
+        <option value="Turkish">التركية</option>
+        <option value="Urdu">الأردية</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="translateText()">🌐 ترجمة</button>
+    <div class="loading-bar" id="trans-loading"><span class="spinner"></span></div>
+    <div id="trans-result" style="display:none;margin-top:16px;background:#111118;border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:16px;font-size:14px;line-height:1.8"></div>
+  </div>
+</div>
+
+</div><!-- end content -->
+</div><!-- end main -->
 
 <script>
 const API_BASE = window.location.origin;
-
-// Tab switching
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
-  document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
-  document.getElementById(`tab-${tab}`).classList.add('active');
-  if (tab === 'products') loadProducts();
-}
-
-// Load products from Salla
 let allProducts = [];
+let selectedProducts = {desc:{}, improve:{}, seo:{}};
+let generatedResults = {desc:[], improve:[], seo:[]};
+
+// ===== INIT =====
+async function init() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromUrl = params.get('token');
+    if (tokenFromUrl) {
+      localStorage.setItem('salla_token', tokenFromUrl);
+      window.history.replaceState({}, '', '/');
+    }
+    const token = localStorage.getItem('salla_token');
+    if (!token) {
+      document.getElementById('store-name').textContent = 'غير مرتبط';
+      return;
+    }
+    document.getElementById('store-name').textContent = 'جاري التحميل...';
+    await loadProducts();
+  } catch(e) {
+    console.error('Init error:', e);
+  }
+}
 
 async function loadProducts() {
   const token = localStorage.getItem('salla_token') || 'demo';
@@ -284,383 +521,359 @@ async function loadProducts() {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await res.json();
-    if (data.products && data.products.length > 0) {
-      allProducts = data.products;
-      document.getElementById('products-count').textContent = data.products.length;
-      renderProducts(data.products);
-    } else {
-      document.getElementById('products-list').innerHTML = '<div style="text-align:center;padding:30px;color:#606080;">لا توجد منتجات</div>';
-    }
+    allProducts = data.products || [];
+    document.getElementById('store-name').textContent = `${allProducts.length} منتج`;
+    document.getElementById('products-count-bar').textContent = `${allProducts.length} منتج`;
+    renderProductsList('desc');
+    renderProductsList('improve');
+    renderProductsList('seo');
   } catch(e) {
-    document.getElementById('products-list').innerHTML = '<div style="text-align:center;padding:30px;color:#606080;">تعذّر تحميل المنتجات</div>';
+    document.getElementById('store-name').textContent = 'خطأ في التحميل';
   }
 }
 
+// ===== NAVIGATION =====
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  document.getElementById('nav-' + pageId).classList.add('active');
+  const titles = {'desc-bulk':'وصف بالجملة','improve-bulk':'تحسين الوصف','seo-bulk':'SEO بالجملة','image-gen':'توليد الصور','image-edit':'تحرير الصور','translate':'الترجمة'};
+  document.getElementById('page-title').textContent = titles[pageId] || pageId;
+}
+
+function goStep(type, step) {
+  for(let i=1;i<=3;i++) {
+    const stepEl = document.getElementById(`${type}-step-${i}`);
+    const wizEl = document.getElementById(`step-${type}-${i}`);
+    if(stepEl) stepEl.style.display = i===step ? 'block' : 'none';
+    if(wizEl) {
+      wizEl.classList.remove('active','done');
+      if(i===step) wizEl.classList.add('active');
+      else if(i<step) wizEl.classList.add('done');
+    }
+  }
+}
+
+// ===== PRODUCTS LIST =====
 function getPrice(p) {
   if (!p.price) return '0';
   if (typeof p.price === 'object') return p.price.amount || p.price.regular || '0';
   return p.price;
 }
 
-function renderProducts(products) {
-  const list = document.getElementById('products-list');
-  list.innerHTML = `
-    <div style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#a0a0c0;cursor:pointer">
-        <input type="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)" style="width:16px;height:16px">
-        تحديد الكل
-      </label>
-      <button class="btn-small" onclick="updateAllDescriptions()" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;">
-        ✨ توليد الوصف للمحدد
-      </button>
-      <button class="btn-small" onclick="generateAndUploadAll()" style="background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;">
-        🚀 توليد ورفع الكل تلقائياً
-      </button>
-    </div>
-    <div id="bulk-progress" style="display:none;margin-bottom:12px;padding:12px;background:rgba(99,102,241,0.1);border-radius:10px;font-size:13px;color:#a5b4fc;"></div>
-    ${products.map((p, i) => `
-      <div class="product-item">
-        <div style="display:flex;align-items:center;gap:10px;flex:1">
-          <input type="checkbox" class="product-checkbox" data-index="${i}" style="width:16px;height:16px">
-          <div>
-            <div class="product-name">${p.name}</div>
-            <div class="product-price">${getPrice(p)} ريال</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-small" onclick="autoFill('image-gen','${p.name.replace(/'/g,"\\'")}','${p.id}')">صورة</button>
-          <button class="btn-small" onclick="autoFill('description','${p.name.replace(/'/g,"\\'")}','${p.id}')">وصف</button>
-        </div>
+function renderProductsList(type) {
+  const el = document.getElementById(`${type}-products-list`);
+  if (!el || allProducts.length === 0) return;
+  el.innerHTML = allProducts.map((p,i) => `
+    <div class="product-item" onclick="toggleProduct('${type}',${i},this)" id="${type}-prod-${i}">
+      <input type="checkbox" class="${type}-checkbox" data-index="${i}" style="width:18px;height:18px;accent-color:#6366f1" onclick="event.stopPropagation();toggleProduct('${type}',${i},document.getElementById('${type}-prod-${i}'))">
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-meta">${getPrice(p)} ريال</div>
       </div>
-    `).join('')}
+    </div>
+  `).join('');
+}
+
+function toggleProduct(type, idx, el) {
+  const cb = el.querySelector('input[type=checkbox]') || el;
+  if(el.classList && el.classList.contains('product-item')) {
+    const checkbox = el.querySelector('input');
+    checkbox.checked = !checkbox.checked;
+    el.classList.toggle('selected', checkbox.checked);
+    selectedProducts[type][idx] = checkbox.checked;
+  }
+  updateSelectedCount(type);
+}
+
+function toggleAll(type, checked) {
+  document.querySelectorAll(`.${type}-checkbox`).forEach(cb => {
+    cb.checked = checked;
+    const idx = cb.dataset.index;
+    const item = document.getElementById(`${type}-prod-${idx}`);
+    if(item) item.classList.toggle('selected', checked);
+    selectedProducts[type][idx] = checked;
+  });
+  updateSelectedCount(type);
+}
+
+function updateSelectedCount(type) {
+  const count = Object.values(selectedProducts[type]).filter(Boolean).length;
+  const el = document.getElementById(`${type}-selected-count`);
+  if(el) el.textContent = `${count} منتج محدد`;
+}
+
+function getSelected(type) {
+  return Object.entries(selectedProducts[type])
+    .filter(([,v]) => v)
+    .map(([i]) => allProducts[parseInt(i)])
+    .filter(Boolean);
+}
+
+// ===== RESULT CARD =====
+function renderResultCard(type, idx, p, data) {
+  return `
+    <div style="background:#111118;border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-weight:700;font-size:14px">${p.name}</div>
+        <span class="badge badge-new">جاهز للرفع</span>
+      </div>
+      ${data.seoTitle ? `
+        <div class="preview-seo">
+          <div class="preview-seo-title">${data.seoTitle}</div>
+          <div class="preview-seo-url">سلة.com › ${p.name.replace(/\s+/g,'-').toLowerCase()}</div>
+          <div class="preview-seo-desc">${data.seoDescription || ''}</div>
+        </div>` : ''}
+      ${data.description ? `
+        <div class="preview-box" style="margin-top:12px">
+          <div class="preview-label">الوصف</div>
+          <div class="preview-content" style="max-height:120px;overflow:hidden">${data.description.substring(0,300)}${data.description.length>300?'...':''}</div>
+        </div>` : ''}
+      ${data.seoKeywords ? `
+        <div style="margin-top:10px;font-size:12px;color:#606080">
+          <b style="color:#a0a0c0">الكلمات المفتاحية:</b> ${data.seoKeywords}
+        </div>` : ''}
+    </div>
   `;
 }
 
-function toggleSelectAll(checked) {
-  document.querySelectorAll('.product-checkbox').forEach(cb => cb.checked = checked);
-}
-
-async function generateAndUploadAll() {
-  const selected = [...document.querySelectorAll('.product-checkbox:checked')];
-  if (selected.length === 0) return alert('اختر منتجاً على الأقل');
-  const token = localStorage.getItem('salla_token');
-  if (!token) return alert('لم يتم ربط المتجر');
-  if (!confirm(`سيتم توليد الوصف ورفعه تلقائياً لـ ${selected.length} منتج. هل توافق؟`)) return;
-
-  const progress = document.getElementById('bulk-progress');
-  progress.style.display = 'block';
-
-  let success = 0, failed = 0;
-
-  for (let i = 0; i < selected.length; i++) {
-    const idx = selected[i].dataset.index;
-    const p = allProducts[idx];
-    progress.innerHTML = `⏳ جاري المعالجة ${i+1} من ${selected.length}: <b>${p.name}</b>`;
-
-    try {
-      // 1. Generate description
-      const genRes = await fetch(`${API_BASE}/api/generate-description`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: p.name,
-          features: p.description || p.name,
-          audience: 'العملاء',
-          price: getPrice(p)
-        })
-      });
-      const genData = await genRes.json();
-      if (!genData.description) throw new Error('فشل توليد الوصف');
-
-      // 2. Upload to Salla
-      const upRes = await fetch(`${API_BASE}/api/update-product`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId: p.id,
-          description: genData.description,
-          seoTitle: genData.seoTitle,
-          seoDescription: genData.seoDescription,
-          token: token
-        })
-      });
-      const upData = await upRes.json();
-      if (upData.success) {
-        success++;
-        progress.innerHTML = `✅ تم: ${p.name} (${success} ناجح، ${failed} فاشل)`;
-      } else {
-        throw new Error(upData.error || 'فشل الرفع');
-      }
-    } catch(e) {
-      failed++;
-      progress.innerHTML = `❌ فشل: ${p.name} — ${e.message}`;
-    }
-
-    await new Promise(r => setTimeout(r, 1500));
-  }
-
-  progress.innerHTML = `🎉 اكتملت العملية! ${success} منتج تم رفعه بنجاح${failed > 0 ? ` — ${failed} فشل` : ''}`;
-}
-
-async function updateAllDescriptions() {
-  const selected = [...document.querySelectorAll('.product-checkbox:checked')];
-  if (selected.length === 0) return alert('اختر منتجاً على الأقل');
+// ===== DESC BULK =====
+async function generateAllDescriptions() {
+  const products = getSelected('desc');
+  if(products.length === 0) return alert('اختر منتجاً على الأقل في الخطوة ٢');
   
-  const progress = document.getElementById('bulk-progress');
-  progress.style.display = 'block';
-  
-  for (let i = 0; i < selected.length; i++) {
-    const idx = selected[i].dataset.index;
-    const p = allProducts[idx];
-    progress.textContent = `جاري تحديث ${i+1} من ${selected.length}: ${p.name}...`;
-    
+  document.getElementById('gen-desc-btn').style.display = 'none';
+  document.getElementById('desc-loading').classList.add('visible');
+  generatedResults.desc = [];
+
+  for(let i=0; i<products.length; i++) {
+    const p = products[i];
+    document.getElementById('desc-progress-text').textContent = `جاري توليد وصف (${i+1}/${products.length}): ${p.name}`;
     try {
       const res = await fetch(`${API_BASE}/api/generate-description`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
           name: p.name,
           features: p.description || p.name,
-          audience: 'العملاء',
+          audience: document.getElementById('desc-audience').value,
           price: getPrice(p)
         })
       });
       const data = await res.json();
-      if (data.description) {
-        progress.textContent = `✅ تم تحديث: ${p.name}`;
-      }
+      generatedResults.desc.push({product: p, ...data});
     } catch(e) {
-      progress.textContent = `❌ خطأ في: ${p.name}`;
+      generatedResults.desc.push({product: p, error: e.message});
     }
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise(r => setTimeout(r, 800));
   }
-  progress.textContent = `✅ تم تحديث ${selected.length} منتج بنجاح!`;
+
+  document.getElementById('desc-loading').classList.remove('visible');
+  document.getElementById('desc-results-area').style.display = 'block';
+  document.getElementById('desc-results-list').innerHTML = generatedResults.desc
+    .map((r,i) => r.error ? `<div class="alert alert-warning">❌ ${r.product.name}: ${r.error}</div>` : renderResultCard('desc', i, r.product, r))
+    .join('');
 }
 
-function autoFill(tab, productName, productId = '') {
-  switchTab(tab);
-  if (tab === 'image-gen') document.getElementById('img-product-name').value = productName;
-  if (tab === 'description') {
-    document.getElementById('desc-name').value = productName;
-    document.getElementById('desc-product-id').value = productId;
-    document.getElementById('desc-approve-box').style.display = 'none';
+async function uploadAllDesc() {
+  const token = localStorage.getItem('salla_token');
+  if(!token) return alert('لم يتم ربط المتجر');
+  const btn = document.getElementById('upload-desc-btn');
+  btn.disabled = true;
+  btn.textContent = 'جاري الرفع...';
+  let success = 0;
+  for(const r of generatedResults.desc) {
+    if(r.error) continue;
+    try {
+      await fetch(`${API_BASE}/api/update-product`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({productId: r.product.id, description: r.description, seoTitle: r.seoTitle, seoDescription: r.seoDescription, token})
+      });
+      success++;
+    } catch(e) {}
+    await new Promise(r => setTimeout(r, 500));
   }
+  btn.textContent = `✅ تم رفع ${success} منتج بنجاح!`;
+  btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
 }
 
-// Generate Image
+// ===== IMPROVE BULK =====
+async function generateAllImprovements() {
+  const products = getSelected('improve');
+  if(products.length === 0) return alert('اختر منتجاً على الأقل');
+  document.getElementById('gen-improve-btn').style.display = 'none';
+  document.getElementById('improve-loading').classList.add('visible');
+  generatedResults.improve = [];
+
+  for(let i=0; i<products.length; i++) {
+    const p = products[i];
+    document.getElementById('improve-progress-text').textContent = `جاري تحسين (${i+1}/${products.length}): ${p.name}`;
+    try {
+      const res = await fetch(`${API_BASE}/api/improve-description`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({name: p.name, currentDescription: p.description || '', instructions: document.getElementById('improve-instructions').value})
+      });
+      const data = await res.json();
+      generatedResults.improve.push({product: p, ...data});
+    } catch(e) {
+      generatedResults.improve.push({product: p, error: e.message});
+    }
+    await new Promise(r => setTimeout(r, 800));
+  }
+
+  document.getElementById('improve-loading').classList.remove('visible');
+  document.getElementById('improve-results-area').style.display = 'block';
+  document.getElementById('improve-results-list').innerHTML = generatedResults.improve
+    .map((r,i) => r.error ? `<div class="alert alert-warning">❌ ${r.product.name}: ${r.error}</div>` : renderResultCard('improve', i, r.product, r))
+    .join('');
+}
+
+async function uploadAllImprove() {
+  const token = localStorage.getItem('salla_token');
+  if(!token) return alert('لم يتم ربط المتجر');
+  const btn = document.getElementById('upload-improve-btn');
+  btn.disabled = true; btn.textContent = 'جاري الرفع...';
+  let success = 0;
+  for(const r of generatedResults.improve) {
+    if(r.error) continue;
+    try {
+      await fetch(`${API_BASE}/api/update-product`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({productId: r.product.id, description: r.description, seoTitle: r.seoTitle, seoDescription: r.seoDescription, token})
+      });
+      success++;
+    } catch(e) {}
+    await new Promise(r => setTimeout(r, 500));
+  }
+  btn.textContent = `✅ تم رفع ${success} منتج!`;
+  btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+}
+
+// ===== SEO BULK =====
+async function generateAllSEO() {
+  const products = getSelected('seo');
+  if(products.length === 0) return alert('اختر منتجاً على الأقل');
+  document.getElementById('gen-seo-btn').style.display = 'none';
+  document.getElementById('seo-loading').classList.add('visible');
+  generatedResults.seo = [];
+
+  for(let i=0; i<products.length; i++) {
+    const p = products[i];
+    document.getElementById('seo-progress-text').textContent = `جاري توليد SEO (${i+1}/${products.length}): ${p.name}`;
+    try {
+      const res = await fetch(`${API_BASE}/api/generate-seo`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({name: p.name, description: p.description || '', keywords: document.getElementById('seo-keywords').value})
+      });
+      const data = await res.json();
+      generatedResults.seo.push({product: p, ...data});
+    } catch(e) {
+      generatedResults.seo.push({product: p, error: e.message});
+    }
+    await new Promise(r => setTimeout(r, 800));
+  }
+
+  document.getElementById('seo-loading').classList.remove('visible');
+  document.getElementById('seo-results-area').style.display = 'block';
+  document.getElementById('seo-results-list').innerHTML = generatedResults.seo
+    .map((r,i) => r.error ? `<div class="alert alert-warning">❌ ${r.product.name}: ${r.error}</div>` : renderResultCard('seo', i, r.product, r))
+    .join('');
+}
+
+async function uploadAllSEO() {
+  const token = localStorage.getItem('salla_token');
+  if(!token) return alert('لم يتم ربط المتجر');
+  const btn = document.getElementById('upload-seo-btn');
+  btn.disabled = true; btn.textContent = 'جاري الرفع...';
+  let success = 0;
+  for(const r of generatedResults.seo) {
+    if(r.error) continue;
+    try {
+      await fetch(`${API_BASE}/api/update-product`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({productId: r.product.id, seoTitle: r.seoTitle, seoDescription: r.seoDescription, token})
+      });
+      success++;
+    } catch(e) {}
+    await new Promise(r => setTimeout(r, 500));
+  }
+  btn.textContent = `✅ تم رفع SEO لـ ${success} منتج!`;
+  btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+}
+
+// ===== IMAGE GEN =====
 async function generateImage() {
-  const name = document.getElementById('img-product-name').value;
-  const prompt = document.getElementById('img-prompt').value;
-  const style = document.getElementById('img-style').value;
-  if (!name) return alert('أدخل اسم المنتج');
-
-  const btn = document.querySelector('#tab-image-gen .btn-primary');
+  const name = document.getElementById('img-name').value;
+  if(!name) return alert('أدخل اسم المنتج');
+  const btn = document.querySelector('#page-image-gen .btn-primary');
   btn.disabled = true;
   document.getElementById('img-loading').classList.add('visible');
-  document.getElementById('img-result').classList.remove('visible');
-
+  document.getElementById('img-result').style.display = 'none';
   try {
     const res = await fetch(`${API_BASE}/api/generate-image`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, prompt: `${name}: ${prompt}`, style })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name, prompt: document.getElementById('img-prompt').value, style: document.getElementById('img-style').value})
     });
     const data = await res.json();
-    if (data.imageUrl) {
+    if(data.imageUrl) {
       document.getElementById('generated-img').src = data.imageUrl;
       document.getElementById('img-download').href = data.imageUrl;
-      document.getElementById('img-result').classList.add('visible');
-    } else {
-      alert('حدث خطأ: ' + (data.error || 'حاول مرة أخرى'));
-    }
-  } catch(e) {
-    alert('تعذّر الاتصال بالخادم');
-  }
+      document.getElementById('img-result').style.display = 'block';
+    } else alert('خطأ: ' + (data.error || 'حاول مرة أخرى'));
+  } catch(e) { alert('تعذر الاتصال'); }
   btn.disabled = false;
   document.getElementById('img-loading').classList.remove('visible');
 }
 
-// Generate Description
-let lastGeneratedDesc = '';
-let lastDescProductId = '';
-let lastSeoTitle = '';
-let lastSeoDescription = '';
-
-async function generateDescription() {
-  const name = document.getElementById('desc-name').value;
-  const features = document.getElementById('desc-features').value;
-  const audience = document.getElementById('desc-audience').value;
-  const price = document.getElementById('desc-price').value;
-  const productId = document.getElementById('desc-product-id')?.value || '';
-  if (!name) return alert('أدخل اسم المنتج');
-
-  const btn = document.querySelector('#tab-description .btn-primary');
-  btn.disabled = true;
-  document.getElementById('desc-loading').classList.add('visible');
-  document.getElementById('desc-result').classList.remove('visible');
-  document.getElementById('desc-approve-box').style.display = 'none';
-
-  try {
-    const res = await fetch(`${API_BASE}/api/generate-description`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, features, audience, price })
-    });
-    const data = await res.json();
-    if (data.description) {
-      lastGeneratedDesc = data.description;
-      lastDescProductId = productId;
-      lastSeoTitle = data.seoTitle || '';
-      lastSeoDescription = data.seoDescription || '';
-      document.getElementById('desc-result').textContent = data.description;
-      document.getElementById('desc-result').classList.add('visible');
-      if (productId) {
-        document.getElementById('desc-approve-box').style.display = 'block';
-      }
-    } else {
-      alert('حدث خطأ: ' + (data.error || 'حاول مرة أخرى'));
-    }
-  } catch(e) {
-    alert('تعذّر الاتصال بالخادم');
-  }
-  btn.disabled = false;
-  document.getElementById('desc-loading').classList.remove('visible');
-}
-
-async function approveAndUpload() {
-  if (!lastDescProductId) return alert('ما في منتج مرتبط');
-  const token = localStorage.getItem('salla_token');
-  if (!token) return alert('لم يتم ربط المتجر');
-  const btn = document.getElementById('approve-btn');
-  btn.disabled = true;
-  btn.textContent = 'جاري الرفع...';
-  try {
-    const res = await fetch(`${API_BASE}/api/update-product`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        productId: lastDescProductId,
-        description: lastGeneratedDesc,
-        seoTitle: lastSeoTitle,
-        seoDescription: lastSeoDescription,
-        token: token
-      })
-    });
-    const data = await res.json();
-    if (data.success) {
-      btn.textContent = '✅ تم الرفع بنجاح!';
-      btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
-    } else {
-      btn.textContent = '❌ فشل الرفع';
-      btn.disabled = false;
-    }
-  } catch(e) {
-    btn.textContent = '❌ خطأ في الاتصال';
-    btn.disabled = false;
-  }
-}
-
-// Edit Image
+// ===== EDIT IMAGE =====
 async function editImage() {
-  const file = document.getElementById('edit-image').files[0];
+  const file = document.getElementById('edit-file').files[0];
   const prompt = document.getElementById('edit-prompt').value;
-  if (!file) return alert('ارفع صورة أولاً');
-  if (!prompt) return alert('أدخل التعديل المطلوب');
-
-  const btn = document.querySelector('#tab-image-edit .btn-primary');
+  if(!file || !prompt) return alert('ارفع صورة وأدخل التعديل');
+  const btn = document.querySelector('#page-image-edit .btn-primary');
   btn.disabled = true;
   document.getElementById('edit-loading').classList.add('visible');
-  document.getElementById('edit-result').classList.remove('visible');
-
+  document.getElementById('edit-result').style.display = 'none';
   const formData = new FormData();
   formData.append('image', file);
   formData.append('prompt', prompt);
-
   try {
-    const res = await fetch(`${API_BASE}/api/edit-image`, {
-      method: 'POST',
-      body: formData
-    });
+    const res = await fetch(`${API_BASE}/api/edit-image`, {method:'POST', body: formData});
     const data = await res.json();
-    if (data.imageUrl) {
+    if(data.imageUrl) {
       document.getElementById('edited-img').src = data.imageUrl;
       document.getElementById('edit-download').href = data.imageUrl;
-      document.getElementById('edit-result').classList.add('visible');
-    } else {
-      alert('حدث خطأ: ' + (data.error || 'حاول مرة أخرى'));
-    }
-  } catch(e) {
-    alert('تعذّر الاتصال بالخادم');
-  }
+      document.getElementById('edit-result').style.display = 'block';
+    } else alert('خطأ: ' + (data.error || 'حاول مرة أخرى'));
+  } catch(e) { alert('تعذر الاتصال'); }
   btn.disabled = false;
   document.getElementById('edit-loading').classList.remove('visible');
 }
 
-// Translate
+// ===== TRANSLATE =====
 async function translateText() {
-  const text = document.getElementById('translate-text').value;
-  const lang = document.getElementById('translate-lang').value;
-  if (!text) return alert('أدخل النص');
-
-  const btn = document.querySelector('#tab-translate .btn-primary');
+  const text = document.getElementById('trans-text').value;
+  if(!text) return alert('أدخل النص');
+  const btn = document.querySelector('#page-translate .btn-primary');
   btn.disabled = true;
   document.getElementById('trans-loading').classList.add('visible');
-  document.getElementById('trans-result').classList.remove('visible');
-
+  document.getElementById('trans-result').style.display = 'none';
   try {
     const res = await fetch(`${API_BASE}/api/translate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, language: lang })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({text, language: document.getElementById('trans-lang').value})
     });
     const data = await res.json();
-    if (data.translation) {
+    if(data.translation) {
       document.getElementById('trans-result').textContent = data.translation;
-      document.getElementById('trans-result').classList.add('visible');
-    } else {
-      alert('حدث خطأ: ' + (data.error || 'حاول مرة أخرى'));
+      document.getElementById('trans-result').style.display = 'block';
     }
-  } catch(e) {
-    alert('تعذّر الاتصال بالخادم');
-  }
+  } catch(e) { alert('تعذر الاتصال'); }
   btn.disabled = false;
   document.getElementById('trans-loading').classList.remove('visible');
 }
 
-// Init
-async function init() {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const tokenFromUrl = params.get('token');
-    
-    if (tokenFromUrl) {
-      localStorage.setItem('salla_token', tokenFromUrl);
-      window.history.replaceState({}, '', '/');
-    }
-
-    const token = localStorage.getItem('salla_token');
-    
-    if (!token) {
-      document.getElementById('store-name').textContent = 'غير مرتبط';
-      document.getElementById('products-list').innerHTML = `
-        <div style="text-align:center;padding:40px;">
-          <p style="color:#a0a0c0;margin-bottom:16px;">لم يتم ربط المتجر بعد</p>
-          <a href="/auth/salla" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;">
-            🔗 ربط متجر سلة
-          </a>
-        </div>`;
-      return;
-    }
-
-    document.getElementById('store-name').textContent = 'متجرك في سلة ✅';
-    await loadProducts();
-  } catch(e) {
-    console.error('Init error:', e);
-    document.getElementById('store-name').textContent = 'خطأ في التحميل';
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => { init(); });
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
