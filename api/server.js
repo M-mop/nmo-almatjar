@@ -465,45 +465,46 @@ app.post('/api/add-tags', async (req, res) => {
       return res.status(400).json({ error: 'بيانات ناقصة' });
     }
 
-    // Get existing tags first to avoid duplicates
-    let existingTagIds = [];
+    const tagIds = [];
+
+    // Get existing product tags
     try {
-      const existing = await sallaGet(`products/${productId}`, token);
-      existingTagIds = (existing.data?.tags || []).map(t => t.id).filter(Boolean);
+      const prod = await sallaGet(`products/${productId}`, token);
+      const existing = prod.data?.tags || [];
+      existing.forEach(t => { if (t.id) tagIds.push(t.id); });
     } catch(e) {}
 
-    // Create new tags
-    const newTagIds = [];
-    for (const tagName of tags) {
+    // Create tags using correct endpoint: POST /products/tags?tag_name=X
+    for (const tagName of tags.slice(0, 8)) {
       try {
-        // Try to create tag
         const r = await axios.post(
-          'https://api.salla.dev/admin/v2/tags',
-          { name: tagName, type: 'product' },
-          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
+          `https://api.salla.dev/admin/v2/products/tags?tag_name=${encodeURIComponent(tagName)}`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
         );
-        if (r.data?.data?.id) newTagIds.push(r.data.data.id);
+        const newId = r.data?.data?.id;
+        if (newId && !tagIds.includes(newId)) tagIds.push(newId);
       } catch(e) {
-        // Tag might exist, search for it
+        // Tag might already exist — get its ID from list
         try {
-          const search = await axios.get(
-            `https://api.salla.dev/admin/v2/tags?search=${encodeURIComponent(tagName)}`,
+          const list = await axios.get(
+            'https://api.salla.dev/admin/v2/products/tags',
             { headers: { Authorization: `Bearer ${token}` } }
           );
-          const found = search.data?.data?.find(t => t.name === tagName);
-          if (found?.id) newTagIds.push(found.id);
+          const found = list.data?.data?.find(t =>
+            t.name?.toLowerCase().trim() === tagName.toLowerCase().trim()
+          );
+          if (found?.id && !tagIds.includes(found.id)) tagIds.push(found.id);
         } catch(e2) {}
       }
     }
 
-    // Combine existing + new tag IDs
-    const allTagIds = [...new Set([...existingTagIds, ...newTagIds])];
-
-    if (allTagIds.length > 0) {
-      await sallaUpdate(productId, { tags: allTagIds }, token);
+    // Update product with all tag IDs
+    if (tagIds.length > 0) {
+      await sallaUpdate(productId, { tags: tagIds }, token);
     }
 
-    res.json({ success: true, added: newTagIds.length, total: allTagIds.length });
+    res.json({ success: true, added: tagIds.length });
   } catch (e) {
     console.error('Add tags error:', e.response?.data || e.message);
     res.status(500).json({ error: e.message });
