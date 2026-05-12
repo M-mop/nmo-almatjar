@@ -80,7 +80,100 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// ===== GENERATE IMAGE =====
+// ===== GET SINGLE PRODUCT =====
+app.get('/api/product/:id', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const response = await axios.get(`https://api.salla.dev/admin/v2/products/${req.params.id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    res.json({ product: response.data.data });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ===== IMPROVE EXISTING DESCRIPTION =====
+app.post('/api/improve-description', async (req, res) => {
+  try {
+    const { name, currentDescription, instructions } = req.body;
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1500,
+      messages: [{
+        role: 'user',
+        content: `أنت خبير تحسين محتوى للتجارة الإلكترونية. اكتب بالعربية فقط بدون markdown.
+
+المنتج: ${name}
+الوصف الحالي: ${currentDescription || 'لا يوجد وصف'}
+تعليمات إضافية: ${instructions || 'حسّن الوصف الحالي'}
+
+المطلوب:
+SEO_TITLE:
+[عنوان محسّن 50-60 حرف]
+
+SEO_DESC:
+[وصف SEO محسّن 150 حرف]
+
+DESCRIPTION:
+[وصف محسّن مقنع يحافظ على روح الوصف الأصلي مع تحسينه — فقرتين + نقاط مميزات + خاتمة]`
+      }]
+    });
+    const fullText = message.content[0].text;
+    const seoTitleMatch = fullText.match(/SEO_TITLE:\n([^\n]+)/);
+    const seoDescMatch = fullText.match(/SEO_DESC:\n([^\n]+)/);
+    const descMatch = fullText.match(/DESCRIPTION:\n([\s\S]+)/);
+    res.json({
+      description: descMatch ? descMatch[1].trim() : fullText,
+      seoTitle: seoTitleMatch ? seoTitleMatch[1].trim() : '',
+      seoDescription: seoDescMatch ? seoDescMatch[1].trim() : ''
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ===== GENERATE SEO ONLY =====
+app.post('/api/generate-seo', async (req, res) => {
+  try {
+    const { name, description, keywords } = req.body;
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 800,
+      messages: [{
+        role: 'user',
+        content: `أنت خبير SEO للتجارة الإلكترونية السعودية. اكتب بالعربية فقط بدون markdown.
+
+المنتج: ${name}
+الوصف: ${description || name}
+كلمات مفتاحية مقترحة: ${keywords || ''}
+
+اكتب:
+SEO_TITLE:
+[عنوان SEO جذاب 50-60 حرف يحتوي الكلمة المفتاحية]
+
+SEO_DESC:
+[وصف SEO دقيق 150-160 حرف يحفز النقر]
+
+SEO_KEYWORDS:
+[15 كلمة مفتاحية مفصولة بفاصلة — قصيرة ومتنوعة]`
+      }]
+    });
+    const fullText = message.content[0].text;
+    const titleMatch = fullText.match(/SEO_TITLE:\n([^\n]+)/);
+    const descMatch = fullText.match(/SEO_DESC:\n([^\n]+)/);
+    const kwMatch = fullText.match(/SEO_KEYWORDS:\n([^\n]+)/);
+    res.json({
+      seoTitle: titleMatch ? titleMatch[1].trim() : '',
+      seoDescription: descMatch ? descMatch[1].trim() : '',
+      seoKeywords: kwMatch ? kwMatch[1].trim() : ''
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+
 app.post('/api/generate-image', async (req, res) => {
   try {
     const { name, prompt, style } = req.body;
