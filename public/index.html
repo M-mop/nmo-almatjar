@@ -484,11 +484,11 @@ function go(id) {
 // ===== WIZARD =====
 function gs(type, step) {
   const max = type === 'tags' ? 2 : 3;
-  const pre = {desc:'d',improve:'i',seo:'se',tags:'t'};
-  const px = pre[type];
+  const pre = {desc:'d', improve:'i', seo:'se', tags:'t', all:'all'};
+  const px = pre[type] || type;
   for (let i = 1; i <= max; i++) {
-    const s = document.getElementById(`${px}s${i}`);
-    const w = document.getElementById(`s${type[0]}${i}`);
+    const s = document.getElementById(`${px}-s${i}`) || document.getElementById(`${px}s${i}`);
+    const w = document.getElementById(`s-${type}-${i}`) || document.getElementById(`s${type[0]}${i}`);
     if (s) s.style.display = i === step ? 'block' : 'none';
     if (w) { w.classList.remove('on','dn'); if(i===step) w.classList.add('on'); else if(i<step) w.classList.add('dn'); }
   }
