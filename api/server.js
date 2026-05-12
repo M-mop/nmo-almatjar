@@ -328,10 +328,10 @@ app.post('/api/update-product', async (req, res) => {
       updateData.description = htmlDescription;
     }
 
-    // Add SEO fields using correct Salla API structure
+    // Add SEO fields using correct Salla API field names
     if (seoTitle || seoDescription) {
-      updateData.page_title = seoTitle || '';
-      updateData.page_description = seoDescription || '';
+      updateData.metadata_title = seoTitle || '';
+      updateData.metadata_description = seoDescription || '';
     }
 
     const response = await axios.put(
