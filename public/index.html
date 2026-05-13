@@ -293,6 +293,10 @@ input:focus,textarea:focus,select:focus{border-color:var(--ac);background:#fff;b
     <div class="nav-sec">التتبع</div>
     <div class="nit" onclick="gp('history')" id="nav-history"><span class="ni">✅</span> المنتجات المحسّنة</div>
     <div class="nit" onclick="gp('quality')" id="nav-quality"><span class="ni">🏆</span> نقاط الجودة</div>
+    <div class="nav-sec">معلومات</div>
+    <div class="nit" onclick="window.open('/about.html','_blank')"><span class="ni">👤</span> من نحن</div>
+    <div class="nit" onclick="window.open('/privacy.html','_blank')"><span class="ni">🔒</span> الخصوصية</div>
+    <div class="nit" onclick="window.open('/terms.html','_blank')"><span class="ni">📋</span> شروط الاستخدام</div>
   </div>
   <div class="sb-foot">
     <div class="usage-box">
@@ -1022,5 +1026,14 @@ function toast(msg,type){
 }
 document.addEventListener('DOMContentLoaded',init);
 </script>
+
+<!-- FOOTER -->
+<div style="text-align:center;padding:14px 20px;border-top:1px solid var(--b1);font-size:11px;color:var(--t3);background:var(--s1);margin-right:var(--sb)">
+  <a href="/about.html" style="color:var(--t3);text-decoration:none;margin:0 7px">من نحن</a>·
+  <a href="/privacy.html" style="color:var(--t3);text-decoration:none;margin:0 7px">الخصوصية</a>·
+  <a href="/terms.html" style="color:var(--t3);text-decoration:none;margin:0 7px">شروط الاستخدام</a>·
+  <a href="https://wa.me/905340355912" target="_blank" style="color:var(--t3);text-decoration:none;margin:0 7px">📱 الدعم</a>
+  <div style="margin-top:5px;opacity:.6">© 2025 نمو المتجر</div>
+</div>
 </body>
 </html>
