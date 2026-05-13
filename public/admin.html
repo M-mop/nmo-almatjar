@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة الإدارة — ذكاء المتجر</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08090d;--s1:#0e1018;--s2:#141620;--s3:#1a1d2a;--b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.1);--ac:#4f8ef7;--gr:#22d3a0;--rd:#f87171;--yw:#fbbf24;--tx:#f0f2ff;--t2:#8b90a8;--t3:#4a4f66}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;min-height:100vh}
+
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-box{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:32px;width:320px;text-align:center}
+.login-logo{font-size:28px;margin-bottom:8px}
+.login-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--t3);margin-bottom:24px}
+.login-box input{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:10px 14px;color:var(--tx);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:14px;outline:none;margin-bottom:12px}
+.login-box input:focus{border-color:var(--ac)}
+.login-btn{width:100%;background:var(--ac);color:#fff;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:600;font-family:'IBM Plex Sans Arabic',sans-serif;cursor:pointer}
+.login-btn:hover{background:#6ba0ff}
+.login-err{color:var(--rd);font-size:12px;margin-top:8px;display:none}
+
+/* DASHBOARD */
+#dashboard{display:none}
+.topbar{background:var(--s1);border-bottom:1px solid var(--b1);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.topbar-brand{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.topbar-brand span{font-size:20px}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.btn{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'IBM Plex Sans Arabic',sans-serif;transition:all .12s}
+.btn-primary{background:var(--ac);color:#fff}.btn-primary:hover{background:#6ba0ff}
+.btn-danger{background:rgba(248,113,113,.15);color:var(--rd);border:1px solid rgba(248,113,113,.2)}.btn-danger:hover{background:rgba(248,113,113,.25)}
+.btn-ghost{background:var(--s2);color:var(--t2);border:1px solid var(--b2)}.btn-ghost:hover{color:var(--tx)}
+
+.content{padding:24px;max-width:1100px;margin:0 auto}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px}
+.stat-card .label{font-size:11px;color:var(--t3);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.stat-card .value{font-size:28px;font-weight:900}
+.stat-card .sub{font-size:11px;color:var(--t3);margin-top:2px}
+.v-green{color:var(--gr)}.v-blue{color:var(--ac)}.v-yellow{color:var(--yw)}.v-white{color:var(--tx)}
+
+/* TABLE */
+.table-card{background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden}
+.table-head{padding:14px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
+.table-head-title{font-size:14px;font-weight:600}
+.search-box{background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:6px 12px;color:var(--tx);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:12px;outline:none;width:220px}
+.search-box:focus{border-color:var(--ac)}
+
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--s2)}
+thead th{padding:10px 16px;text-align:right;font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--b1);transition:background .1s}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+tbody tr:last-child{border:none}
+td{padding:12px 16px;font-size:12px;color:var(--t2);vertical-align:middle}
+td.name{color:var(--tx);font-weight:600}
+
+.avatar{width:34px;height:34px;border-radius:8px;background:var(--s3);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.cell-with-avatar{display:flex;align-items:center;gap:10px}
+.plan-pill{padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700}
+.plan-free{background:rgba(139,144,168,.1);color:var(--t2)}
+.plan-pro{background:rgba(34,211,160,.12);color:var(--gr)}
+.plan-enterprise{background:rgba(79,142,247,.12);color:var(--ac)}
+.date{font-size:11px;color:var(--t3)}
+
+/* EMPTY */
+.empty{padding:48px;text-align:center;color:var(--t3)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-text{font-size:13px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center}
+.modal-overlay.on{display:flex}
+.modal{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:24px;width:440px;max-width:90vw}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px;line-height:1}
+.modal-close:hover{color:var(--tx)}
+.fg{margin-bottom:12px}
+.lbl{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:5px;display:block;letter-spacing:.5px;text-transform:uppercase}
+.modal input,.modal select{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:8px 12px;color:var(--tx);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;outline:none}
+.modal input:focus,.modal select:focus{border-color:var(--ac)}
+.modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
+
+/* ALERT */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:10px 18px;font-size:12px;z-index:999;display:none;animation:slideup .2s ease}
+.toast.on{display:block}
+@keyframes slideup{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.toast.success{border-color:var(--gr);color:var(--gr)}
+.toast.error{border-color:var(--rd);color:var(--rd)}
+
+/* LOADING */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(79,142,247,.2);border-top-color:var(--ac);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🛡️</div>
+    <div class="login-title">لوحة الإدارة</div>
+    <div class="login-sub">ذكاء المتجر — Admin Panel</div>
+    <input type="password" id="pass-input" placeholder="كلمة المرور..." onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">دخول</button>
+    <div class="login-err" id="login-err">كلمة المرور خطأ</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="topbar-brand"><span>✦</span> ذكاء المتجر — الإدارة</div>
+    <div class="topbar-actions">
+      <span id="last-refresh" style="font-size:11px;color:var(--t3)"></span>
+      <button class="btn btn-ghost" onclick="loadAll()">🔄 تحديث</button>
+      <button class="btn btn-ghost" onclick="logout()">خروج</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="label">إجمالي العملاء</div>
+        <div class="value v-white" id="stat-total">—</div>
+        <div class="sub">متجر مرتبط</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">اليوم</div>
+        <div class="value v-green" id="stat-today">—</div>
+        <div class="sub">عميل جديد اليوم</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">هذا الشهر</div>
+        <div class="value v-blue" id="stat-month">—</div>
+        <div class="sub">عميل هذا الشهر</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">آخر تسجيل</div>
+        <div class="value v-yellow" id="stat-last" style="font-size:13px;padding-top:6px">—</div>
+        <div class="sub">آخر متجر ربط التطبيق</div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <div class="table-head">
+        <div class="table-head-title">👥 العملاء (<span id="cust-count">0</span>)</div>
+        <input class="search-box" id="search" placeholder="ابحث باسم المتجر أو الإيميل..." oninput="filterTable()">
+      </div>
+      <div id="table-wrap">
+        <div class="empty"><div class="spin"></div><div style="margin-top:12px;font-size:12px">جاري التحميل...</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-title">
+      تعديل بيانات العميل
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <input type="hidden" id="edit-id">
+    <div class="fg"><label class="lbl">اسم المتجر</label><input type="text" id="edit-name"></div>
+    <div class="fg"><label class="lbl">الإيميل</label><input type="email" id="edit-email" dir="ltr"></div>
+    <div class="fg"><label class="lbl">الخطة</label>
+      <select id="edit-plan">
+        <option value="free">مجاني</option>
+        <option value="pro">Pro</option>
+        <option value="enterprise">Enterprise</option>
+      </select>
+    </div>
+    <div class="fg"><label class="lbl">ملاحظات</label><input type="text" id="edit-notes" placeholder="أي ملاحظات..."></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveEdit()">💾 حفظ التعديلات</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const B = window.location.origin;
+let adminKey = '';
+let allCustomers = [];
+
+// ─── LOGIN ──────────────────────────────
+function doLogin() {
+  const pass = document.getElementById('pass-input').value;
+  if (!pass) return;
+  adminKey = pass;
+  loadAll();
+}
+
+function logout() {
+  adminKey = '';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('pass-input').value = '';
+}
+
+// ─── LOAD ───────────────────────────────
+async function loadAll() {
+  await Promise.all([loadStats(), loadCustomers()]);
+}
+
+async function loadStats() {
+  try {
+    const r = await fetch(`${B}/api/admin/stats`, { headers: { 'x-admin-key': adminKey } });
+    if (r.status === 401) { showLoginError(); return; }
+    const d = await r.json();
+
+    // Auth success — show dashboard
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('login-err').style.display = 'none';
+
+    document.getElementById('stat-total').textContent = d.total || 0;
+    document.getElementById('stat-today').textContent = d.today || 0;
+    document.getElementById('stat-month').textContent = d.this_month || 0;
+
+    const latest = d.latest?.[0];
+    document.getElementById('stat-last').textContent = latest
+      ? (latest.store_name || 'غير معروف')
+      : '—';
+    document.getElementById('last-refresh').textContent = 'آخر تحديث: ' + new Date().toLocaleTimeString('ar');
+  } catch(e) {
+    console.error('loadStats:', e);
+    showLoginError();
+  }
+}
+
+async function loadCustomers() {
+  try {
+    const r = await fetch(`${B}/api/admin/customers`, { headers: { 'x-admin-key': adminKey } });
+    if (r.status === 401) return;
+    const d = await r.json();
+    allCustomers = d.customers || [];
+    document.getElementById('cust-count').textContent = allCustomers.length;
+    renderTable(allCustomers);
+  } catch(e) { console.error('loadCustomers:', e); }
+}
+
+function showLoginError() {
+  document.getElementById('login-err').style.display = 'block';
+  document.getElementById('login-err').textContent = 'كلمة المرور خطأ أو الـ server غير متاح';
+}
+
+// ─── RENDER TABLE ───────────────────────
+function renderTable(customers) {
+  const wrap = document.getElementById('table-wrap');
+  if (!customers.length) {
+    wrap.innerHTML = `<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">لا يوجد عملاء بعد — عندما يربط أي شخص متجره سيظهر هنا</div></div>`;
+    return;
+  }
+
+  wrap.innerHTML = `<table>
+    <thead><tr>
+      <th>المتجر</th>
+      <th>الإيميل</th>
+      <th>الخطة</th>
+      <th>المنتجات</th>
+      <th>تاريخ التسجيل</th>
+      <th>آخر دخول</th>
+      <th>إجراءات</th>
+    </tr></thead>
+    <tbody>${customers.map(c => buildRow(c)).join('')}</tbody>
+  </table>`;
+}
+
+function buildRow(c) {
+  const planClass = c.plan === 'pro' ? 'plan-pro' : c.plan === 'enterprise' ? 'plan-enterprise' : 'plan-free';
+  const planLabel = c.plan === 'pro' ? 'Pro' : c.plan === 'enterprise' ? 'Enterprise' : 'مجاني';
+  const avatar = c.avatar
+    ? `<div class="avatar"><img src="${c.avatar}" alt=""></div>`
+    : `<div class="avatar">🏪</div>`;
+  const createdDate = c.created_at ? new Date(c.created_at).toLocaleDateString('ar-SA') : '—';
+  const lastLogin   = c.last_login  ? new Date(c.last_login).toLocaleDateString('ar-SA')  : '—';
+
+  return `<tr>
+    <td class="name">
+      <div class="cell-with-avatar">
+        ${avatar}
+        <div>
+          <div>${c.store_name || 'غير معروف'}</div>
+          <div style="font-size:10px;color:var(--t3)">#${c.store_id || '—'}</div>
+        </div>
+      </div>
+    </td>
+    <td dir="ltr" style="text-align:right">${c.email || '—'}</td>
+    <td><span class="plan-pill ${planClass}">${planLabel}</span></td>
+    <td>${c.products_count || 0}</td>
+    <td class="date">${createdDate}</td>
+    <td class="date">${lastLogin}</td>
+    <td>
+      <div style="display:flex;gap:5px">
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="openEdit(${JSON.stringify(c).replace(/"/g,'&quot;')})">✏️ تعديل</button>
+        <button class="btn btn-danger" style="font-size:10px;padding:4px 8px" onclick="deleteCustomer('${c.id}','${c.store_name}')">🗑️</button>
+      </div>
+    </td>
+  </tr>`;
+}
+
+// ─── SEARCH ─────────────────────────────
+function filterTable() {
+  const q = document.getElementById('search').value.toLowerCase();
+  if (!q) { renderTable(allCustomers); return; }
+  const filtered = allCustomers.filter(c =>
+    (c.store_name||'').toLowerCase().includes(q) ||
+    (c.email||'').toLowerCase().includes(q) ||
+    (c.store_id||'').includes(q)
+  );
+  renderTable(filtered);
+  document.getElementById('cust-count').textContent = filtered.length;
+}
+
+// ─── EDIT MODAL ─────────────────────────
+function openEdit(c) {
+  document.getElementById('edit-id').value    = c.id;
+  document.getElementById('edit-name').value  = c.store_name || '';
+  document.getElementById('edit-email').value = c.email || '';
+  document.getElementById('edit-plan').value  = c.plan || 'free';
+  document.getElementById('edit-notes').value = c.notes || '';
+  document.getElementById('edit-modal').classList.add('on');
+}
+
+function closeModal() {
+  document.getElementById('edit-modal').classList.remove('on');
+}
+
+async function saveEdit() {
+  const id    = document.getElementById('edit-id').value;
+  const body  = {
+    store_name: document.getElementById('edit-name').value,
+    email:      document.getElementById('edit-email').value,
+    plan:       document.getElementById('edit-plan').value,
+    notes:      document.getElementById('edit-notes').value,
+  };
+  try {
+    const r = await fetch(`${B}/api/admin/customers/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+      body: JSON.stringify(body)
+    });
+    if (!r.ok) throw new Error('فشل الحفظ');
+    closeModal();
+    showToast('✅ تم حفظ التعديلات', 'success');
+    await loadCustomers();
+  } catch(e) {
+    showToast('❌ ' + e.message, 'error');
+  }
+}
+
+// ─── DELETE ─────────────────────────────
+async function deleteCustomer(id, name) {
+  if (!confirm(`هل تريد حذف "${name}"؟`)) return;
+  try {
+    await fetch(`${B}/api/admin/customers/${id}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-key': adminKey }
+    });
+    showToast('🗑️ تم الحذف', 'success');
+    await loadCustomers();
+    await loadStats();
+  } catch(e) {
+    showToast('❌ فشل الحذف', 'error');
+  }
+}
+
+// ─── TOAST ──────────────────────────────
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast on ${type}`;
+  setTimeout(() => t.classList.remove('on'), 3000);
+}
+
+// ─── CLOSE MODAL ON OVERLAY CLICK ───────
+document.getElementById('edit-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
