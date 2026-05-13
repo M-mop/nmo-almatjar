@@ -487,7 +487,7 @@ function closeModal(e){
 }
 
 function doSalla(){
-  window.location.href = B + '/auth/salla';
+  window.location.href = '/';
 }
 
 async function doRegister(){
@@ -499,7 +499,7 @@ async function doRegister(){
   // Save to localStorage for now (replace with real auth later)
   localStorage.setItem('user',JSON.stringify({name,email,plan:'free',joined:new Date().toISOString()}));
   toast('✅ تم إنشاء حسابك! جاري التحويل...','success');
-  setTimeout(()=>{ window.location.href = B + '/auth/salla'; }, 1500);
+  setTimeout(()=>{ window.location.href = '/'; }, 1500);
 }
 
 async function doLogin(){
@@ -514,7 +514,7 @@ async function doLogin(){
   } else {
     // Try salla auth
     toast('جاري التحقق...','');
-    setTimeout(()=>{ window.location.href = B + '/auth/salla'; }, 800);
+    setTimeout(()=>{ window.location.href = '/'; }, 800);
   }
 }
 
