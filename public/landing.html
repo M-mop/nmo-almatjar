@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>ذكاء المتجر — حسّن منتجاتك بالذكاء الاصطناعي</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--ac:#4361ee;--ac2:#7c3aed;--gr:#059669;--tx:#0f172a;--t2:#475569;--t3:#94a3b8;--bg:#f8f9ff;--s1:#fff;--b1:rgba(0,0,0,.07)}
+html{scroll-behavior:smooth}
+body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden}
+.btn{padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:7px;text-decoration:none;letter-spacing:-.2px}
+.btn:active{transform:scale(.97)}
+.bp{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 4px 20px rgba(67,97,238,.35)}
+.bp:hover{opacity:.92;transform:translateY(-2px);box-shadow:0 8px 28px rgba(67,97,238,.45)}
+.bs{background:#fff;color:var(--ac);border:2px solid rgba(67,97,238,.25)}
+.bs:hover{border-color:var(--ac);background:rgba(67,97,238,.04)}
+
+/* NAV */
+nav{background:rgba(255,255,255,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:50;padding:0 5vw;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 4px 12px rgba(67,97,238,.3)}
+.nav-name{font-size:15px;font-weight:800;letter-spacing:-.3px}
+.nav-links{display:flex;align-items:center;gap:8px}
+.nav-link{font-size:13px;color:var(--t2);font-weight:500;cursor:pointer;padding:6px 10px;border-radius:7px;transition:all .15s;text-decoration:none}
+.nav-link:hover{color:var(--tx);background:rgba(0,0,0,.04)}
+
+/* HERO */
+.hero{padding:80px 5vw 60px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:800px;height:600px;background:radial-gradient(ellipse,rgba(67,97,238,.08) 0%,transparent 65%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(67,97,238,.08);border:1px solid rgba(67,97,238,.2);border-radius:100px;padding:5px 14px;font-size:12px;color:var(--ac);font-weight:600;margin-bottom:20px}
+.hero-title{font-size:clamp(32px,6vw,60px);font-weight:900;line-height:1.15;letter-spacing:-.5px;margin-bottom:16px}
+.hero-title span{background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:clamp(15px,2.5vw,19px);color:var(--t2);max-width:560px;margin:0 auto 32px;line-height:1.65;font-weight:400}
+.hero-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:40px}
+.hero-stats{display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap}
+.hstat{text-align:center}
+.hstat-n{font-size:26px;font-weight:900;color:var(--ac);letter-spacing:-.5px}
+.hstat-l{font-size:12px;color:var(--t3);font-weight:500;margin-top:2px}
+
+/* MOCKUP */
+.mockup-wrap{padding:0 5vw 70px;max-width:900px;margin:0 auto}
+.mockup{background:#fff;border:1px solid var(--b1);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.1),0 4px 16px rgba(0,0,0,.06)}
+.mock-bar{background:#f5f6fa;border-bottom:1px solid var(--b1);padding:12px 16px;display:flex;align-items:center;gap:8px}
+.mock-dots{display:flex;gap:5px}.mock-dot{width:10px;height:10px;border-radius:50%}
+.mock-url{flex:1;background:#fff;border:1px solid var(--b1);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--t3);margin:0 8px;text-align:center}
+.mock-body{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mock-card{background:#f8f9ff;border:1px solid rgba(67,97,238,.1);border-radius:10px;padding:12px}
+.mock-prod{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.mock-img{width:36px;height:36px;border-radius:7px;background:linear-gradient(135deg,#e8ecff,#d4d9ff);flex-shrink:0}
+.mock-pname{font-size:11px;font-weight:700;color:var(--tx)}
+.mock-price{font-size:10px;color:var(--t3)}
+.mock-badge{font-size:9px;padding:2px 7px;border-radius:100px;font-weight:600}
+.mb-gr{background:rgba(5,150,105,.1);color:var(--gr)}.mb-ac{background:rgba(67,97,238,.1);color:var(--ac)}
+.mock-seo{background:rgba(67,97,238,.04);border:1px solid rgba(67,97,238,.12);border-radius:7px;padding:8px;margin-bottom:7px}
+.mock-seo-t{font-size:10px;color:#1a56db;font-weight:700;margin-bottom:2px}
+.mock-seo-d{font-size:9px;color:var(--t3);line-height:1.5}
+.mock-tags{display:flex;flex-wrap:wrap;gap:4px}
+.mock-tag{background:#fff;border:1px solid var(--b1);border-radius:100px;padding:2px 7px;font-size:9px;color:var(--t2)}
+.mock-cat{font-size:9px;color:var(--ac);background:rgba(67,97,238,.08);border-radius:100px;padding:2px 7px;font-weight:600;display:inline-block;margin-bottom:6px}
+
+/* FEATURES */
+.features{padding:70px 5vw;background:#fff}
+.sec-title{text-align:center;font-size:clamp(24px,4vw,36px);font-weight:900;margin-bottom:8px;letter-spacing:-.4px}
+.sec-sub{text-align:center;font-size:15px;color:var(--t2);max-width:500px;margin:0 auto 48px;line-height:1.6}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;max-width:1000px;margin:0 auto}
+.feat-card{background:var(--bg);border:1.5px solid var(--b1);border-radius:14px;padding:24px;transition:all .2s}
+.feat-card:hover{border-color:rgba(67,97,238,.3);transform:translateY(-3px);box-shadow:0 8px 24px rgba(67,97,238,.1)}
+.feat-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px}
+.fi-blue{background:rgba(67,97,238,.1)}.fi-green{background:rgba(5,150,105,.1)}.fi-purple{background:rgba(124,58,237,.1)}.fi-orange{background:rgba(234,88,12,.1)}.fi-pink{background:rgba(219,39,119,.1)}.fi-yellow{background:rgba(217,119,6,.1)}
+.feat-title{font-size:15px;font-weight:800;margin-bottom:6px;letter-spacing:-.2px}
+.feat-desc{font-size:13px;color:var(--t2);line-height:1.65}
+
+/* HOW IT WORKS */
+.how{padding:70px 5vw;background:var(--bg)}
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;max-width:900px;margin:0 auto}
+.step-card{background:#fff;border:1.5px solid var(--b1);border-radius:14px;padding:22px;text-align:center}
+.step-n{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:15px;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 4px 12px rgba(67,97,238,.3)}
+.step-icon{font-size:26px;margin-bottom:10px}
+.step-title{font-size:14px;font-weight:700;margin-bottom:5px}
+.step-desc{font-size:12px;color:var(--t2);line-height:1.6}
+
+/* PRICING */
+.pricing{padding:70px 5vw;background:#fff}
+.plans{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;max-width:900px;margin:0 auto}
+.plan{background:var(--bg);border:2px solid var(--b1);border-radius:16px;padding:28px;transition:all .2s;position:relative}
+.plan.popular{border-color:var(--ac);background:#fff;box-shadow:0 8px 32px rgba(67,97,238,.15)}
+.plan-badge{position:absolute;top:-12px;right:50%;transform:translateX(50%);background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:11px;font-weight:700;padding:4px 14px;border-radius:100px;white-space:nowrap}
+.plan-name{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.plan-price{font-size:38px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px}
+.plan-price span{font-size:16px;font-weight:500;color:var(--t2)}
+.plan-period{font-size:12px;color:var(--t3);margin-bottom:20px}
+.plan-features{list-style:none;margin-bottom:24px}
+.plan-features li{font-size:13px;color:var(--t2);padding:6px 0;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:8px}
+.plan-features li:last-child{border:none}
+.plan-features li::before{content:'✓';color:var(--gr);font-weight:700;flex-shrink:0}
+.plan-features li.no{color:var(--t3)}.plan-features li.no::before{content:'✗';color:var(--t3)}
+.plan-btn{width:100%;padding:12px;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;border:none}
+.plan-btn-p{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 4px 14px rgba(67,97,238,.3)}
+.plan-btn-p:hover{opacity:.92;transform:translateY(-1px)}
+.plan-btn-s{background:var(--bg);color:var(--ac);border:2px solid rgba(67,97,238,.25)}
+.plan-btn-s:hover{border-color:var(--ac)}
+
+/* FAQ */
+.faq{padding:70px 5vw;background:var(--bg);max-width:700px;margin:0 auto}
+.faq-item{background:#fff;border:1.5px solid var(--b1);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.faq-q{padding:16px 18px;font-size:14px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.faq-q:hover{background:var(--bg)}
+.faq-arr{transition:transform .2s;font-size:12px;color:var(--t3)}
+.faq-a{padding:0 18px;font-size:13px;color:var(--t2);line-height:1.7;max-height:0;overflow:hidden;transition:all .25s}
+.faq-item.open .faq-arr{transform:rotate(180deg)}
+.faq-item.open .faq-a{max-height:200px;padding:0 18px 14px}
+
+/* CTA */
+.cta{padding:70px 5vw;text-align:center;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff}
+.cta-title{font-size:clamp(24px,4vw,38px);font-weight:900;margin-bottom:10px;letter-spacing:-.4px}
+.cta-sub{font-size:16px;opacity:.85;margin-bottom:28px;line-height:1.6}
+.cta .btn{background:#fff;color:var(--ac);font-size:15px;padding:14px 28px}
+.cta .btn:hover{opacity:.95;transform:translateY(-2px)}
+
+/* FOOTER */
+footer{background:var(--tx);color:#94a3b8;text-align:center;padding:24px 5vw;font-size:12px}
+footer a{color:#94a3b8;text-decoration:none}.footer-logo{color:#fff;font-weight:800;font-size:15px;margin-bottom:6px}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
+.modal-bg.on{display:flex}
+.modal{background:#fff;border-radius:18px;padding:32px;width:400px;max-width:92vw;animation:mIn .2s ease}
+@keyframes mIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal-title{font-size:20px;font-weight:900;margin-bottom:4px;letter-spacing:-.4px}
+.modal-sub{font-size:13px;color:var(--t2);margin-bottom:22px;line-height:1.5}
+.fg{margin-bottom:14px}
+.lbl{font-size:11px;font-weight:700;color:var(--t2);margin-bottom:5px;display:block;letter-spacing:.3px}
+.inp{width:100%;background:#f8f9ff;border:1.5px solid var(--b1);border-radius:9px;padding:10px 13px;color:var(--tx);font-family:inherit;font-size:14px;outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--ac);background:#fff;box-shadow:0 0 0 3px rgba(67,97,238,.1)}
+.modal-btn{width:100%;padding:13px;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border:none;margin-top:4px;transition:all .2s;box-shadow:0 4px 14px rgba(67,97,238,.3)}
+.modal-btn:hover{opacity:.92;transform:translateY(-1px)}
+.modal-close{position:absolute;top:16px;left:16px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--t3);width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:#f1f5f9;color:var(--tx)}
+.modal-wrap{position:relative}
+.divider{text-align:center;font-size:12px;color:var(--t3);margin:14px 0;display:flex;align-items:center;gap:8px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--b1)}
+.salla-btn{width:100%;padding:12px;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;background:#5b47d5;color:#fff;border:none;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.salla-btn:hover{opacity:.92;transform:translateY(-1px)}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--tx);border-radius:10px;padding:11px 20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .22s;pointer-events:none;white-space:nowrap;color:#fff}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--gr)}.toast.error{background:#dc2626}
+
+@media(max-width:640px){
+  .hero{padding:50px 5vw 40px}
+  .nav-links .bs{display:none}
+  .mock-body{grid-template-columns:1fr}
+  .hero-stats{gap:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-icon">✦</div>
+    <div class="nav-name">ذكاء المتجر</div>
+  </div>
+  <div class="nav-links">
+    <a href="#features" class="nav-link">المميزات</a>
+    <a href="#pricing" class="nav-link">الأسعار</a>
+    <a href="#faq" class="nav-link">الأسئلة</a>
+    <button class="btn bs" onclick="openModal('login')" style="padding:8px 16px;font-size:13px">تسجيل دخول</button>
+    <button class="btn bp" onclick="openModal('register')" style="padding:8px 16px;font-size:13px">ابدأ مجاناً ←</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">🤖 مدعوم بـ Claude AI من Anthropic</div>
+  <h1 class="hero-title">حسّن منتجاتك وضاعف<br><span>مبيعاتك بالذكاء الاصطناعي</span></h1>
+  <p class="hero-sub">أداة تحسين المحتوى الأولى المتخصصة لمتاجر سلة — تحسين الوصف والعنوان والـ SEO والوسوم بضغطة زر واحدة.</p>
+  <div class="hero-btns">
+    <button class="btn bp" onclick="openModal('register')" style="font-size:15px;padding:14px 28px">🚀 ابدأ مجاناً الآن</button>
+    <a href="#features" class="btn bs" style="font-size:14px;padding:13px 24px">شاهد المميزات</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat"><div class="hstat-n">50+</div><div class="hstat-l">منتج دفعة واحدة</div></div>
+    <div class="hstat"><div class="hstat-n">5</div><div class="hstat-l">أدوات تحسين</div></div>
+    <div class="hstat"><div class="hstat-n">100%</div><div class="hstat-l">متوافق مع سلة</div></div>
+    <div class="hstat"><div class="hstat-n">3x</div><div class="hstat-l">تحسين الظهور</div></div>
+  </div>
+</section>
+
+<!-- MOCKUP -->
+<div class="mockup-wrap">
+  <div class="mockup">
+    <div class="mock-bar">
+      <div class="mock-dots">
+        <div class="mock-dot" style="background:#f87171"></div>
+        <div class="mock-dot" style="background:#fbbf24"></div>
+        <div class="mock-dot" style="background:#34d399"></div>
+      </div>
+      <div class="mock-url">app.ذكاء-المتجر.sa</div>
+    </div>
+    <div class="mock-body">
+      <div class="mock-card">
+        <div class="mock-cat">👗 ملابس وأزياء</div>
+        <div class="mock-prod">
+          <div class="mock-img"></div>
+          <div><div class="mock-pname">فستان سهرة أنيق</div><div class="mock-price">249 ر.س</div></div>
+        </div>
+        <div class="mock-seo">
+          <div class="mock-seo-t">فستان سهرة نسائي أنيق للمناسبات الراقية</div>
+          <div class="mock-seo-d">فستان راقٍ مصمم لإبراز أناقتك في كل مناسبة — قماش فاخر...</div>
+        </div>
+        <div class="mock-tags">
+          <span class="mock-tag">فستان نسائي</span>
+          <span class="mock-tag">سهرة</span>
+          <span class="mock-tag">مناسبات</span>
+          <span class="mock-tag">أناقة</span>
+        </div>
+      </div>
+      <div class="mock-card">
+        <div class="mock-cat">📱 إلكترونيات</div>
+        <div class="mock-prod">
+          <div class="mock-img" style="background:linear-gradient(135deg,#e8f4ff,#d0e8ff)"></div>
+          <div><div class="mock-pname">سماعة لاسلكية Pro</div><div class="mock-price">199 ر.س</div></div>
+        </div>
+        <div class="mock-seo">
+          <div class="mock-seo-t">سماعة بلوتوث لاسلكية Pro بجودة صوت فائقة</div>
+          <div class="mock-seo-d">صوت نقي واتصال مستقر، بطارية 30 ساعة، مضادة للماء...</div>
+        </div>
+        <div class="mock-tags">
+          <span class="mock-tag">سماعة</span>
+          <span class="mock-tag">بلوتوث</span>
+          <span class="mock-tag">لاسلكية</span>
+          <span class="mock-tag">Pro</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="sec-title">كل ما تحتاجه لمتجر متصدر</div>
+  <p class="sec-sub">أدوات ذكاء اصطناعي متخصصة لرفع جودة محتوى متجرك وزيادة مبيعاتك</p>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon fi-blue">🧠</div>
+      <div class="feat-title">ذكاء الفئات التلقائي</div>
+      <div class="feat-desc">يكتشف نوع منتجك تلقائياً ويكتب وصفاً متخصصاً — ملابس يركز على القماش والمقاسات، إلكترونيات يركز على المواصفات والضمان.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-green">⭐</div>
+      <div class="feat-title">الرد الذكي على التقييمات</div>
+      <div class="feat-desc">يقرأ تقييمات عملائك ويحوّلها لعبارات بيع قوية داخل الوصف — كلام عملائك الحقيقي أفضل دليل للمشتري الجديد.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-purple">🔍</div>
+      <div class="feat-title">تحسين SEO كامل</div>
+      <div class="feat-desc">عنوان الصفحة ووصفها ووسومها كلها محسّنة لـ Google — منتجاتك تظهر أعلى نتائج البحث وتجذب زوار مجانيين.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-orange">🔤</div>
+      <div class="feat-title">اختبار العناوين (A/B)</div>
+      <div class="feat-desc">يقترح 3 عناوين مختلفة لكل منتج — أنت تختار الأقوى وأكثرها جذباً للنقر بناءً على كلماتها المفتاحية.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-pink">🏆</div>
+      <div class="feat-title">نقاط جودة المتجر</div>
+      <div class="feat-desc">لوحة تعرض نسبة تحسين متجرك مع مهام واضحة لإصلاح المشاكل — تحدّ نفسك للوصول لـ 100%.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-yellow">⚡</div>
+      <div class="feat-title">تحسين 50 منتج دفعة</div>
+      <div class="feat-desc">اختر حتى 50 منتج ومنهم يتحسنون تلقائياً — وصف + عنوان + SEO + وسوم بضغطة زر واحدة.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="sec-title">كيف يعمل؟</div>
+  <p class="sec-sub">ثلاث خطوات بسيطة لتحسين متجرك كاملاً</p>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-n">١</div>
+      <div class="step-icon">🔗</div>
+      <div class="step-title">اربط متجرك</div>
+      <div class="step-desc">اربط متجرك على سلة بخطوة واحدة — لا تحتاج أي معرفة تقنية</div>
+    </div>
+    <div class="step-card">
+      <div class="step-n">٢</div>
+      <div class="step-icon">☑️</div>
+      <div class="step-title">اختر المنتجات</div>
+      <div class="step-desc">اختر المنتجات التي تريد تحسينها — ابدأ بالأولى بالأولوية</div>
+    </div>
+    <div class="step-card">
+      <div class="step-n">٣</div>
+      <div class="step-icon">🚀</div>
+      <div class="step-title">اضغط تحسين</div>
+      <div class="step-desc">الذكاء الاصطناعي يكتب الوصف والعنوان والوسوم في ثوانٍ</div>
+    </div>
+    <div class="step-card">
+      <div class="step-n">٤</div>
+      <div class="step-icon">✅</div>
+      <div class="step-title">ارفع للمتجر</div>
+      <div class="step-desc">راجع النتائج وارفعها لمتجرك مباشرة — بدون أي خطوات إضافية</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="sec-title">أسعار شفافة وبسيطة</div>
+  <p class="sec-sub">ابدأ مجاناً — لا تحتاج بطاقة ائتمانية</p>
+  <div class="plans">
+    <div class="plan">
+      <div class="plan-name">مجاني</div>
+      <div class="plan-price">0 <span>ر.س</span></div>
+      <div class="plan-period">إلى الأبد</div>
+      <ul class="plan-features">
+        <li>10 منتجات في الشهر</li>
+        <li>تحسين الوصف والعنوان</li>
+        <li>تحسين SEO أساسي</li>
+        <li>توليد الوسوم</li>
+        <li class="no">ذكاء الفئات المتقدم</li>
+        <li class="no">الرد على التقييمات</li>
+        <li class="no">تحسين بالجملة</li>
+      </ul>
+      <button class="plan-btn plan-btn-s" onclick="openModal('register')">ابدأ مجاناً</button>
+    </div>
+    <div class="plan popular">
+      <div class="plan-badge">الأكثر شعبية ⭐</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">99 <span>ر.س</span></div>
+      <div class="plan-period">شهرياً</div>
+      <ul class="plan-features">
+        <li>200 منتج في الشهر</li>
+        <li>تحسين الوصف والعنوان</li>
+        <li>تحسين SEO متقدم</li>
+        <li>توليد الوسوم</li>
+        <li>ذكاء الفئات المتقدم</li>
+        <li>الرد على التقييمات</li>
+        <li>تحسين 50 منتج دفعة</li>
+      </ul>
+      <button class="plan-btn plan-btn-p" onclick="openModal('register')">ابدأ الآن ←</button>
+    </div>
+    <div class="plan">
+      <div class="plan-name">Enterprise</div>
+      <div class="plan-price">299 <span>ر.س</span></div>
+      <div class="plan-period">شهرياً</div>
+      <ul class="plan-features">
+        <li>غير محدود</li>
+        <li>كل مميزات Pro</li>
+        <li>أولوية في الدعم</li>
+        <li>تقارير تفصيلية</li>
+        <li>لوحة إدارة متقدمة</li>
+        <li>API مخصص</li>
+        <li>دعم عبر واتساب</li>
+      </ul>
+      <button class="plan-btn plan-btn-s" onclick="openModal('register')">تواصل معنا</button>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="padding:70px 5vw;background:var(--bg)">
+  <div style="max-width:680px;margin:0 auto">
+    <div class="sec-title" style="margin-bottom:8px">الأسئلة الشائعة</div>
+    <p class="sec-sub">كل ما تحتاج معرفته</p>
+    <div id="faq-list">
+      <div class="faq-item">
+        <div class="faq-q" onclick="togFaq(this)">هل التطبيق متوافق مع سلة؟ <span class="faq-arr">▼</span></div>
+        <div class="faq-a">نعم — التطبيق مبني خصيصاً لمنصة سلة ومتكامل معها بالكامل. يربط متجرك مباشرة ويحدّث المنتجات تلقائياً.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="togFaq(this)">كيف يعمل الذكاء الاصطناعي على منتجاتي؟ <span class="faq-arr">▼</span></div>
+        <div class="faq-a">نستخدم نموذج Claude من Anthropic — من أقوى النماذج اللغوية عالمياً. يكتشف نوع منتجك تلقائياً ويكتب محتوى متخصصاً يناسب فئته وجمهوره المستهدف.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="togFaq(this)">هل يمكنني تعديل النتائج قبل الرفع؟ <span class="faq-arr">▼</span></div>
+        <div class="faq-a">بالطبع — تستطيع مراجعة كل الوصف والعناوين قبل رفعها. تختار العنوان الأفضل من بين 3 خيارات وتوسّع الوصف لتقرأه كاملاً.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="togFaq(this)">هل بياناتي آمنة؟ <span class="faq-arr">▼</span></div>
+        <div class="faq-a">نعم — لا نخزن بيانات منتجاتك. نستخدم التوكن للوصول المؤقت لمتجرك فقط عند الحاجة، ولا نشارك أي بيانات مع أطراف ثالثة.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="togFaq(this)">ماذا لو لم أكن راضياً؟ <span class="faq-arr">▼</span></div>
+        <div class="faq-a">الخطة المجانية متاحة دائماً بدون بطاقة ائتمانية. إذا اشتركت بالـ Pro وأردت الإلغاء، يمكنك ذلك في أي وقت.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-title">ابدأ تحسين متجرك اليوم</div>
+  <p class="cta-sub">انضم وابدأ مجاناً — لا تحتاج بطاقة ائتمانية</p>
+  <button class="btn" onclick="openModal('register')" style="background:#fff;color:var(--ac);font-size:15px;padding:14px 28px;font-weight:800;box-shadow:0 4px 20px rgba(0,0,0,.15)">🚀 ابدأ مجاناً الآن ←</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">✦ ذكاء المتجر</div>
+  <div>أداة تحسين المحتوى الأولى لمتاجر سلة</div>
+  <div style="margin-top:8px;opacity:.6">© 2025 ذكاء المتجر — جميع الحقوق محفوظة</div>
+</footer>
+
+<!-- REGISTER/LOGIN MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
+  <div class="modal modal-wrap">
+    <button class="modal-close" onclick="document.getElementById('modal-bg').classList.remove('on')">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const B = window.location.origin;
+
+// ── FAQ ──────────────────────────────────
+function togFaq(el){
+  const item = el.parentElement;
+  item.classList.toggle('open');
+}
+
+// ── MODAL ────────────────────────────────
+function openModal(type){
+  const c = document.getElementById('modal-content');
+  if(type==='register'){
+    c.innerHTML = `
+      <div class="modal-title">ابدأ مجاناً 🚀</div>
+      <div class="modal-sub">أنشئ حسابك وابدأ تحسين منتجاتك فوراً</div>
+      <div class="fg"><label class="lbl">الاسم</label><input class="inp" id="reg-name" placeholder="اسمك الكامل" type="text"></div>
+      <div class="fg"><label class="lbl">البريد الإلكتروني</label><input class="inp" id="reg-email" placeholder="example@email.com" type="email" dir="ltr"></div>
+      <div class="fg"><label class="lbl">كلمة المرور</label><input class="inp" id="reg-pass" placeholder="8 أحرف على الأقل" type="password" dir="ltr"></div>
+      <button class="modal-btn" onclick="doRegister()">إنشاء الحساب ←</button>
+      <div class="divider">أو</div>
+      <button class="salla-btn" onclick="doSalla()">🔗 ربط متجر سلة مباشرة</button>
+      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--t3)">
+        عندك حساب؟ <span style="color:var(--ac);cursor:pointer;font-weight:600" onclick="openModal('login')">سجّل دخول</span>
+      </div>`;
+  } else {
+    c.innerHTML = `
+      <div class="modal-title">مرحباً بعودتك 👋</div>
+      <div class="modal-sub">سجّل دخولك للوصول لمتجرك</div>
+      <div class="fg"><label class="lbl">البريد الإلكتروني</label><input class="inp" id="log-email" placeholder="example@email.com" type="email" dir="ltr"></div>
+      <div class="fg"><label class="lbl">كلمة المرور</label><input class="inp" id="log-pass" placeholder="كلمة المرور" type="password" dir="ltr"></div>
+      <button class="modal-btn" onclick="doLogin()">دخول ←</button>
+      <div class="divider">أو</div>
+      <button class="salla-btn" onclick="doSalla()">🔗 دخول بحساب سلة</button>
+      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--t3)">
+        ليس عندك حساب؟ <span style="color:var(--ac);cursor:pointer;font-weight:600" onclick="openModal('register')">إنشاء حساب</span>
+      </div>`;
+  }
+  document.getElementById('modal-bg').classList.add('on');
+  setTimeout(()=>document.querySelector('.inp')?.focus(), 100);
+}
+
+function closeModal(e){
+  if(e.target===document.getElementById('modal-bg'))
+    document.getElementById('modal-bg').classList.remove('on');
+}
+
+function doSalla(){
+  window.location.href = B + '/auth/salla';
+}
+
+async function doRegister(){
+  const name  = document.getElementById('reg-name')?.value?.trim();
+  const email = document.getElementById('reg-email')?.value?.trim();
+  const pass  = document.getElementById('reg-pass')?.value;
+  if(!name||!email||!pass){toast('أكمل جميع الحقول','error');return;}
+  if(pass.length<8){toast('كلمة المرور 8 أحرف على الأقل','error');return;}
+  // Save to localStorage for now (replace with real auth later)
+  localStorage.setItem('user',JSON.stringify({name,email,plan:'free',joined:new Date().toISOString()}));
+  toast('✅ تم إنشاء حسابك! جاري التحويل...','success');
+  setTimeout(()=>{ window.location.href = B + '/auth/salla'; }, 1500);
+}
+
+async function doLogin(){
+  const email = document.getElementById('log-email')?.value?.trim();
+  const pass  = document.getElementById('log-pass')?.value;
+  if(!email||!pass){toast('أدخل البريد وكلمة المرور','error');return;}
+  // Check localStorage (replace with real auth later)
+  const user = JSON.parse(localStorage.getItem('user')||'null');
+  if(user&&user.email===email){
+    toast('✅ مرحباً '+user.name+'! جاري الدخول...','success');
+    setTimeout(()=>{ window.location.href = '/'; }, 1500);
+  } else {
+    // Try salla auth
+    toast('جاري التحقق...','');
+    setTimeout(()=>{ window.location.href = B + '/auth/salla'; }, 800);
+  }
+}
+
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast on '+(type||'');
+  setTimeout(()=>t.classList.remove('on'),3000);
+}
+
+// Keyboard support
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') document.getElementById('modal-bg').classList.remove('on');
+  if(e.key==='Enter'){
+    if(document.getElementById('reg-pass')===document.activeElement) doRegister();
+    if(document.getElementById('log-pass')===document.activeElement) doLogin();
+  }
+});
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    document.querySelector(this.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>
