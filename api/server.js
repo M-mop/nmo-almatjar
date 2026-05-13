@@ -70,6 +70,81 @@ async function saveCustomer(token, store) {
 
 // Single source of truth for model name
 const AI_MODEL = 'claude-haiku-4-5-20251001';
+// ─────────────────────────────────────────
+// PLANS CONFIG
+// ─────────────────────────────────────────
+const PLANS = {
+  free:       { limit: 10,     name: 'مجاني',      price: 0   },
+  pro:        { limit: 200,    name: 'Pro',         price: 99  },
+  enterprise: { limit: 99999,  name: 'Enterprise',  price: 299 }
+};
+
+// ─────────────────────────────────────────
+// CHECK USAGE LIMIT
+// ─────────────────────────────────────────
+async function checkLimit(storeId) {
+  try {
+    const res = await dbQuery(
+      `SELECT plan, products_count FROM customers WHERE store_id = $1`,
+      [String(storeId)]
+    );
+    if (!res.rows.length) return { allowed: true, plan: 'free', used: 0, limit: 10 };
+    const { plan, products_count } = res.rows[0];
+    const limit = PLANS[plan]?.limit || 10;
+    return { allowed: products_count < limit, plan, used: products_count, limit };
+  } catch(e) {
+    return { allowed: true, plan: 'free', used: 0, limit: 10 };
+  }
+}
+
+async function incUsageCount(storeId) {
+  try {
+    await dbQuery(
+      `UPDATE customers SET products_count = products_count + 1 WHERE store_id = $1`,
+      [String(storeId)]
+    );
+  } catch(e) { console.warn('incUsage error:', e.message); }
+}
+
+// ─────────────────────────────────────────
+// GET PLAN INFO
+// ─────────────────────────────────────────
+app.post('/api/plan', async (req, res) => {
+  try {
+    const token = getToken(req);
+    if (!token) return res.status(401).json({ error: 'غير مصرح' });
+    const storeInfo = await sallaGet('store/info', token);
+    const storeId = storeInfo.data?.id;
+    const info = await checkLimit(storeId);
+    res.json({ ...info, plans: PLANS });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ─────────────────────────────────────────
+// UPGRADE PLAN (admin only for now)
+// ─────────────────────────────────────────
+app.post('/api/upgrade-plan', async (req, res) => {
+  try {
+    const { storeId, plan, adminKey } = req.body;
+    if (adminKey !== process.env.ADMIN_PASSWORD) return res.status(401).json({ error: 'غير مصرح' });
+    if (!PLANS[plan]) return res.status(400).json({ error: 'خطة غير صحيحة' });
+    await dbQuery(
+      `UPDATE customers SET plan = $1 WHERE store_id = $2`,
+      [plan, String(storeId)]
+    );
+    res.json({ success: true, plan, limit: PLANS[plan].limit });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Serve landing page
+app.get('/landing', (req, res) => {
+  res.sendFile(require('path').join(__dirname, '..', 'public', 'landing.html'));
+});
+
 console.log('=== SERVER START ===', 'model:', AI_MODEL, 'anthropic_key:', !!process.env.ANTHROPIC_API_KEY);
 
 // ─────────────────────────────────────────
@@ -238,7 +313,17 @@ app.post('/api/seo-score', async (req, res) => {
 // ─────────────────────────────────────────
 app.post('/api/generate-description', async (req, res) => {
   try {
-    const { name, currentDescription, audience, tone, instructions, mode } = req.body;
+    const { name, currentDescription, audience, tone, instructions, mode, storeId } = req.body;
+    // Check usage limit
+    if (storeId) {
+      const limit = await checkLimit(storeId);
+      if (!limit.allowed) {
+        return res.status(429).json({
+          error: `وصلت للحد الشهري (${limit.used}/${limit.limit} منتج). الرجاء الترقية للخطة Pro`,
+          limitReached: true, plan: limit.plan, used: limit.used, limit: limit.limit
+        });
+      }
+    }
 
     const toneMap = { professional:'احترافي ورسمي', youth:'شبابي وعصري', luxury:'فاخر وراقي', friendly:'ودي وقريب' };
     const modeInst = mode === 'improve' ? 'حسّن الوصف الحالي' : 'اكتب وصفاً احترافياً جديداً';
@@ -324,6 +409,8 @@ ${reviewsSection}
     const features = extractSection(text, 'FEATURES')
       .split('\n').filter(f => f.trim().startsWith('-')).map(f => f.replace(/^-\s*/, '').trim());
 
+    // Increment usage
+    if (storeId) await incUsageCount(storeId);
     res.json({
       seoTitle:         extractSection(text, 'SEO_TITLE'),
       seoDescription:   extractSection(text, 'SEO_DESC'),
