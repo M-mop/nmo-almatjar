@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>من نحن — نمو المتجر</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--ac:#059669;--ac2:#0d9488;--tx:#0f172a;--t2:#475569;--t3:#94a3b8;--bg:#f8fffe;--s1:#fff;--b1:rgba(0,0,0,.07)}
+body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--tx);font-size:14px}
+nav{background:#fff;border-bottom:1px solid var(--b1);padding:0 5vw;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-icon{width:36px;height:36px;border-radius:9px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.nav-icon img{width:100%;height:100%;object-fit:cover}
+.nav-name{font-size:15px;font-weight:800;color:var(--tx)}
+.nav-links{display:flex;gap:6px}
+.nav-link{font-size:12px;color:var(--t2);text-decoration:none;padding:6px 10px;border-radius:7px;transition:all .15s}
+.nav-link:hover{background:#f1f5f9;color:var(--tx)}
+.nav-link.active{color:var(--ac);font-weight:600}
+.hero{background:linear-gradient(135deg,#ecfdf5,#f0fdfa);border-bottom:1px solid rgba(5,150,105,.1);padding:60px 5vw;text-align:center}
+.hero-icon{font-size:52px;margin-bottom:16px}
+.hero-title{font-size:clamp(26px,5vw,42px);font-weight:900;color:var(--tx);margin-bottom:10px;letter-spacing:-.5px}
+.hero-sub{font-size:16px;color:var(--t2);max-width:500px;margin:0 auto;line-height:1.65}
+.content{max-width:760px;margin:0 auto;padding:50px 5vw}
+.section{margin-bottom:48px}
+.sec-title{font-size:20px;font-weight:800;color:var(--tx);margin-bottom:6px;letter-spacing:-.3px;display:flex;align-items:center;gap:8px}
+.sec-sub{font-size:13px;color:var(--t3);margin-bottom:18px}
+.sec-body{font-size:14px;color:var(--t2);line-height:1.85}
+.sec-body p{margin-bottom:12px}
+.card{background:var(--s1);border:1.5px solid var(--b1);border-radius:14px;padding:22px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.card:hover{border-color:rgba(5,150,105,.2);transform:translateY(-1px);transition:all .2s}
+.card-icon{font-size:24px;margin-bottom:10px}
+.card-title{font-size:14px;font-weight:700;margin-bottom:5px}
+.card-body{font-size:13px;color:var(--t2);line-height:1.6}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.contact-box{background:linear-gradient(135deg,#ecfdf5,#f0fdfa);border:1.5px solid rgba(5,150,105,.2);border-radius:14px;padding:24px;text-align:center}
+.contact-box h3{font-size:16px;font-weight:800;margin-bottom:6px}
+.contact-box p{font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.6}
+.contact-links{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.clink{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none;transition:all .15s}
+.clink-wa{background:#25d366;color:#fff}.clink-wa:hover{opacity:.9}
+.clink-em{background:#f1f5f9;color:var(--tx);border:1px solid var(--b1)}.clink-em:hover{background:#e2e8f0}
+.divider{height:1px;background:var(--b1);margin:48px 0}
+.team-card{display:flex;align-items:center;gap:16px;background:var(--s1);border:1.5px solid var(--b1);border-radius:14px;padding:20px}
+.team-av{width:56px;height:56px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.team-name{font-size:15px;font-weight:800;margin-bottom:3px}
+.team-role{font-size:12px;color:var(--t3);font-weight:500}
+.team-bio{font-size:13px;color:var(--t2);margin-top:6px;line-height:1.6}
+.badge{display:inline-flex;align-items:center;gap:4px;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.15);border-radius:100px;padding:3px 10px;font-size:11px;color:var(--ac);font-weight:600;margin:3px}
+footer{background:var(--tx);color:#94a3b8;text-align:center;padding:20px 5vw;font-size:12px}
+footer a{color:#94a3b8;text-decoration:none}
+.footer-logo{color:#fff;font-weight:800;font-size:14px;margin-bottom:5px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}.nav-links{display:none}.team-card{flex-direction:column;text-align:center}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">
+    <div class="nav-icon"><img src="/logo.png" alt="نمو المتجر" onerror="this.parentElement.innerHTML='🛍️'"></div>
+    <div class="nav-name">نمو المتجر</div>
+  </a>
+  <div class="nav-links">
+    <a href="/" class="nav-link">الرئيسية</a>
+    <a href="/landing.html" class="nav-link">المميزات</a>
+    <a href="/about.html" class="nav-link active">من نحن</a>
+    <a href="/privacy.html" class="nav-link">الخصوصية</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-icon">🛍️</div>
+  <h1 class="hero-title">من نحن</h1>
+  <p class="hero-sub">نرتقي بمنتجاتك ونرفع ظهورك — أداة ذكاء اصطناعي متخصصة لمتاجر سلة</p>
+</div>
+
+<div class="content">
+
+  <!-- رسالتنا -->
+  <div class="section">
+    <div class="sec-title">🎯 رسالتنا</div>
+    <div class="sec-sub">لماذا وُجد نمو المتجر؟</div>
+    <div class="sec-body">
+      <p>نمو المتجر وُلد من فكرة بسيطة: <strong>أصحاب المتاجر الإلكترونية يستحقون أدوات ذكاء اصطناعي تفهم طبيعة بضاعتهم</strong> — لا مجرد كاتب نصوص عام.</p>
+      <p>رأينا كيف يعاني التجار في كتابة أوصاف جذابة لمئات المنتجات، وكيف تضيع منتجاتهم في نتائج البحث بسبب ضعف المحتوى. قررنا أن نحل هذه المشكلة مرة واحدة وللأبد.</p>
+      <p>اليوم، نمو المتجر يساعد التجار السعوديين على تحسين وصف منتجاتهم وعناوينها ووسومها بالذكاء الاصطناعي — بضغطة زر واحدة.</p>
+    </div>
+  </div>
+
+  <!-- ما نقدمه -->
+  <div class="section">
+    <div class="sec-title">⚡ ما نقدمه</div>
+    <div class="sec-sub">أدوات متخصصة لرفع جودة متجرك</div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-icon">🧠</div>
+        <div class="card-title">ذكاء الفئات التلقائي</div>
+        <div class="card-body">يكتشف نوع منتجك ويكتب وصفاً متخصصاً — ملابس أو إلكترونيات أو عطور أو غيرها</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <div class="card-title">تحسين SEO كامل</div>
+        <div class="card-body">عنوان الصفحة ووصفها ووسومها كلها محسّنة لـ Google ومنصة سلة</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⭐</div>
+        <div class="card-title">الرد الذكي على التقييمات</div>
+        <div class="card-body">يحوّل تقييمات عملائك لعبارات بيع قوية داخل وصف المنتج تلقائياً</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏆</div>
+        <div class="card-title">نقاط جودة المتجر</div>
+        <div class="card-body">لوحة تعرض نسبة تحسين متجرك مع مهام واضحة للوصول لـ 100%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- الفريق -->
+  <div class="section">
+    <div class="sec-title">👨‍💻 الفريق</div>
+    <div class="sec-sub">من يقف خلف نمو المتجر</div>
+    <div class="team-card">
+      <div class="team-av">👨‍💻</div>
+      <div>
+        <div class="team-name">محمد</div>
+        <div class="team-role">المؤسس والمطور</div>
+        <div class="team-bio">مطور سعودي متخصص في بناء أدوات الذكاء الاصطناعي للتجارة الإلكترونية. يؤمن بأن كل تاجر يستحق أدوات احترافية تساعده على النمو والمنافسة.</div>
+        <div style="margin-top:8px">
+          <span class="badge">🤖 AI Developer</span>
+          <span class="badge">🛍️ E-Commerce</span>
+          <span class="badge">🇸🇦 السعودية</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- قيمنا -->
+  <div class="section">
+    <div class="sec-title">💎 قيمنا</div>
+    <div class="sec-sub">المبادئ التي نعمل بها</div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <div class="card-title">البساطة أولاً</div>
+        <div class="card-body">أداة بسيطة تحل مشكلة حقيقية — بدون تعقيد أو خطوات زائدة</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <div class="card-title">الخصوصية والأمان</div>
+        <div class="card-body">لا نخزن بيانات منتجاتك — نحترم خصوصية متجرك وعملائك</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📈</div>
+        <div class="card-title">نتائج حقيقية</div>
+        <div class="card-body">كل ميزة مبنية على أساس رفع المبيعات وتحسين الظهور فعلياً</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤝</div>
+        <div class="card-title">دعم حقيقي</div>
+        <div class="card-body">نرد على استفساراتك عبر واتساب — دعم بشري لا روبوتات</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- تواصل -->
+  <div class="contact-box">
+    <h3>تواصل معنا 👋</h3>
+    <p>عندك سؤال أو اقتراح؟ نحن هنا للمساعدة</p>
+    <div class="contact-links">
+      <a href="https://wa.me/905340355912" target="_blank" class="clink clink-wa">📱 واتساب</a>
+      <a href="mailto:oo3ooi@icloud.com" class="clink clink-em">✉️ oo3ooi@icloud.com</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">🛍️ نمو المتجر</div>
+  <div>نرتقي بمنتجاتك.. ونرفع ظهورك</div>
+  <div style="margin-top:8px;opacity:.6">
+    © 2025 نمو المتجر — <a href="/privacy.html">سياسة الخصوصية</a> · <a href="/terms.html">شروط الاستخدام</a>
+  </div>
+</footer>
+</body>
+</html>
