@@ -577,14 +577,56 @@ function renderQuality(){
 async function init(){
   const p=new URLSearchParams(window.location.search),t=p.get('token');
   if(t){localStorage.setItem('st',t);history.replaceState({},'','/');}
-  await loadP();updU();
+  await loadP();
+  await loadPlan();
+  updU();
+}
+
+async function loadPlan(){
+  try{
+    const tk=localStorage.getItem('st');
+    if(!tk||tk==='demo')return;
+    const d=await api('/api/plan',{token:tk});
+    if(d.plan) localStorage.setItem('uP',d.plan);
+    if(typeof d.used==='number') localStorage.setItem('uC',d.used);
+    updU();
+    // Show limit warning
+    if(d.used>=d.limit){
+      showLimitModal(d);
+    }
+  }catch(e){console.warn('plan load:',e.message);}
+}
+
+function showLimitModal(info){
+  const plans={free:'مجاني',pro:'Pro',enterprise:'Enterprise'};
+  const pname=plans[info.plan]||info.plan;
+  const wrap=document.createElement('div');
+  wrap.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)';
+  wrap.innerHTML='<div style="background:#fff;border-radius:18px;padding:28px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2)">'
+    +'<div style="font-size:36px;margin-bottom:10px">⚡</div>'
+    +'<div style="font-size:17px;font-weight:800;margin-bottom:6px;color:#0f172a">وصلت للحد الشهري</div>'
+    +'<div style="font-size:13px;color:#64748b;margin-bottom:18px;line-height:1.6">خطتك <b>'+pname+'</b> تسمح بـ '+info.limit+' منتج/شهر. تم استخدام <b>'+info.used+'</b> منتج.</div>'
+    +'<div style="background:#f8f9ff;border:1.5px solid rgba(67,97,238,.2);border-radius:12px;padding:16px;margin-bottom:18px">'
+    +'<div style="font-size:12px;color:#64748b;margin-bottom:8px">الترقية لـ Pro = 200 منتج/شهر</div>'
+    +'<div style="font-size:22px;font-weight:900;color:#4361ee">99 ر.س <span style="font-size:12px;font-weight:400;color:#94a3b8">/ شهر</span></div>'
+    +'</div>'
+    +'<button onclick="this.closest('div[style]').remove()" style="background:linear-gradient(135deg,#4361ee,#7c3aed);color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;width:100%;font-family:inherit;margin-bottom:8px">تواصل للترقية ←</button>'
+    +'<button onclick="this.closest('div[style]').remove()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:10px;font-size:13px;cursor:pointer;width:100%;font-family:inherit">إغلاق</button>'
+    +'</div>';
+  document.body.appendChild(wrap);
 }
 const DEMO=[{id:1,name:'جاكيت نسائي خفيف',price:{amount:84},description:'جاكيت أنيق'},{id:2,name:'طاولة بلوت فاخرة',price:{amount:349},description:''},{id:3,name:'تيشيرت الهلال 2025',price:{amount:129},description:'تيشيرت رسمي'},{id:4,name:'عطر ورد الطائف',price:{amount:599},description:''}];
 async function loadP(){
   const tk=localStorage.getItem('st')||'demo';
   if(tk==='demo'){prods=DEMO;meta();rList(prods);return;}
   try{
-    const r=await fetch(B+'/api/products',{headers:{Authorization:'Bearer '+tk}});
+    // Save store info
+  try{
+    const si=await fetch(B+'/api/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tk})});
+    const sd=await si.json();
+    if(sd.plan)localStorage.setItem('uP',sd.plan);
+  }catch(e){}
+  const r=await fetch(B+'/api/products',{headers:{Authorization:'Bearer '+tk}});
     const tx=await r.text();
     if(tx.trim().startsWith('<'))throw 0;
     const d=JSON.parse(tx);prods=d.products?.length?d.products:DEMO;
@@ -670,7 +712,8 @@ async function run(){
     renderR();
     try{
       if(d1||d3||d4){
-        const d=await api('/api/generate-description',{name:p.name,currentDescription:p.description||'',audience:'العملاء السعوديين',tone,instructions:inst,mode:'write'});
+        const _sid=localStorage.getItem('store_id')||'';
+const d=await api('/api/generate-description',{name:p.name,currentDescription:p.description||'',audience:'العملاء السعوديين',tone,instructions:inst,mode:'write',storeId:_sid});
         if(d1){r.data.description=d.description||'';r.data.descriptionHtml=d.descriptionHtml||'';}
         if(d3)r.data.seoTitle=d.seoTitle||'';
         if(d4)r.data.seoDescription=d.seoDescription||'';
@@ -705,7 +748,18 @@ async function run(){
         }
       }
       r.status='ok';
-    }catch(e){r.status='err';r.error=e.message;}
+    }catch(e){
+      r.status='err';
+      r.error=e.message;
+      if(e.message&&e.message.includes('وصلت للحد')){
+        // Stop processing
+        renderR();
+        document.getElementById('pg').classList.remove('on');
+        document.getElementById('rarea').style.display='block';
+        toast(e.message,'error');
+        break;
+      }
+    }
     renderR();
     await sleep(1800);
   }
