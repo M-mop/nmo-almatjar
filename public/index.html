@@ -293,6 +293,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--ac);background:#fff;b
     <div class="nav-sec">التتبع</div>
     <div class="nit" onclick="gp('history')" id="nav-history"><span class="ni">✅</span> المنتجات المحسّنة</div>
     <div class="nit" onclick="gp('quality')" id="nav-quality"><span class="ni">🏆</span> نقاط الجودة</div>
+    <div class="nav-sec">أدوات إضافية</div>
+    <div class="nit" onclick="gp('excel')" id="nav-excel"><span class="ni">📊</span> تحسين Excel</div>
     <div class="nav-sec">معلومات</div>
     <div class="nit" onclick="window.open('/about.html','_blank')"><span class="ni">👤</span> من نحن</div>
     <div class="nit" onclick="window.open('/privacy.html','_blank')"><span class="ni">🔒</span> الخصوصية</div>
@@ -472,7 +474,7 @@ let prods=[],sel={},res=[];
 let eIds=JSON.parse(localStorage.getItem('eI')||'[]');
 let eLog=JSON.parse(localStorage.getItem('eL')||'[]');
 
-const PI={enhance:{t:'⚡ تحسين المنتجات',g:'الأدوات'},score:{t:'📊 تقييم SEO',g:'الأدوات'},history:{t:'✅ المنتجات المحسّنة',g:'التتبع'},quality:{t:'🏆 نقاط الجودة',g:'التتبع'}};
+const PI={enhance:{t:'⚡ تحسين المنتجات',g:'الأدوات'},score:{t:'📊 تقييم SEO',g:'الأدوات'},history:{t:'✅ المنتجات المحسّنة',g:'التتبع'},quality:{t:'🏆 نقاط الجودة',g:'التتبع'},excel:{t:'📊 تحسين Excel',g:'أدوات إضافية'}};
 function gp(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nit').forEach(n=>n.classList.remove('on'));
@@ -642,6 +644,196 @@ function renderQuality(){
         +'<div style="font-size:18px;font-weight:900;color:'+r.color+'">'+r.val+'</div>'
         +'</div>').join('')+'</div>';
   }
+}
+
+
+// ── EXCEL FUNCTIONS ──────────────────────
+let excelFileP = null, excelFileS = null;
+
+function switchTab(tab){
+  document.getElementById('excel-products-tab').style.display = tab==='products'?'block':'none';
+  document.getElementById('excel-seo-tab').style.display = tab==='seo'?'block':'none';
+  document.getElementById('tab-products').className = tab==='products'?'btn bp':'btn bs';
+  document.getElementById('tab-seo').className = tab==='seo'?'btn bp':'btn bs';
+  if(tab==='products'){
+    document.getElementById('tab-products').style.cssText='background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 4px 14px rgba(67,97,238,.3)';
+    document.getElementById('tab-seo').style.cssText='';
+  } else {
+    document.getElementById('tab-seo').style.cssText='background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 4px 14px rgba(67,97,238,.3)';
+    document.getElementById('tab-products').style.cssText='';
+  }
+}
+
+function onFileSelect(input, type){
+  const file = input.files[0];
+  if(!file) return;
+  if(!file.name.endsWith('.xlsx')){ toast('يجب أن يكون الملف بصيغة .xlsx','error'); return; }
+  if(type==='p'){
+    excelFileP = file;
+    document.getElementById('file-p-name').textContent = '✅ ' + file.name;
+    document.getElementById('drop-p').style.borderColor = 'var(--ac)';
+    document.getElementById('btn-enhance-p').disabled = false;
+  } else {
+    excelFileS = file;
+    document.getElementById('file-s-name').textContent = '✅ ' + file.name;
+    document.getElementById('drop-s').style.borderColor = 'var(--ac)';
+    document.getElementById('btn-enhance-s').disabled = false;
+  }
+}
+
+function handleExcelDrop(e, type){
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if(!file) return;
+  const input = document.getElementById(type==='p'?'file-p':'file-s');
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  input.files = dt.files;
+  onFileSelect(input, type);
+  const drop = document.getElementById('drop-'+type);
+  drop.style.borderColor = 'var(--b2)';
+  drop.style.background = 'var(--s2)';
+}
+
+async function enhanceExcel(type){
+  const isProducts = type === 'products';
+  const file = isProducts ? excelFileP : excelFileS;
+  const progBox = document.getElementById(isProducts?'excel-prog-p':'excel-prog-s');
+  const progTxt = document.getElementById(isProducts?'excel-prog-txt-p':'excel-prog-txt-s');
+  const progBar = document.getElementById(isProducts?'excel-prog-bar-p':'excel-prog-bar-s');
+  const resultsBox = document.getElementById(isProducts?'excel-results-p':'excel-results-s');
+  const btn = document.getElementById(isProducts?'btn-enhance-p':'btn-enhance-s');
+
+  if(!file){ toast('اختر ملف أولاً','error'); return; }
+
+  btn.disabled = true;
+  progBox.style.display = 'block';
+  resultsBox.style.display = 'none';
+  progTxt.textContent = 'جاري رفع الملف وتحليله...';
+  progBar.style.width = '15%';
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    if(isProducts){
+      const tone = document.getElementById('excel-tone-p').value;
+      formData.append('tone', tone);
+    }
+
+    progTxt.textContent = 'جاري التحسين بالذكاء الاصطناعي... قد يستغرق بضع دقائق';
+    progBar.style.width = '40%';
+
+    const endpoint = isProducts ? '/api/excel/products' : '/api/excel/seo';
+    const res = await fetch(B + endpoint, { method:'POST', body: formData });
+    const data = await res.json();
+
+    progBar.style.width = '100%';
+    await sleep(300);
+    progBox.style.display = 'none';
+
+    if(!res.ok || data.error){
+      toast('❌ ' + (data.error||'حدث خطأ'),'error');
+      btn.disabled = false;
+      return;
+    }
+
+    // Show results preview
+    resultsBox.style.display = 'block';
+    resultsBox.innerHTML = buildExcelResults(data, isProducts);
+
+    // Auto download file
+    const blob = base64ToBlob(data.file, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = data.filename; a.click();
+    URL.revokeObjectURL(url);
+
+    toast('✅ تم التحسين وتحميل الملف!','success');
+
+  } catch(e){
+    progBox.style.display = 'none';
+    toast('❌ ' + e.message,'error');
+  }
+  btn.disabled = false;
+}
+
+function buildExcelResults(data, isProducts){
+  const ok = data.results.filter(r=>r.status==='success');
+  const fail = data.results.filter(r=>r.status==='error');
+
+  let html = '<div style="background:var(--s2);border:1.5px solid var(--b1);border-radius:12px;overflow:hidden">';
+
+  // Summary bar
+  html += '<div style="padding:14px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">';
+  html += '<div style="font-size:13px;font-weight:700">📊 نتيجة التحسين</div>';
+  html += '<div style="display:flex;gap:10px;font-size:12px">';
+  html += '<span style="color:var(--gr);font-weight:700">✅ '+ok.length+' تم تحسينه</span>';
+  if(fail.length) html += '<span style="color:var(--rd);font-weight:700">❌ '+fail.length+' فشل</span>';
+  html += '</div></div>';
+
+  // Results table
+  html += '<div style="max-height:360px;overflow-y:auto">';
+  ok.slice(0,20).forEach(r => {
+    html += '<div style="padding:12px 16px;border-bottom:1px solid var(--b1)">';
+    if(isProducts){
+      html += '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px">';
+      html += '<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px">الاسم</div>';
+      html += '<span style="font-size:10px;padding:2px 8px;border-radius:100px;background:rgba(5,150,105,.1);color:var(--gr);font-weight:700">✓ محسّن</span>';
+      html += '</div>';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">';
+      html += '<div style="background:#fff;border:1px solid var(--b1);border-radius:7px;padding:8px"><div style="font-size:10px;color:var(--t3);margin-bottom:3px">قبل</div><div style="color:var(--t2)">'+escHtml(r.oldName)+'</div></div>';
+      html += '<div style="background:rgba(5,150,105,.04);border:1px solid rgba(5,150,105,.15);border-radius:7px;padding:8px"><div style="font-size:10px;color:var(--gr);margin-bottom:3px">بعد</div><div style="color:var(--tx);font-weight:600">'+escHtml(r.newName)+'</div></div>';
+      html += '</div>';
+      if(r.newDesc){
+        html += '<div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">الوصف الجديد (مقتطف)</div>';
+        html += '<div style="background:rgba(67,97,238,.04);border:1px solid rgba(67,97,238,.1);border-radius:7px;padding:8px;font-size:11px;color:var(--t2);line-height:1.6">'+escHtml(r.newDesc.substring(0,150))+'...</div>';
+      }
+    } else {
+      html += '<div style="display:flex;justify-content:space-between;margin-bottom:8px">';
+      html += '<div style="font-size:12px;font-weight:700">'+escHtml(r.name)+'</div>';
+      html += '<span style="font-size:10px;padding:2px 8px;border-radius:100px;background:rgba(5,150,105,.1);color:var(--gr);font-weight:700">✓ محسّن</span>';
+      html += '</div>';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">';
+      html += '<div style="background:#fff;border:1px solid var(--b1);border-radius:7px;padding:8px"><div style="font-size:10px;color:var(--t3);margin-bottom:3px">عنوان SEO الجديد</div><div style="color:var(--ac);font-weight:600">'+escHtml(r.newTitle)+'</div></div>';
+      html += '<div style="background:#fff;border:1px solid var(--b1);border-radius:7px;padding:8px"><div style="font-size:10px;color:var(--t3);margin-bottom:3px">وصف SEO الجديد</div><div style="color:var(--t2)">'+escHtml(r.newDesc)+'</div></div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+
+  if(ok.length > 20){
+    html += '<div style="padding:12px 16px;text-align:center;font-size:12px;color:var(--t3)">+ '+(ok.length-20)+' منتج آخر في الملف المحمّل</div>';
+  }
+
+  if(fail.length){
+    fail.forEach(r => {
+      html += '<div style="padding:10px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:8px">';
+      html += '<span style="font-size:12px;color:var(--rd)">❌ '+(r.oldName||r.name||'منتج')+'</span>';
+      html += '<span style="font-size:11px;color:var(--t3)">'+escHtml(r.error||'')+'</span>';
+      html += '</div>';
+    });
+  }
+
+  html += '</div></div>';
+
+  // Download button again
+  html += '<div class="btn-row" style="margin-top:12px">';
+  html += '<div style="font-size:12px;color:var(--gr);font-weight:600">📥 تم تحميل الملف تلقائياً — ارجع لسلة واستورده</div>';
+  html += '</div>';
+
+  return html;
+}
+
+function escHtml(t){
+  if(!t) return '';
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function base64ToBlob(b64, type){
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+  return new Blob([arr],{type});
 }
 
 async function init(){
@@ -1027,7 +1219,140 @@ function toast(msg,type){
 document.addEventListener('DOMContentLoaded',init);
 </script>
 
-<!-- FOOTER -->
+
+    <!-- EXCEL PAGE -->
+    <div class="page" id="page-excel">
+      <div style="margin-bottom:16px">
+        <div style="font-size:16px;font-weight:800;margin-bottom:4px;letter-spacing:-.4px">📊 تحسين Excel سلة</div>
+        <div style="font-size:13px;color:var(--t2)">حسّن منتجاتك وبيانات SEO عبر ملفات Excel — بدون ربط مباشر</div>
+      </div>
+
+      <!-- WARNING BOX -->
+      <div style="background:rgba(217,119,6,.06);border:1.5px solid rgba(217,119,6,.25);border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;gap:10px;align-items:flex-start">
+        <span style="font-size:20px;flex-shrink:0">⚠️</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">كيف تحصل على الملف الصحيح من سلة؟</div>
+          <div style="font-size:12px;color:#78350f;line-height:1.8">
+            <b>ملف المنتجات:</b> لوحة تحكم سلة ← المنتجات ← الاستيراد والتصدير ← <b>تصدير وتحديث المنتجات الحالية</b> ← تصدير الملف<br>
+            <b>ملف SEO:</b> لوحة تحكم سلة ← المنتجات ← الاستيراد والتصدير ← <b>تصدير واستيراد بيانات SEO للمنتجات</b> ← تصدير الملف
+          </div>
+          <div style="font-size:11px;color:#92400e;margin-top:6px;font-weight:600">⛔ لا ترفع أي ملف Excel آخر — فقط الملفات المُصدَّرة من سلة مباشرة</div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <button class="btn" id="tab-products" onclick="switchTab('products')"
+          style="background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 4px 14px rgba(67,97,238,.3)">
+          📦 ملف المنتجات
+        </button>
+        <button class="btn bs" id="tab-seo" onclick="switchTab('seo')">
+          🔍 ملف SEO
+        </button>
+      </div>
+
+      <!-- PRODUCTS TAB -->
+      <div id="excel-products-tab">
+        <div class="card">
+          <div class="chd">
+            <div>
+              <div class="ctitle">📦 تحسين ملف المنتجات</div>
+              <div class="csub">يعدّل: اسم المنتج + الوصف فقط — باقي الأعمدة لا تُمس</div>
+            </div>
+          </div>
+          <div class="cbody">
+            <div class="fg">
+              <label class="lbl">أسلوب الكتابة</label>
+              <select id="excel-tone-p">
+                <option value="professional">احترافي</option>
+                <option value="luxury">فاخر</option>
+                <option value="youth">شبابي</option>
+                <option value="friendly">ودي</option>
+              </select>
+            </div>
+            <div id="drop-p"
+              style="border:2px dashed var(--b2);border-radius:12px;padding:36px;text-align:center;cursor:pointer;transition:all .15s;background:var(--s2)"
+              onclick="document.getElementById('file-p').click()"
+              ondragover="event.preventDefault();this.style.borderColor='var(--ac)';this.style.background='rgba(67,97,238,.04)'"
+              ondragleave="this.style.borderColor='var(--b2)';this.style.background='var(--s2)'"
+              ondrop="handleExcelDrop(event,'p')">
+              <div style="font-size:40px;margin-bottom:10px">📊</div>
+              <div style="font-size:14px;font-weight:700;color:var(--tx);margin-bottom:4px">اسحب ملف Excel هنا</div>
+              <div style="font-size:12px;color:var(--t3)">أو اضغط للاختيار — .xlsx فقط</div>
+              <div id="file-p-name" style="margin-top:10px;font-size:12px;color:var(--ac);font-weight:600"></div>
+            </div>
+            <input type="file" id="file-p" accept=".xlsx" style="display:none" onchange="onFileSelect(this,'p')">
+            <div class="btn-row">
+              <button class="btn bp" onclick="enhanceExcel('products')" id="btn-enhance-p" disabled>🚀 بدء التحسين</button>
+            </div>
+
+            <!-- Progress -->
+            <div id="excel-prog-p" style="display:none;margin-top:14px">
+              <div style="background:rgba(67,97,238,.05);border:1.5px solid rgba(67,97,238,.12);border-radius:10px;padding:14px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                  <span class="spin"></span>
+                  <div style="font-size:13px;color:#3451c7;font-weight:600" id="excel-prog-txt-p">جاري التحسين...</div>
+                </div>
+                <div style="height:5px;background:rgba(67,97,238,.1);border-radius:5px;overflow:hidden">
+                  <div id="excel-prog-bar-p" style="height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:5px;width:0%;transition:width .4s"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Results Preview -->
+            <div id="excel-results-p" style="display:none;margin-top:16px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO TAB -->
+      <div id="excel-seo-tab" style="display:none">
+        <div class="card">
+          <div class="chd">
+            <div>
+              <div class="ctitle">🔍 تحسين ملف SEO</div>
+              <div class="csub">يعدّل: عنوان الصفحة + وصف الصفحة فقط — رقم المنتج والاسم لا يُمسان</div>
+            </div>
+          </div>
+          <div class="cbody">
+            <div id="drop-s"
+              style="border:2px dashed var(--b2);border-radius:12px;padding:36px;text-align:center;cursor:pointer;transition:all .15s;background:var(--s2)"
+              onclick="document.getElementById('file-s').click()"
+              ondragover="event.preventDefault();this.style.borderColor='var(--ac)';this.style.background='rgba(67,97,238,.04)'"
+              ondragleave="this.style.borderColor='var(--b2)';this.style.background='var(--s2)'"
+              ondrop="handleExcelDrop(event,'s')">
+              <div style="font-size:40px;margin-bottom:10px">🔍</div>
+              <div style="font-size:14px;font-weight:700;color:var(--tx);margin-bottom:4px">اسحب ملف SEO هنا</div>
+              <div style="font-size:12px;color:var(--t3)">أو اضغط للاختيار — .xlsx فقط</div>
+              <div id="file-s-name" style="margin-top:10px;font-size:12px;color:var(--ac);font-weight:600"></div>
+            </div>
+            <input type="file" id="file-s" accept=".xlsx" style="display:none" onchange="onFileSelect(this,'s')">
+            <div class="btn-row">
+              <button class="btn bp" onclick="enhanceExcel('seo')" id="btn-enhance-s" disabled>🚀 بدء التحسين</button>
+            </div>
+
+            <!-- Progress -->
+            <div id="excel-prog-s" style="display:none;margin-top:14px">
+              <div style="background:rgba(67,97,238,.05);border:1.5px solid rgba(67,97,238,.12);border-radius:10px;padding:14px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                  <span class="spin"></span>
+                  <div style="font-size:13px;color:#3451c7;font-weight:600" id="excel-prog-txt-s">جاري التحسين...</div>
+                </div>
+                <div style="height:5px;background:rgba(67,97,238,.1);border-radius:5px;overflow:hidden">
+                  <div id="excel-prog-bar-s" style="height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:5px;width:0%;transition:width .4s"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Results Preview -->
+            <div id="excel-results-s" style="display:none;margin-top:16px"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
 <div style="text-align:center;padding:14px 20px;border-top:1px solid var(--b1);font-size:11px;color:var(--t3);background:var(--s1);margin-right:var(--sb)">
   <a href="/about.html" style="color:var(--t3);text-decoration:none;margin:0 7px">من نحن</a>·
   <a href="/privacy.html" style="color:var(--t3);text-decoration:none;margin:0 7px">الخصوصية</a>·
