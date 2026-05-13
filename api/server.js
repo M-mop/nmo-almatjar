@@ -10,14 +10,85 @@ const axios = require('axios');
 const app = express();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+// ─── SECURITY: CORS ───────────────────────
+const allowedOrigins = [
+  'https://salla-ai-app-indol.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:3001',
+];
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.some(o => origin.startsWith(o))) return callback(null, true);
+    return callback(new Error('CORS: غير مسموح'), false);
+  },
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization','x-admin-key'],
+  credentials: true
+}));
+
+// ─── SECURITY: Rate Limiting ───────────────
+const rateLimitMap = new Map();
+function rateLimit(maxReqs, windowMs) {
+  return (req, res, next) => {
+    const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.ip || 'unknown';
+    const key = ip + req.path;
+    const now = Date.now();
+    const entry = rateLimitMap.get(key) || { count: 0, start: now };
+    if (now - entry.start > windowMs) { entry.count = 0; entry.start = now; }
+    entry.count++;
+    rateLimitMap.set(key, entry);
+    if (entry.count > maxReqs) {
+      return res.status(429).json({ error: 'طلبات كثيرة — انتظر قليلاً', retryAfter: Math.ceil((windowMs - (now - entry.start)) / 1000) });
+    }
+    next();
+  };
+}
+// Clean old entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, val] of rateLimitMap.entries()) {
+    if (now - val.start > 300000) rateLimitMap.delete(key);
+  }
+}, 300000);
+
+// ─── SECURITY: Token Validation ────────────
+function requireToken(req, res, next) {
+  const token = req.headers.authorization?.replace('Bearer ','') || req.body?.token;
+  if (!token || token === 'demo' || token.length < 20) {
+    return res.status(401).json({ error: 'غير مصرح — يرجى ربط المتجر أولاً' });
+  }
+  req.sallaToken = token;
+  next();
+}
+
+// ─── SECURITY: Admin Key Validation ────────
+function requireAdmin(req, res, next) {
+  const key = req.headers['x-admin-key'] || req.body?.adminKey;
+  if (!key || key !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'غير مصرح — كلمة مرور خاطئة' });
+  }
+  next();
+}
+
+// ─── SECURITY: Security Headers ────────────
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
+
+app.use(express.json({ limit: '5mb' }));
 
 const publicPath = path.join(__dirname, '../public');
 app.use(express.static(publicPath));
 app.get('/', (req, res) => {
   const f = path.join(publicPath, 'index.html');
-  fs.existsSync(f) ? res.sendFile(f) : res.send('<h1>ذكاء المتجر</h1>');
+  fs.existsSync(f) ? res.sendFile(f) : res.send('<h1>نمو المتجر</h1>');
 });
 
 // لوحة الإدارة
@@ -74,10 +145,15 @@ const AI_MODEL = 'claude-haiku-4-5-20251001';
 // PLANS CONFIG
 // ─────────────────────────────────────────
 const PLANS = {
-  free:       { limit: 10,     name: 'مجاني',      price: 0   },
-  pro:        { limit: 200,    name: 'Pro',         price: 99  },
-  enterprise: { limit: 99999,  name: 'Enterprise',  price: 299 }
+  free:       { limit: 2,      name: 'مجاني',      price: 0,   trialDays: 0  },
+  pro:        { limit: 200,    name: 'Pro',         price: 99,  trialDays: 0  },
+  enterprise: { limit: 99999,  name: 'Enterprise',  price: 299, trialDays: 0  }
 };
+
+// ─── REFERRAL: توليد كود إحالة ─────────────
+function genReferralCode(storeId) {
+  return 'REF' + Buffer.from(String(storeId)).toString('base64').slice(0,6).toUpperCase();
+}
 
 // ─────────────────────────────────────────
 // CHECK USAGE LIMIT
@@ -88,12 +164,12 @@ async function checkLimit(storeId) {
       `SELECT plan, products_count FROM customers WHERE store_id = $1`,
       [String(storeId)]
     );
-    if (!res.rows.length) return { allowed: true, plan: 'free', used: 0, limit: 10 };
+    if (!res.rows.length) return { allowed: true, plan: 'free', used: 0, limit: 2 };
     const { plan, products_count } = res.rows[0];
-    const limit = PLANS[plan]?.limit || 10;
+    const limit = PLANS[plan]?.limit || 2;
     return { allowed: products_count < limit, plan, used: products_count, limit };
   } catch(e) {
-    return { allowed: true, plan: 'free', used: 0, limit: 10 };
+    return { allowed: true, plan: 'free', used: 0, limit: 2 };
   }
 }
 
@@ -123,6 +199,29 @@ app.post('/api/plan', async (req, res) => {
 });
 
 // ─────────────────────────────────────────
+// REFERRAL SYSTEM
+// ─────────────────────────────────────────
+app.post('/api/referral/apply', async (req, res) => {
+  try {
+    const { referralCode, token } = req.body;
+    if (!referralCode || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
+    const storeInfo = await sallaGet('store/info', token);
+    const storeId = String(storeInfo.data?.id || '');
+    // Find referrer
+    const all = await dbQuery('SELECT store_id FROM customers', []);
+    const referrer = all.rows.find(r => genReferralCode(r.store_id) === referralCode.toUpperCase());
+    if (!referrer) return res.status(404).json({ error: 'كود الإحالة غير صحيح' });
+    if (referrer.store_id === storeId) return res.status(400).json({ error: 'لا يمكن استخدام كودك الخاص' });
+    // Give referred user 1 month free trial
+    const trialEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    await dbQuery('UPDATE customers SET plan=$1, trial_end=$2, products_count=0 WHERE store_id=$3', ['trial', trialEnd, storeId]);
+    // Give referrer extra month (extend their current plan)
+    await dbQuery('UPDATE customers SET products_count = GREATEST(0, products_count - 50) WHERE store_id=$1', [referrer.store_id]);
+    res.json({ success: true, message: 'تم تطبيق كود الإحالة — استمتع بشهر مجاني!' });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ─────────────────────────────────────────
 // UPGRADE PLAN (admin only for now)
 // ─────────────────────────────────────────
 app.post('/api/upgrade-plan', async (req, res) => {
@@ -136,6 +235,182 @@ app.post('/api/upgrade-plan', async (req, res) => {
     );
     res.json({ success: true, plan, limit: PLANS[plan].limit });
   } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+
+// ─────────────────────────────────────────
+// EXCEL: تحسين ملف Excel من سلة
+// ─────────────────────────────────────────
+
+// ─────────────────────────────────────────
+// EXCEL: تحسين ملف المنتجات
+// ─────────────────────────────────────────
+app.post('/api/excel/products', rateLimit(5, 60000), upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'لم يتم رفع ملف' });
+    const tone = req.body.tone || 'professional';
+    const toneMap = { professional:'احترافي', luxury:'فاخر وراقي', youth:'شبابي وعصري', friendly:'ودي وقريب' };
+    const ExcelJS = require('exceljs');
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load(req.file.buffer);
+    const ws = wb.worksheets[0];
+    if (!ws) return res.status(400).json({ error: 'الملف فارغ أو تالف' });
+
+    // Validate: must be products file (col 3 row 2 = أسم المنتج)
+    const h = String(ws.getRow(2).getCell(3).value || '');
+    if (!h.includes('أسم المنتج')) {
+      return res.status(400).json({ error: 'هذا ليس ملف المنتجات الصحيح — صدّر ملف "تصدير وتحديث المنتجات الحالية" من سلة' });
+    }
+
+    const products = [];
+    ws.eachRow((row, rowNum) => {
+      if (rowNum < 3) return;
+      const id = row.getCell(1).value;
+      const name = row.getCell(3).value;
+      if (!id || !name) return;
+      const rawDesc = String(row.getCell(9).value || '').replace(/<[^>]*>/g, '').substring(0, 400);
+      products.push({ rowNum, id, name: String(name), cleanDesc: rawDesc });
+    });
+
+    if (!products.length) return res.status(400).json({ error: 'لا توجد منتجات في الملف' });
+    if (products.length > 100) return res.status(400).json({ error: 'الحد الأقصى 100 منتج — قسّم الملف' });
+
+    const results = [];
+    for (const p of products) {
+      try {
+        const catFocusMap = [
+          { kw:['فستان','بلوزة','قميص','بنطلون','جاكيت','ملابس','عباءة'], focus:'القماش والمقاسات والمناسبة المثالية للارتداء' },
+          { kw:['عطر','بخور','دهن','زيت عطري','عود','مسك'],              focus:'العائلة العطرية والنوتات والثبات والمناسبات' },
+          { kw:['جوال','لابتوب','سماعة','شاشة','كاميرا'],                focus:'المواصفات التقنية والأداء والضمان' },
+          { kw:['قهوة','شاي','تمر','عسل','زيت','مكسرات'],               focus:'الفوائد الصحية والمكونات الطبيعية' },
+        ];
+        let catFocus = 'المميزات الرئيسية وقيمة المنتج للعميل';
+        for (const cat of catFocusMap) {
+          if (cat.kw.some(k => p.name.includes(k) || p.cleanDesc.includes(k))) { catFocus = cat.focus; break; }
+        }
+
+        const msg = await anthropic.messages.create({
+          model: AI_MODEL, max_tokens: 1200,
+          messages: [{ role: 'user', content:
+`كاتب محتوى تجارة إلكترونية. اكتب بالعربية فقط. لا تستخدم ** أو markdown.
+المنتج: ${p.name}
+الوصف الحالي: ${p.cleanDesc || 'لا يوجد'}
+الأسلوب: ${toneMap[tone]}
+تعليمات: ${catFocus}
+
+###NAME###
+[اسم المنتج المحسّن — أضف كلمات مفتاحية مهمة]
+###DESC###
+[وصف HTML: فقرة + <h3>مميزات</h3> + <ul><li> + خاتمة]` }]
+        });
+
+        const text = msg.content[0].text;
+        const nm = (text.match(/###NAME###\s*([\s\S]*?)###DESC###/) || [])[1]?.trim().split('
+')[0] || p.name;
+        const dc = (text.match(/###DESC###\s*([\s\S]*)$/) || [])[1]?.trim() || '';
+
+        // Update ONLY col C (3) and col I (9)
+        const row = ws.getRow(p.rowNum);
+        if (nm) row.getCell(3).value = nm;
+        if (dc) row.getCell(9).value = dc;
+        row.commit();
+
+        results.push({ status:'success', rowNum:p.rowNum, oldName:p.name, newName:nm, newDesc:dc.replace(/<[^>]*>/g,'').substring(0,150) });
+        await new Promise(r => setTimeout(r, 900));
+      } catch(e) {
+        results.push({ status:'error', rowNum:p.rowNum, oldName:p.name, error:e.message });
+      }
+    }
+
+    const buffer = await wb.xlsx.writeBuffer();
+    res.json({
+      success:true, total:products.length,
+      enhanced:results.filter(r=>r.status==='success').length,
+      failed:results.filter(r=>r.status==='error').length,
+      results, file:Buffer.from(buffer).toString('base64'),
+      filename:'nmo-products-enhanced.xlsx'
+    });
+  } catch(e) {
+    console.error('excel/products:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ─────────────────────────────────────────
+// EXCEL: تحسين ملف SEO
+// ─────────────────────────────────────────
+app.post('/api/excel/seo', rateLimit(5, 60000), upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'لم يتم رفع ملف' });
+    const ExcelJS = require('exceljs');
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load(req.file.buffer);
+    const ws = wb.worksheets[0];
+    if (!ws) return res.status(400).json({ error: 'الملف فارغ أو تالف' });
+
+    // Validate: must be SEO file (col 4 row 1 contains SEO)
+    const h4 = String(ws.getRow(1).getCell(4).value || '');
+    if (!h4.includes('SEO')) {
+      return res.status(400).json({ error: 'هذا ليس ملف SEO الصحيح — صدّر "تصدير واستيراد بيانات SEO للمنتجات" من سلة' });
+    }
+
+    const products = [];
+    ws.eachRow((row, rowNum) => {
+      if (rowNum < 2) return;
+      const id = row.getCell(1).value;
+      const name = row.getCell(2).value;
+      if (!id || !name) return;
+      products.push({ rowNum, id, name: String(name) });
+    });
+
+    if (!products.length) return res.status(400).json({ error: 'لا توجد منتجات في الملف' });
+    if (products.length > 100) return res.status(400).json({ error: 'الحد الأقصى 100 منتج' });
+
+    const results = [];
+    for (const p of products) {
+      try {
+        const msg = await anthropic.messages.create({
+          model: AI_MODEL, max_tokens: 400,
+          messages: [{ role: 'user', content:
+`خبير SEO للتجارة الإلكترونية. اكتب بالعربية فقط.
+المنتج: ${p.name}
+###TITLE###
+[عنوان SEO: 50-60 حرف — يتضمن الكلمة المفتاحية الرئيسية]
+###DESC###
+[وصف SEO: 140-160 حرف — جملة أو جملتان تحفزان على النقر]` }]
+        });
+
+        const text = msg.content[0].text;
+        const newTitle = (text.match(/###TITLE###\s*([\s\S]*?)###DESC###/) || [])[1]?.trim().split('
+')[0] || '';
+        const newDesc  = (text.match(/###DESC###\s*([\s\S]*)$/) || [])[1]?.trim().split('
+')[0] || '';
+
+        // Update ONLY col D (4) and col E (5) — do NOT touch col A, B, C
+        const row = ws.getRow(p.rowNum);
+        if (newTitle) row.getCell(4).value = newTitle;
+        if (newDesc)  row.getCell(5).value = newDesc;
+        row.commit();
+
+        results.push({ status:'success', name:p.name, newTitle, newDesc });
+        await new Promise(r => setTimeout(r, 700));
+      } catch(e) {
+        results.push({ status:'error', name:p.name, error:e.message });
+      }
+    }
+
+    const buffer = await wb.xlsx.writeBuffer();
+    res.json({
+      success:true, total:products.length,
+      enhanced:results.filter(r=>r.status==='success').length,
+      failed:results.filter(r=>r.status==='error').length,
+      results, file:Buffer.from(buffer).toString('base64'),
+      filename:'nmo-seo-enhanced.xlsx'
+    });
+  } catch(e) {
+    console.error('excel/seo:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
@@ -288,7 +563,7 @@ app.get('/api/products', async (req, res) => {
 // ─────────────────────────────────────────
 // SEO SCORE
 // ─────────────────────────────────────────
-app.post('/api/seo-score', async (req, res) => {
+app.post('/api/seo-score', rateLimit(10, 60000), async (req, res) => {
   try {
     const { products } = req.body;
     const scored = products.map(p => {
@@ -311,7 +586,7 @@ app.post('/api/seo-score', async (req, res) => {
 // ─────────────────────────────────────────
 // GENERATE DESCRIPTION  ★ MAIN FIX ★
 // ─────────────────────────────────────────
-app.post('/api/generate-description', async (req, res) => {
+app.post('/api/generate-description', rateLimit(10, 60000), async (req, res) => {
   try {
     const { name, currentDescription, audience, tone, instructions, mode, storeId } = req.body;
     // Check usage limit
@@ -504,7 +779,7 @@ app.post('/api/generate-seo', async (req, res) => {
 // ─────────────────────────────────────────
 // GENERATE TAGS
 // ─────────────────────────────────────────
-app.post('/api/generate-tags', async (req, res) => {
+app.post('/api/generate-tags', rateLimit(20, 60000), async (req, res) => {
   try {
     const { name, description } = req.body;
     const message = await anthropic.messages.create({
@@ -524,7 +799,7 @@ app.post('/api/generate-tags', async (req, res) => {
 // ─────────────────────────────────────────
 // OPTIMIZE TITLE
 // ─────────────────────────────────────────
-app.post('/api/optimize-title', async (req, res) => {
+app.post('/api/optimize-title', rateLimit(20, 60000), async (req, res) => {
   try {
     const { name, description, category } = req.body;
     const msg = await anthropic.messages.create({
@@ -635,7 +910,7 @@ app.post('/api/generate-blog', async (req, res) => {
 // ─────────────────────────────────────────
 // UPDATE PRODUCT
 // ─────────────────────────────────────────
-app.post('/api/update-product', async (req, res) => {
+app.post('/api/update-product', rateLimit(30, 60000), async (req, res) => {
   try {
     const { productId, description, descriptionHtml, seoTitle, seoDescription, name, token } = req.body;
     if (!productId || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
@@ -657,7 +932,7 @@ app.post('/api/update-product', async (req, res) => {
 // ─────────────────────────────────────────
 // ADD TAGS
 // ─────────────────────────────────────────
-app.post('/api/add-tags', async (req, res) => {
+app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
   try {
     const { productId, tags, token } = req.body;
     if (!productId || !tags?.length || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
@@ -922,7 +1197,7 @@ function checkAdmin(req, res) {
 }
 
 // جلب كل العملاء
-app.get('/api/admin/customers', async (req, res) => {
+app.get('/api/admin/customers', requireAdmin, async (req, res) => {
   if (!checkAdmin(req, res)) return;
   try {
     const data = await dbQuery('GET', 'customers', null, '?order=created_at.desc');
@@ -931,7 +1206,7 @@ app.get('/api/admin/customers', async (req, res) => {
 });
 
 // تعديل بيانات عميل
-app.put('/api/admin/customers/:id', async (req, res) => {
+app.put('/api/admin/customers/:id', requireAdmin, async (req, res) => {
   if (!checkAdmin(req, res)) return;
   try {
     const { id } = req.params;
@@ -942,7 +1217,7 @@ app.put('/api/admin/customers/:id', async (req, res) => {
 });
 
 // حذف عميل
-app.delete('/api/admin/customers/:id', async (req, res) => {
+app.delete('/api/admin/customers/:id', requireAdmin, async (req, res) => {
   if (!checkAdmin(req, res)) return;
   try {
     await dbQuery('DELETE', 'customers', null, `?id=eq.${req.params.id}`);
@@ -951,7 +1226,7 @@ app.delete('/api/admin/customers/:id', async (req, res) => {
 });
 
 // إحصائيات سريعة
-app.get('/api/admin/stats', async (req, res) => {
+app.get('/api/admin/stats', requireAdmin, async (req, res) => {
   if (!checkAdmin(req, res)) return;
   try {
     const customers = await dbQuery('GET', 'customers', null, '');
