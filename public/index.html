@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#f8f9ff">
-<title>ذكاء المتجر</title>
+<title>نمو المتجر</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -283,7 +283,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--ac);background:#fff;b
 <div class="sb" id="sb">
   <div class="sb-head">
     <div class="logo">✦</div>
-    <div><div class="brand">ذكاء المتجر</div><div class="brand-sub">AI for Salla</div></div>
+    <div><div class="brand">نمو المتجر</div><div class="brand-sub">نرتقي بمنتجاتك.. ونرفع ظهورك</div></div>
   </div>
   <div class="sb-store"><div class="dot"></div><span class="store-nm" id="sn">جاري التحميل...</span></div>
   <div class="sb-nav">
@@ -300,7 +300,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--ac);background:#fff;b
       <div class="ubar"><div class="ufill" id="ufill" style="width:0%"></div></div>
       <div class="uplan" id="uplan">خطة مجانية</div>
     </div>
-    <a href="/auth/salla" class="sb-btn">🔗 إعادة ربط المتجر</a>
+    <a href="/auth/salla" class="sb-btn" style="margin-bottom:6px">🔗 إعادة ربط المتجر</a>
+    <button class="sb-btn" onclick="showTrialModal()" id="trial-btn" style="background:linear-gradient(135deg,rgba(67,97,238,.1),rgba(124,58,237,.08));border-color:rgba(67,97,238,.25);color:var(--ac)">🎯 جرّب 7 أيام مجاناً</button>
   </div>
 </div>
 
@@ -452,7 +453,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--ac);background:#fff;b
         <div class="chd"><div class="ctitle">سجل العمليات</div><button class="btn bs" style="font-size:11px;padding:5px 10px" onclick="clearH()">🗑️ مسح السجل</button></div>
         <div id="hlist"><div style="padding:32px;text-align:center;color:var(--t3);font-size:13px">لا يوجد سجل بعد — ارفع منتجاتك أولاً</div></div>
       </div>
-      <div class="brow"><button class="btn bp" onclick="gp('enhance')">⚡ تحسين المزيد</button></div>
+      <div class="brow"><button class="btn bp" onclick="gp('enhance')">⚡ تحسين المزيد</button><button class="btn bs" onclick="showReferralCode()">🎁 كود الإحالة</button></div>
     </div>
 
   </div>
@@ -485,13 +486,78 @@ function closeSB(){document.getElementById('sb').classList.remove('open');docume
 
 function updU(){
   const u=parseInt(localStorage.getItem('uC')||'0'),p=localStorage.getItem('uP')||'free';
-  const l={free:10,pro:200,enterprise:99999}[p]||10,pct=Math.min(100,Math.round(u/l*100));
+  const l={free:2,trial:50,pro:200,enterprise:99999}[p]||2,pct=Math.min(100,Math.round(u/l*100));
   const f=document.getElementById('ufill');
   if(f){f.style.width=pct+'%';f.style.background=pct>80?'linear-gradient(90deg,#d97706,#dc2626)':pct>50?'linear-gradient(90deg,#4361ee,#d97706)':'linear-gradient(90deg,#4361ee,#7c3aed)';}
   const v=document.getElementById('uval');if(v)v.textContent=u+' / '+(l===99999?'∞':l);
-  const pl=document.getElementById('uplan');if(pl)pl.textContent=p==='free'?'خطة مجانية':p==='pro'?'⭐ Pro':'💎 Enterprise';
+  const pl=document.getElementById('uplan');if(pl)pl.textContent=p==='free'?'خطة مجانية (2 منتج)':p==='trial'?'🎯 تجربة مجانية (7 أيام)':p==='pro'?'⭐ Pro (200 منتج)':'💎 Enterprise';
 }
 function incU(){localStorage.setItem('uC',(parseInt(localStorage.getItem('uC')||'0')+1));updU();}
+
+// ── Trial Modal ──────────────────────────
+function showTrialModal(){
+  const plan=localStorage.getItem('uP')||'free';
+  if(plan!=='free'){toast('أنت مشترك بالفعل في خطة '+plan,'info');return;}
+  const wrap=document.createElement('div');
+  wrap.id='trial-modal';
+  wrap.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)';
+  wrap.innerHTML='<div style="background:#fff;border-radius:18px;padding:28px;max-width:400px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.2)">'
+    +'<div style="text-align:center;margin-bottom:16px"><div style="font-size:40px">🎯</div>'
+    +'<div style="font-size:18px;font-weight:900;color:#0f172a;margin-bottom:6px">جرّب مجاناً 7 أيام</div>'
+    +'<div style="font-size:13px;color:#64748b;line-height:1.6">50 منتج — كل الميزات — بدون دفع</div></div>'
+    +'<div style="background:#f8f9ff;border:1.5px solid rgba(67,97,238,.15);border-radius:12px;padding:14px;margin-bottom:16px">'
+    +'<div style="font-size:11px;font-weight:700;color:#4361ee;margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase">ماذا تحصل؟</div>'
+    +'<div style="font-size:12px;color:#475569;line-height:1.8">'
+    +'✓ 50 منتج كاملة<br>✓ ذكاء الفئات<br>✓ الرد على التقييمات<br>✓ نقاط الجودة</div></div>'
+    +'<div style="margin-bottom:12px">'
+    +'<div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:5px;letter-spacing:.3px">عندك كود إحالة؟</div>'
+    +'<input id="ref-code" style="width:100%;background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;text-align:center;letter-spacing:2px" placeholder="مثال: REF4AB2K" dir="ltr">'
+    +'</div>'
+    +'<button onclick="activateTrial()" style="width:100%;background:linear-gradient(135deg,#4361ee,#7c3aed);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px">تفعيل التجربة المجانية ←</button>'
+    +'<button onclick="document.getElementById('trial-modal').remove()" style="width:100%;background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:10px;font-size:13px;cursor:pointer;font-family:inherit">لاحقاً</button>'
+    +'</div>';
+  document.body.appendChild(wrap);
+}
+
+async function activateTrial(){
+  const tk=localStorage.getItem('st');
+  const refCode=document.getElementById('ref-code')?.value?.trim();
+  if(!tk||tk==='demo'){toast('اربط متجرك أولاً','error');return;}
+  try{
+    let result;
+    if(refCode){
+      result=await api('/api/referral/apply',{referralCode:refCode,token:tk});
+      toast('🎉 '+result.message,'success');
+    } else {
+      result=await api('/api/start-trial',{token:tk});
+      toast('🎯 '+result.message,'success');
+    }
+    localStorage.setItem('uP','trial');
+    localStorage.setItem('uC','0');
+    updU();
+    document.getElementById('trial-modal')?.remove();
+    document.getElementById('trial-btn').style.display='none';
+  }catch(e){toast('❌ '+e.message,'error');}
+}
+
+// ── Show referral code ─────────────────────
+function showReferralCode(){
+  const storeId=localStorage.getItem('store_id')||'';
+  if(!storeId){toast('اربط متجرك أولاً','error');return;}
+  const code='REF'+btoa(storeId).slice(0,6).toUpperCase();
+  const wrap=document.createElement('div');
+  wrap.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)';
+  wrap.innerHTML='<div style="background:#fff;border-radius:18px;padding:28px;max-width:360px;width:92%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2)">'
+    +'<div style="font-size:36px;margin-bottom:10px">🎁</div>'
+    +'<div style="font-size:17px;font-weight:900;color:#0f172a;margin-bottom:6px">كود الإحالة الخاص بك</div>'
+    +'<div style="font-size:13px;color:#64748b;margin-bottom:16px;line-height:1.6">شارك الكود — من يسجل به يحصل على شهر مجاني وأنت أيضاً!</div>'
+    +'<div style="background:#f0f2ff;border:2px dashed rgba(67,97,238,.3);border-radius:12px;padding:16px;margin-bottom:16px">'
+    +'<div style="font-size:28px;font-weight:900;color:#4361ee;letter-spacing:4px">'+code+'</div></div>'
+    +'<button onclick="navigator.clipboard.writeText(''+code+'').then(()=>toast('✅ تم النسخ','success'))" style="background:linear-gradient(135deg,#4361ee,#7c3aed);color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;width:100%">📋 نسخ الكود</button>'
+    +'<button onclick="this.closest('div[style]').remove()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:10px;font-size:13px;cursor:pointer;width:100%;font-family:inherit">إغلاق</button>'
+    +'</div>';
+  document.body.appendChild(wrap);
+}
 
 // ── Category labels ──
 const CAT_LABELS={fashion:'👗 ملابس وأزياء',electronics:'📱 إلكترونيات',perfume:'🌸 عطور',food:'🍃 غذاء وصحة',home:'🏠 منزل وديكور',jewelry:'💍 مجوهرات',general:'📦 عام'};
