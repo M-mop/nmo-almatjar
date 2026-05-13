@@ -243,6 +243,37 @@ input:focus,textarea:focus,select:focus{border-color:var(--ac);background:#fff;b
   .stp-l{display:none}.topbar{padding:0 12px}
   .h-stats{grid-template-columns:1fr 1fr}
 }
+
+/* QUALITY DASHBOARD */
+.qdash{background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--r);padding:20px;margin-bottom:14px;box-shadow:var(--sh)}
+.qdash-title{font-size:15px;font-weight:800;margin-bottom:4px;letter-spacing:-.3px}
+.qdash-sub{font-size:12px;color:var(--t3);margin-bottom:16px}
+.qscore-wrap{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.qscore-circle{width:72px;height:72px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;position:relative;background:conic-gradient(var(--ac) 0% var(--pct,0%), var(--s3) var(--pct,0%) 100%)}
+.qscore-inner{width:54px;height:54px;border-radius:50%;background:var(--s1);display:flex;flex-direction:column;align-items:center;justify-content:center;position:absolute}
+.qscore-num{font-size:16px;font-weight:900;color:var(--ac)}
+.qscore-lbl{font-size:9px;color:var(--t3);font-weight:600}
+.qscore-info{flex:1}
+.qscore-msg{font-size:13px;font-weight:700;margin-bottom:4px}
+.qscore-detail{font-size:12px;color:var(--t2);line-height:1.5}
+.qtasks{display:flex;flex-direction:column;gap:8px}
+.qtask{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;cursor:pointer;transition:all .15s}
+.qtask:hover{border-color:rgba(67,97,238,.3);background:rgba(67,97,238,.04)}
+.qtask-l{display:flex;align-items:center;gap:9px}
+.qtask-icon{font-size:16px}
+.qtask-title{font-size:12px;font-weight:600;color:var(--tx)}
+.qtask-count{font-size:11px;color:var(--t3)}
+.qtask-btn{font-size:11px;padding:5px 12px;border-radius:7px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border:none;font-family:inherit;font-weight:700;cursor:pointer;white-space:nowrap}
+/* REVIEW BADGE */
+.rev-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:3px 8px;border-radius:100px;background:rgba(5,150,105,.1);color:var(--gr);font-weight:600;margin-right:6px}
+/* CAT BADGE */
+.cat-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 9px;border-radius:100px;background:rgba(67,97,238,.1);color:var(--ac);font-weight:600}
+/* REVIEWS SECTION */
+.rev-section{background:var(--s2);border:1.5px solid rgba(5,150,105,.15);border-radius:10px;padding:11px;margin-top:4px}
+.rev-title{font-size:10px;font-weight:700;color:var(--gr);margin-bottom:7px;letter-spacing:.3px;text-transform:uppercase}
+.rev-item{font-size:12px;color:var(--t2);line-height:1.6;padding:5px 0;border-bottom:1px solid var(--b1)}
+.rev-item:last-child{border:none}
+.rev-stars{color:var(--yw);font-size:10px;margin-left:5px}
 </style>
 </head>
 <body>
@@ -261,6 +292,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--ac);background:#fff;b
     <div class="nit" onclick="gp('score')" id="nav-score"><span class="ni">📊</span> تقييم SEO</div>
     <div class="nav-sec">التتبع</div>
     <div class="nit" onclick="gp('history')" id="nav-history"><span class="ni">✅</span> المنتجات المحسّنة</div>
+    <div class="nit" onclick="gp('quality')" id="nav-quality"><span class="ni">🏆</span> نقاط الجودة</div>
   </div>
   <div class="sb-foot">
     <div class="usage-box">
@@ -332,6 +364,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--ac);background:#fff;b
             <div class="trow"><div class="tinfo"><div class="tl">وصف الصفحة (Meta Description)</div><div class="th">النص الذي يظهر تحت الرابط في Google</div></div><label class="tog"><input type="checkbox" id="o4" checked><span class="ts"></span></label></div>
             <div class="sec-lbl" style="margin-top:6px">🏷️ الوسوم</div>
             <div class="trow"><div class="tinfo"><div class="tl">توليد وسوم ذكية</div><div class="th">يضيف وسوماً تساعد العملاء في البحث</div></div><label class="tog"><input type="checkbox" id="o5" checked><span class="ts"></span></label></div>
+            <div class="sec-lbl" style="margin-top:6px">⭐ التقييمات</div>
+            <div class="trow"><div class="tinfo"><div class="tl">الرد الذكي على التقييمات</div><div class="th">يقرأ تقييمات عملائك ويضيف عباراتهم الحقيقية للوصف تلقائياً</div></div><label class="tog"><input type="checkbox" id="o6"><span class="ts"></span></label></div>
           </div>
         </div>
         <div class="brow">
@@ -373,6 +407,36 @@ input:focus,textarea:focus,select:focus{border-color:var(--ac);background:#fff;b
       </div></div>
     </div>
 
+    <!-- QUALITY PAGE -->
+    <div class="page" id="page-quality">
+      <div style="margin-bottom:16px">
+        <div style="font-size:16px;font-weight:800;margin-bottom:4px;letter-spacing:-.4px">🏆 نقاط الجودة</div>
+        <div style="font-size:13px;color:var(--t2)">تحدّ نفسك للوصول إلى 100% تحسين في متجرك</div>
+      </div>
+      <div class="qdash">
+        <div class="qscore-wrap">
+          <div class="qscore-circle" id="qcircle">
+            <div class="qscore-inner">
+              <div class="qscore-num" id="qnum">0%</div>
+              <div class="qscore-lbl">جودة</div>
+            </div>
+          </div>
+          <div class="qscore-info">
+            <div class="qscore-msg" id="qmsg">ابدأ رحلة التحسين!</div>
+            <div class="qscore-detail" id="qdetail">لم تبدأ بعد — ابدأ بالمنتجات بدون وصف</div>
+          </div>
+        </div>
+        <div class="qtasks" id="qtasks"></div>
+      </div>
+
+      <div class="card">
+        <div class="chd"><div class="ctitle">📊 تحليل المتجر</div></div>
+        <div class="cbody" id="qanalysis">
+          <div style="text-align:center;padding:20px;color:var(--t3);font-size:13px">جاري التحليل...</div>
+        </div>
+      </div>
+    </div>
+
     <!-- HISTORY PAGE -->
     <div class="page" id="page-history">
       <div style="margin-bottom:16px">
@@ -403,7 +467,7 @@ let prods=[],sel={},res=[];
 let eIds=JSON.parse(localStorage.getItem('eI')||'[]');
 let eLog=JSON.parse(localStorage.getItem('eL')||'[]');
 
-const PI={enhance:{t:'⚡ تحسين المنتجات',g:'الأدوات'},score:{t:'📊 تقييم SEO',g:'الأدوات'},history:{t:'✅ المنتجات المحسّنة',g:'التتبع'}};
+const PI={enhance:{t:'⚡ تحسين المنتجات',g:'الأدوات'},score:{t:'📊 تقييم SEO',g:'الأدوات'},history:{t:'✅ المنتجات المحسّنة',g:'التتبع'},quality:{t:'🏆 نقاط الجودة',g:'التتبع'}};
 function gp(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nit').forEach(n=>n.classList.remove('on'));
@@ -413,6 +477,7 @@ function gp(id){
   document.getElementById('pg-title').textContent=i.t||id;
   document.getElementById('pg-tag').textContent=i.g||'';
   if(id==='history')renderH();
+  if(id==='quality')renderQuality();
   closeSB();
 }
 function toggleSB(){document.getElementById('sb').classList.toggle('open');document.getElementById('ov').classList.toggle('on');}
@@ -427,6 +492,87 @@ function updU(){
   const pl=document.getElementById('uplan');if(pl)pl.textContent=p==='free'?'خطة مجانية':p==='pro'?'⭐ Pro':'💎 Enterprise';
 }
 function incU(){localStorage.setItem('uC',(parseInt(localStorage.getItem('uC')||'0')+1));updU();}
+
+// ── Category labels ──
+const CAT_LABELS={fashion:'👗 ملابس وأزياء',electronics:'📱 إلكترونيات',perfume:'🌸 عطور',food:'🍃 غذاء وصحة',home:'🏠 منزل وديكور',jewelry:'💍 مجوهرات',general:'📦 عام'};
+
+// ── Build card meta bar (category badge) ──
+function buildCardMeta(d){
+  if(!d.detectedCategory||d.detectedCategory==='general')return'';
+  const lbl=CAT_LABELS[d.detectedCategory]||d.detectedCategory;
+  return'<div style="padding:7px 13px;background:rgba(67,97,238,.04);border-bottom:1px solid rgba(67,97,238,.08)">'
+    +'<span class="cat-badge">'+lbl+'</span>'
+    +(d.reviewsUsed?'<span class="rev-badge">⭐ محسّن بالتقييمات</span>':'')
+    +'</div>';
+}
+
+// ── Fetch reviews for a product ──
+async function fetchReviews(productId){
+  try{
+    const tk=localStorage.getItem('st');
+    if(!tk||tk==='demo')return[];
+    const d=await api('/api/get-reviews',{productId,token:tk});
+    return d.reviews||[];
+  }catch{return[];}
+}
+
+// ── Quality Dashboard ──
+function renderQuality(){
+  const total=prods.length||0;
+  const enhanced=eIds.length;
+  const noDesc=prods.filter(p=>!p.description||p.description.length<10).length;
+  const pct=total?Math.round(enhanced/total*100):0;
+
+  // Circle
+  const circle=document.getElementById('qcircle');
+  if(circle) circle.style.setProperty('--pct',pct+'%');
+  const qnum=document.getElementById('qnum');
+  if(qnum) qnum.textContent=pct+'%';
+
+  // Message
+  const msg=document.getElementById('qmsg');
+  const detail=document.getElementById('qdetail');
+  if(msg){
+    if(pct===100){msg.textContent='🎉 متجرك محسّن بالكامل!';msg.style.color='var(--gr)';}
+    else if(pct>=75){msg.textContent='رائع! أنت قريب جداً من 100%';msg.style.color='var(--ac)';}
+    else if(pct>=50){msg.textContent='تقدم ممتاز — استمر!';msg.style.color='var(--ac)';}
+    else if(pct>0){msg.textContent='بداية جيدة — واصل التحسين';msg.style.color='var(--yw)';}
+    else{msg.textContent='ابدأ رحلة التحسين!';msg.style.color='var(--t2)';}
+  }
+  if(detail) detail.textContent=enhanced+' منتج محسّن من أصل '+total+' — باقي '+(total-enhanced)+' منتج';
+
+  // Tasks
+  const tasks=document.getElementById('qtasks');
+  if(tasks){
+    const items=[];
+    if(noDesc>0) items.push({icon:'📝',title:'منتجات بدون وصف',count:noDesc+' منتج',action:"gp('enhance');doF('no',null)",btn:'إصلاح الآن'});
+    const noTags=prods.filter(p=>!eIds.includes(String(p.id))).length;
+    if(noTags>0) items.push({icon:'🏷️',title:'منتجات بدون تحسين',count:noTags+' منتج',action:"gp('enhance')",btn:'تحسين الآن'});
+    if(enhanced>0) items.push({icon:'✅',title:'منتجات محسّنة',count:enhanced+' منتج',action:"gp('history')",btn:'عرض السجل'});
+    tasks.innerHTML=items.map(t=>'<div class="qtask" onclick="'+t.action+'">'
+      +'<div class="qtask-l"><span class="qtask-icon">'+t.icon+'</span>'
+      +'<div><div class="qtask-title">'+t.title+'</div><div class="qtask-count">'+t.count+'</div></div></div>'
+      +'<button class="qtask-btn">'+t.btn+'</button></div>').join('');
+  }
+
+  // Analysis
+  const analysis=document.getElementById('qanalysis');
+  if(analysis){
+    const withDesc=prods.filter(p=>p.description&&p.description.length>10).length;
+    const rows=[
+      {lbl:'إجمالي المنتجات',val:total,color:'var(--tx)'},
+      {lbl:'منتجات محسّنة بالذكاء',val:enhanced,color:'var(--gr)'},
+      {lbl:'منتجات مع وصف',val:withDesc,color:'var(--ac)'},
+      {lbl:'منتجات بدون وصف',val:noDesc,color:'var(--yw)'},
+      {lbl:'نسبة التحسين',val:pct+'%',color:pct>75?'var(--gr)':pct>40?'var(--ac)':'var(--yw)'},
+    ];
+    analysis.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+      +rows.map(r=>'<div style="background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:12px">'
+        +'<div style="font-size:11px;color:var(--t3);margin-bottom:3px">'+r.lbl+'</div>'
+        +'<div style="font-size:18px;font-weight:900;color:'+r.color+'">'+r.val+'</div>'
+        +'</div>').join('')+'</div>';
+  }
+}
 
 async function init(){
   const p=new URLSearchParams(window.location.search),t=p.get('token');
@@ -464,7 +610,7 @@ function rList(list){
       +'<input type="checkbox" class="pcb pcbb" data-i="'+ri+'" '+(isl?'checked':'')+' onclick="event.stopPropagation();tSel('+ri+')">'
       +(img?'<img class="pimg" src="'+img+'" alt="">':'<div class="pimg" style="display:flex;align-items:center;justify-content:center;font-size:18px">📦</div>')
       +'<div class="pinfo"><div class="pnm">'+p.name+'</div><div class="ppr">'+gPr(p)+' ر.س</div></div>'
-      +(id?'<span class="pbadge pb-done">✓ محسّن</span>':hd?'<span class="pbadge pb-ok">✓ وصف</span>':'<span class="pbadge pb-no">بدون وصف</span>')
+      +(id?'<span class="pbadge pb-done">✓ محسّن</span>'+(hd?'':' '):'')+((!id&&hd)?'<span class="pbadge pb-ok">✓ وصف</span>':(!id&&!hd)?'<span class="pbadge pb-no">بدون وصف</span>':'')
       +'</div>';
   }).join('');
   updC();
@@ -536,13 +682,32 @@ async function run(){
         r.data.selectedTitle=t.title1||p.name;
       }
       if(d5){
+        await sleep(400);
         const tg=await api('/api/generate-tags',{name:p.name,description:p.description||''});
         r.data.tags=tg.tags||[];
+      }
+      // Review-to-Content
+      const useReviews=document.getElementById('o6')?.checked;
+      if(useReviews&&p.id){
+        const reviews=await fetchReviews(p.id);
+        if(reviews.length>0){
+          const revText=reviews.map(rv=>'- "'+rv.comment+'" ('+rv.rating+' نجوم)').join('\n');
+          // Re-generate description with reviews
+          const inst2=(document.getElementById('o-inst').value||'')+'\n###REVIEWS###\n'+revText;
+          const d2=await api('/api/generate-description',{name:p.name,currentDescription:p.description||'',audience:'العملاء السعوديين',tone:document.getElementById('o-tone').value,instructions:inst2,mode:'write'});
+          if(document.getElementById('o1').checked){
+            r.data.description=d2.description||r.data.description;
+            r.data.descriptionHtml=d2.descriptionHtml||r.data.descriptionHtml;
+          }
+          r.data.reviews=reviews;
+          r.data.reviewsUsed=true;
+          r.data.detectedCategory=d2.detectedCategory||r.data.detectedCategory;
+        }
       }
       r.status='ok';
     }catch(e){r.status='err';r.error=e.message;}
     renderR();
-    await sleep(950);
+    await sleep(1800);
   }
 
   document.getElementById('pfill').style.width='100%';
@@ -597,6 +762,11 @@ function mkCard(r,ri){
       +'</div><div class="desc-body" id="desc-'+ri+'">'+(d.descriptionHtml||esc(d.description||''))+'</div></div>'
     :'';
 
+  const revB=(d.reviews&&d.reviews.length)
+    ?'<div class="rev-section"><div class="rev-title">⭐ تقييمات العملاء المستخدمة في الوصف</div>'
+      +d.reviews.slice(0,3).map(rv=>'<div class="rev-item"><span class="rev-stars">'+'★'.repeat(rv.rating||5)+'</span>'+rv.comment+'</div>').join('')
+      +'</div>'
+    :'';
   const tagsB=(d.tags&&d.tags.length)
     ?'<div class="blk"><div class="blk-lbl">🏷️ الوسوم ('+d.tags.length+')</div>'
       +'<div class="tags-wrap">'+d.tags.map(function(t){return'<span class="tag">'+t+'</span>';}).join('')+'</div></div>'
@@ -609,7 +779,8 @@ function mkCard(r,ri){
     +'<div class="pc-hd">'+imgEl
     +'<div class="pc-info"><div class="pc-nm">'+p.name+'</div><div class="pc-pr">'+gPr(p)+' ر.س</div></div>'
     +'<span class="pc-badge b-ok">جاهز ✓</span></div>'
-    +'<div class="pc-body">'+seoB+titB+shrtB+descB+tagsB+'</div>'
+    +buildCardMeta(d)
+    +'<div class="pc-body">'+seoB+titB+shrtB+descB+tagsB+revB+'</div>'
     +'<div class="pc-ft">'
     +'<div class="sdot '+dc+'" id="dot-'+ri+'"></div>'
     +'<span class="slbl" id="sl-'+ri+'">'+dl+'</span>'
@@ -639,7 +810,7 @@ async function uploadAll(){
   for(let ri=0;ri<res.length;ri++){
     if(res[ri].status!=='ok')continue;
     await upOne(ri,tk);
-    await sleep(1400);
+    await sleep(2000);
   }
   const ok=res.filter(r=>r.status==='uploaded').length;
   btn.textContent='✅ تم رفع '+ok+' منتج';btn.className='btn bg';btn.disabled=false;
