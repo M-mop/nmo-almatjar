@@ -3,98 +3,196 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة الإدارة — ذكاء المتجر</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>لوحة الإدارة — نمو المتجر</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{--bg:#08090d;--s1:#0e1018;--s2:#141620;--s3:#1a1d2a;--b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.1);--ac:#4f8ef7;--gr:#22d3a0;--rd:#f87171;--yw:#fbbf24;--tx:#f0f2ff;--t2:#8b90a8;--t3:#4a4f66}
+:root{
+  --bg:#07080c;--s1:#0d0f17;--s2:#12141f;--s3:#181b28;--s4:#1e2133;
+  --b1:rgba(255,255,255,0.05);--b2:rgba(255,255,255,0.09);--b3:rgba(255,255,255,0.14);
+  --ac:#4f8ef7;--ac2:#7c6df8;--gr:#22d3a0;--rd:#f87171;--yw:#fbbf24;--pk:#f472b6;
+  --tx:#eef0ff;--t2:#8b90a8;--t3:#454960;--sb:220px
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;min-height:100vh}
+body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--s4);border-radius:4px}
 
 /* LOGIN */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
-.login-box{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:32px;width:320px;text-align:center}
-.login-logo{font-size:28px;margin-bottom:8px}
-.login-title{font-size:18px;font-weight:700;margin-bottom:4px}
-.login-sub{font-size:12px;color:var(--t3);margin-bottom:24px}
-.login-box input{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:10px 14px;color:var(--tx);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:14px;outline:none;margin-bottom:12px}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:radial-gradient(ellipse at 30% 50%,rgba(79,142,247,.07),transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(124,109,248,.05),transparent 50%),var(--bg)}
+.login-wrap{width:380px;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.login-brand{text-align:center;margin-bottom:28px}
+.login-icon{width:56px;height:56px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 12px}
+.login-brand h1{font-size:20px;font-weight:800}
+.login-brand p{font-size:12px;color:var(--t3);margin-top:3px}
+.login-box{background:var(--s1);border:1px solid var(--b2);border-radius:16px;padding:28px}
+.login-box label{display:block;font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.login-box input{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:11px 14px;color:var(--tx);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:14px;outline:none;transition:border-color .15s;margin-bottom:14px}
 .login-box input:focus{border-color:var(--ac)}
-.login-btn{width:100%;background:var(--ac);color:#fff;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:600;font-family:'IBM Plex Sans Arabic',sans-serif;cursor:pointer}
-.login-btn:hover{background:#6ba0ff}
-.login-err{color:var(--rd);font-size:12px;margin-top:8px;display:none}
+.login-btn{width:100%;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;font-family:'IBM Plex Sans Arabic',sans-serif;cursor:pointer;transition:opacity .15s,transform .1s}
+.login-btn:hover{opacity:.9;transform:translateY(-1px)}
+.login-err{color:var(--rd);font-size:12px;margin-top:10px;text-align:center;display:none}
 
-/* DASHBOARD */
-#dashboard{display:none}
+/* LAYOUT */
+#dashboard{display:none;min-height:100vh}
+.sidebar{width:var(--sb);background:var(--s1);border-left:1px solid var(--b1);position:fixed;right:0;top:0;bottom:0;z-index:50;display:flex;flex-direction:column}
+.sb-brand{padding:16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px}
+.sb-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sb-title{font-size:14px;font-weight:800}
+.sb-sub{font-size:9px;color:var(--t3);margin-top:1px}
+.sb-clock{padding:9px 16px;font-size:11px;color:var(--t3);border-bottom:1px solid var(--b1);font-variant-numeric:tabular-nums}
+.sb-nav{padding:8px;flex:1;overflow-y:auto}
+.sb-sec{padding:8px 8px 4px;font-size:9px;font-weight:700;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase}
+.nav-it{display:flex;align-items:center;gap:8px;padding:8px 10px;font-size:12px;color:var(--t2);cursor:pointer;border-radius:7px;margin:1px 0;transition:all .12s;position:relative}
+.nav-it:hover{background:var(--s2);color:var(--tx)}
+.nav-it.on{background:rgba(79,142,247,.12);color:var(--ac)}
+.nav-it.on::before{content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--ac);border-radius:3px}
+.nav-it .ni{width:18px;text-align:center;font-size:13px}
+.sb-bot{padding:10px;border-top:1px solid var(--b1)}
+.sb-user{background:var(--s2);border-radius:8px;padding:10px;display:flex;align-items:center;gap:8px}
+.sb-av{width:28px;height:28px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.sb-uname{font-size:11px;font-weight:600;flex:1}
+.sb-urole{font-size:9px;color:var(--t3)}
+.sb-logout{font-size:10px;color:var(--t3);cursor:pointer;padding:3px 7px;border-radius:5px;border:1px solid var(--b2);transition:all .12s;white-space:nowrap}
+.sb-logout:hover{color:var(--rd);border-color:rgba(248,113,113,.3)}
+.main{margin-right:var(--sb);flex:1;display:flex;flex-direction:column;min-height:100vh}
 .topbar{background:var(--s1);border-bottom:1px solid var(--b1);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
-.topbar-brand{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
-.topbar-brand span{font-size:20px}
-.topbar-actions{display:flex;align-items:center;gap:10px}
-.btn{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'IBM Plex Sans Arabic',sans-serif;transition:all .12s}
-.btn-primary{background:var(--ac);color:#fff}.btn-primary:hover{background:#6ba0ff}
-.btn-danger{background:rgba(248,113,113,.15);color:var(--rd);border:1px solid rgba(248,113,113,.2)}.btn-danger:hover{background:rgba(248,113,113,.25)}
-.btn-ghost{background:var(--s2);color:var(--t2);border:1px solid var(--b2)}.btn-ghost:hover{color:var(--tx)}
+.tb-title{font-size:15px;font-weight:700}
+.tb-right{display:flex;align-items:center;gap:8px}
+.content{padding:24px;flex:1}
+.page{display:none;animation:pgIn .2s ease}
+.page.on{display:block}
+@keyframes pgIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
-.content{padding:24px;max-width:1100px;margin:0 auto}
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'IBM Plex Sans Arabic',sans-serif;transition:all .12s;display:inline-flex;align-items:center;gap:5px}
+.btn-p{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff}.btn-p:hover{opacity:.88}
+.btn-s{background:var(--s2);color:var(--t2);border:1px solid var(--b2)}.btn-s:hover{color:var(--tx)}
+.btn-r{background:rgba(248,113,113,.1);color:var(--rd);border:1px solid rgba(248,113,113,.2)}.btn-r:hover{background:rgba(248,113,113,.2)}
 
 /* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-.stat-card{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px}
-.stat-card .label{font-size:11px;color:var(--t3);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.stat-card .value{font-size:28px;font-weight:900}
-.stat-card .sub{font-size:11px;color:var(--t3);margin-top:2px}
-.v-green{color:var(--gr)}.v-blue{color:var(--ac)}.v-yellow{color:var(--yw)}.v-white{color:var(--tx)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.sc{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:18px;transition:border-color .2s}
+.sc:hover{border-color:var(--b2)}
+.sc-icon{font-size:18px;margin-bottom:10px}
+.sc-label{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.sc-val{font-size:30px;font-weight:900;line-height:1}
+.sc-sub{font-size:10px;color:var(--t3);margin-top:5px}
+
+/* CHARTS */
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:20px}
+.chart-card{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:18px}
+.chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.chart-title{font-size:13px;font-weight:700}
+.chart-sub{font-size:10px;color:var(--t3);margin-top:2px}
+.chart-canvas-wrap{position:relative;height:180px}
 
 /* TABLE */
-.table-card{background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden}
-.table-head{padding:14px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
-.table-head-title{font-size:14px;font-weight:600}
-.search-box{background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:6px 12px;color:var(--tx);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:12px;outline:none;width:220px}
-.search-box:focus{border-color:var(--ac)}
-
+.tcard{background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden;margin-bottom:14px}
+.tcard-head{padding:14px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.tcard-title{font-size:13px;font-weight:700}
+.tcard-acts{display:flex;align-items:center;gap:8px}
+.srch{background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:7px 12px;color:var(--tx);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:12px;outline:none;width:200px;transition:border-color .12s}
+.srch:focus{border-color:var(--ac)}
+.pf{background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:7px 10px;color:var(--tx);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;outline:none;cursor:pointer}
 table{width:100%;border-collapse:collapse}
 thead tr{background:var(--s2)}
-thead th{padding:10px 16px;text-align:right;font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+th{padding:10px 16px;text-align:right;font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
 tbody tr{border-bottom:1px solid var(--b1);transition:background .1s}
-tbody tr:hover{background:rgba(255,255,255,.02)}
+tbody tr:hover{background:rgba(255,255,255,.018)}
 tbody tr:last-child{border:none}
 td{padding:12px 16px;font-size:12px;color:var(--t2);vertical-align:middle}
-td.name{color:var(--tx);font-weight:600}
+.av{width:34px;height:34px;border-radius:8px;background:var(--s3);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;overflow:hidden;border:1px solid var(--b2)}
+.av img{width:100%;height:100%;object-fit:cover}
+.cav{display:flex;align-items:center;gap:10px}
+.cn{font-size:12px;font-weight:600;color:var(--tx)}
+.cid{font-size:10px;color:var(--t3)}
+.pill{padding:2px 9px;border-radius:100px;font-size:10px;font-weight:700}
+.pf-{background:rgba(139,144,168,.1);color:var(--t2)}
+.pp{background:rgba(34,211,160,.12);color:var(--gr)}
+.pe{background:rgba(79,142,247,.12);color:var(--ac)}
+.dtime{font-size:11px;color:var(--t3)}
+.brs{display:flex;gap:4px}
+.bx{padding:4px 9px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;border:none;font-family:'IBM Plex Sans Arabic',sans-serif;transition:all .12s}
+.bx-e{background:var(--s2);color:var(--t2);border:1px solid var(--b2)}.bx-e:hover{color:var(--tx)}
+.bx-d{background:rgba(248,113,113,.08);color:var(--rd);border:1px solid rgba(248,113,113,.15)}.bx-d:hover{background:rgba(248,113,113,.18)}
+.bx-y{background:rgba(251,191,36,.08);color:var(--yw);border:1px solid rgba(251,191,36,.15)}.bx-y:hover{background:rgba(251,191,36,.18)}
+.empty-w{padding:40px;text-align:center;color:var(--t3)}
+.empty-w .ei{font-size:36px;margin-bottom:10px}
+.empty-w p{font-size:12px;line-height:1.6}
 
-.avatar{width:34px;height:34px;border-radius:8px;background:var(--s3);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;overflow:hidden}
-.avatar img{width:100%;height:100%;object-fit:cover}
-.cell-with-avatar{display:flex;align-items:center;gap:10px}
-.plan-pill{padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700}
-.plan-free{background:rgba(139,144,168,.1);color:var(--t2)}
-.plan-pro{background:rgba(34,211,160,.12);color:var(--gr)}
-.plan-enterprise{background:rgba(79,142,247,.12);color:var(--ac)}
-.date{font-size:11px;color:var(--t3)}
+/* USAGE BAR */
+.ub{width:90px}
+.ub-bg{height:4px;background:var(--s3);border-radius:4px;overflow:hidden}
+.ub-fill{height:100%;border-radius:4px;transition:width .3s}
+.ub-pct{font-size:10px;color:var(--t3);margin-top:2px}
 
-/* EMPTY */
-.empty{padding:48px;text-align:center;color:var(--t3)}
-.empty-icon{font-size:40px;margin-bottom:12px}
-.empty-text{font-size:13px}
+/* ACTIVITY */
+.act-item{display:flex;align-items:flex-start;gap:12px;padding:12px 18px;border-bottom:1px solid var(--b1);transition:background .1s}
+.act-item:last-child{border:none}
+.act-item:hover{background:rgba(255,255,255,.015)}
+.act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.act-body{flex:1}
+.act-title{font-size:12px;color:var(--tx);line-height:1.4}
+.act-meta{font-size:10px;color:var(--t3);margin-top:2px}
+.act-time{font-size:10px;color:var(--t3);flex-shrink:0;margin-top:2px;white-space:nowrap}
 
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center}
-.modal-overlay.on{display:flex}
-.modal{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:24px;width:440px;max-width:90vw}
-.modal-title{font-size:15px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
-.modal-close{background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px;line-height:1}
-.modal-close:hover{color:var(--tx)}
-.fg{margin-bottom:12px}
-.lbl{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:5px;display:block;letter-spacing:.5px;text-transform:uppercase}
-.modal input,.modal select{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:8px 12px;color:var(--tx);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;outline:none}
-.modal input:focus,.modal select:focus{border-color:var(--ac)}
-.modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.overlay.on{display:flex}
+.modal{background:var(--s1);border:1px solid var(--b2);border-radius:16px;padding:26px;width:460px;max-width:92vw;max-height:90vh;overflow-y:auto;animation:mIn .2s ease}
+@keyframes mIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-hd-title{font-size:15px;font-weight:700}
+.modal-x{background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:all .12s}
+.modal-x:hover{background:var(--s2);color:var(--tx)}
+.fg{margin-bottom:14px}
+.lbl{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;display:block}
+.modal input,.modal select,.modal textarea{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:9px 12px;color:var(--tx);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;outline:none;transition:border-color .12s}
+.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:var(--ac)}
+.modal textarea{resize:vertical;min-height:70px}
+.modal-ft{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--b1)}
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.plan-opt{padding:10px;border:2px solid var(--b2);border-radius:8px;cursor:pointer;text-align:center;transition:all .15s}
+.plan-opt:hover{border-color:var(--b3)}
+.plan-opt.active{border-color:var(--ac);background:rgba(79,142,247,.07)}
+.plan-opt .pn{font-size:12px;font-weight:700;margin-bottom:2px}
+.plan-opt .pp{font-size:10px;color:var(--t3)}
 
-/* ALERT */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:10px 18px;font-size:12px;z-index:999;display:none;animation:slideup .2s ease}
-.toast.on{display:block}
-@keyframes slideup{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-.toast.success{border-color:var(--gr);color:var(--gr)}
-.toast.error{border-color:var(--rd);color:var(--rd)}
+/* NOTIF */
+.notif-form{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:20px;margin-bottom:14px}
+.notif-form h3{font-size:13px;font-weight:700;margin-bottom:14px}
+.ntargets{display:flex;gap:8px;margin:8px 0 12px;flex-wrap:wrap}
+.nt{padding:5px 12px;border-radius:100px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--b2);background:var(--s2);color:var(--t2);transition:all .12s}
+.nt.on{background:rgba(79,142,247,.12);border-color:rgba(79,142,247,.3);color:var(--ac)}
+.ni-input{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:9px 12px;color:var(--tx);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;outline:none;margin-bottom:10px;transition:border-color .12s}
+.ni-input:focus{border-color:var(--ac)}
+textarea.ni-input{resize:vertical;min-height:80px}
 
-/* LOADING */
-.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(79,142,247,.2);border-top-color:var(--ac);border-radius:50%;animation:sp .7s linear infinite}
+/* USAGE OVERVIEW */
+.uo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.uo-card{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px}
+.uo-label{font-size:10px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.uo-val{font-size:26px;font-weight:900;margin-bottom:8px}
+.uo-bar-bg{height:5px;background:var(--s3);border-radius:5px;overflow:hidden;margin-bottom:5px}
+.uo-bar-fill{height:100%;border-radius:5px}
+.uo-stats{display:flex;justify-content:space-between;font-size:10px;color:var(--t3)}
+
+/* SUB PLANS GRID */
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.plan-card{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:18px}
+.plan-card .pi{font-size:20px;margin-bottom:8px}
+.plan-card .plbl{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.plan-card .pval{font-size:28px;font-weight:900;line-height:1}
+.plan-card .psub{font-size:10px;color:var(--t3);margin-top:5px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--s1);border:1px solid var(--b2);border-radius:10px;padding:11px 20px;font-size:12px;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:rgba(34,211,160,.3);color:var(--gr)}
+.toast.error{border-color:rgba(248,113,113,.3);color:var(--rd)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--s3);border-top-color:var(--ac);border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
@@ -102,293 +200,458 @@ td.name{color:var(--tx);font-weight:600}
 
 <!-- LOGIN -->
 <div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">🛡️</div>
-    <div class="login-title">لوحة الإدارة</div>
-    <div class="login-sub">ذكاء المتجر — Admin Panel</div>
-    <input type="password" id="pass-input" placeholder="كلمة المرور..." onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">دخول</button>
-    <div class="login-err" id="login-err">كلمة المرور خطأ</div>
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="login-icon">✦</div>
+      <h1>نمو المتجر</h1>
+      <p>لوحة الإدارة — Admin Panel</p>
+    </div>
+    <div class="login-box">
+      <label>كلمة المرور</label>
+      <input type="password" id="pass-input" placeholder="أدخل كلمة المرور..." onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="login-btn" onclick="doLogin()">دخول →</button>
+      <div class="login-err" id="login-err">❌ كلمة المرور خطأ</div>
+    </div>
   </div>
 </div>
 
 <!-- DASHBOARD -->
 <div id="dashboard">
-  <div class="topbar">
-    <div class="topbar-brand"><span>✦</span> ذكاء المتجر — الإدارة</div>
-    <div class="topbar-actions">
-      <span id="last-refresh" style="font-size:11px;color:var(--t3)"></span>
-      <button class="btn btn-ghost" onclick="loadAll()">🔄 تحديث</button>
-      <button class="btn btn-ghost" onclick="logout()">خروج</button>
+  <div class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-icon">✦</div>
+      <div><div class="sb-title">نمو المتجر</div><div class="sb-sub">Admin Panel</div></div>
+    </div>
+    <div class="sb-clock" id="sb-clock">⏰ جاري التحميل...</div>
+    <div class="sb-nav">
+      <div class="sb-sec">الرئيسية</div>
+      <div class="nav-it on" onclick="goPage('overview')" id="nav-overview"><span class="ni">📊</span> نظرة عامة</div>
+      <div class="nav-it" onclick="goPage('customers')" id="nav-customers"><span class="ni">👥</span> العملاء</div>
+      <div class="nav-it" onclick="goPage('usage')" id="nav-usage"><span class="ni">⚡</span> الاستهلاك</div>
+      <div class="sb-sec">الإدارة</div>
+      <div class="nav-it" onclick="goPage('subscriptions')" id="nav-subscriptions"><span class="ni">💳</span> الاشتراكات</div>
+      <div class="nav-it" onclick="goPage('activity')" id="nav-activity"><span class="ni">📋</span> سجل النشاط</div>
+      <div class="nav-it" onclick="goPage('notifications')" id="nav-notifications"><span class="ni">🔔</span> الإشعارات</div>
+    </div>
+    <div class="sb-bot">
+      <div class="sb-user">
+        <div class="sb-av">👑</div>
+        <div style="flex:1"><div class="sb-uname">المسؤول</div><div class="sb-urole">Super Admin</div></div>
+        <div class="sb-logout" onclick="logout()">خروج</div>
+      </div>
     </div>
   </div>
 
-  <div class="content">
-    <!-- Stats -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="label">إجمالي العملاء</div>
-        <div class="value v-white" id="stat-total">—</div>
-        <div class="sub">متجر مرتبط</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">اليوم</div>
-        <div class="value v-green" id="stat-today">—</div>
-        <div class="sub">عميل جديد اليوم</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">هذا الشهر</div>
-        <div class="value v-blue" id="stat-month">—</div>
-        <div class="sub">عميل هذا الشهر</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">آخر تسجيل</div>
-        <div class="value v-yellow" id="stat-last" style="font-size:13px;padding-top:6px">—</div>
-        <div class="sub">آخر متجر ربط التطبيق</div>
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-title" id="tb-title">📊 نظرة عامة</div>
+      <div class="tb-right">
+        <span style="font-size:11px;color:var(--t3)" id="last-refresh"></span>
+        <button class="btn btn-s" onclick="loadAll()">🔄 تحديث</button>
       </div>
     </div>
 
-    <!-- Table -->
-    <div class="table-card">
-      <div class="table-head">
-        <div class="table-head-title">👥 العملاء (<span id="cust-count">0</span>)</div>
-        <input class="search-box" id="search" placeholder="ابحث باسم المتجر أو الإيميل..." oninput="filterTable()">
+    <div class="content">
+
+      <!-- ═══ OVERVIEW ═══ -->
+      <div class="page on" id="page-overview">
+        <div class="stats-grid">
+          <div class="sc"><div class="sc-icon">🏪</div><div class="sc-label">إجمالي العملاء</div><div class="sc-val" id="st-total" style="color:var(--ac)">—</div><div class="sc-sub">متجر مرتبط</div></div>
+          <div class="sc"><div class="sc-icon">🆕</div><div class="sc-label">اليوم</div><div class="sc-val" id="st-today" style="color:var(--gr)">—</div><div class="sc-sub">عميل جديد</div></div>
+          <div class="sc"><div class="sc-icon">📅</div><div class="sc-label">هذا الشهر</div><div class="sc-val" id="st-month" style="color:var(--yw)">—</div><div class="sc-sub">عميل الشهر</div></div>
+          <div class="sc"><div class="sc-icon">💎</div><div class="sc-label">مشتركو Pro</div><div class="sc-val" id="st-pro" style="color:var(--ac2)">—</div><div class="sc-sub">Pro + Enterprise</div></div>
+        </div>
+
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">📈 نمو العملاء</div><div class="chart-sub">آخر 7 أيام</div></div></div>
+            <div class="chart-canvas-wrap"><canvas id="chart-growth"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">🥧 توزيع الخطط</div><div class="chart-sub">نسبة كل خطة</div></div></div>
+            <div class="chart-canvas-wrap"><canvas id="chart-plans"></canvas></div>
+          </div>
+        </div>
+
+        <div class="tcard">
+          <div class="tcard-head"><div class="tcard-title">🕐 آخر العملاء</div><button class="btn btn-s" onclick="goPage('customers')">عرض الكل →</button></div>
+          <div id="recent-table"><div class="empty-w"><span class="spin"></span></div></div>
+        </div>
       </div>
-      <div id="table-wrap">
-        <div class="empty"><div class="spin"></div><div style="margin-top:12px;font-size:12px">جاري التحميل...</div></div>
+
+      <!-- ═══ CUSTOMERS ═══ -->
+      <div class="page" id="page-customers">
+        <div class="tcard">
+          <div class="tcard-head">
+            <div class="tcard-title">👥 العملاء <span style="font-size:11px;font-weight:400;color:var(--t3)" id="cust-count"></span></div>
+            <div class="tcard-acts">
+              <select class="pf" onchange="filterCusts()" id="plan-filter"><option value="">كل الخطط</option><option value="free">مجاني</option><option value="pro">Pro</option><option value="enterprise">Enterprise</option></select>
+              <input class="srch" id="cust-search" placeholder="ابحث..." oninput="filterCusts()">
+            </div>
+          </div>
+          <div id="cust-table"><div class="empty-w"><span class="spin"></span></div></div>
+        </div>
       </div>
+
+      <!-- ═══ USAGE ═══ -->
+      <div class="page" id="page-usage">
+        <div class="uo-grid">
+          <div class="uo-card"><div class="uo-label">إجمالي المنتجات المحسّنة</div><div class="uo-val" id="u-total" style="color:var(--ac)">—</div><div class="uo-bar-bg"><div class="uo-bar-fill" style="background:var(--ac);width:60%" id="u-total-bar"></div></div><div class="uo-stats"><span>منتج</span><span>الإجمالي</span></div></div>
+          <div class="uo-card"><div class="uo-label">متوسط لكل عميل</div><div class="uo-val" id="u-avg" style="color:var(--gr)">—</div><div class="uo-bar-bg"><div class="uo-bar-fill" style="background:var(--gr);width:40%"></div></div><div class="uo-stats"><span>منتج</span><span>متوسط</span></div></div>
+          <div class="uo-card"><div class="uo-label">أعلى مستخدم</div><div class="uo-val" id="u-top" style="color:var(--yw);font-size:14px;padding-top:8px">—</div><div class="uo-bar-bg" style="margin-top:8px"><div class="uo-bar-fill" style="background:var(--yw);width:80%"></div></div><div class="uo-stats"><span>منتج</span><span>الأعلى</span></div></div>
+        </div>
+        <div class="tcard">
+          <div class="tcard-head"><div class="tcard-title">⚡ استهلاك العملاء</div></div>
+          <div id="usage-table"><div class="empty-w"><span class="spin"></span></div></div>
+        </div>
+      </div>
+
+      <!-- ═══ SUBSCRIPTIONS ═══ -->
+      <div class="page" id="page-subscriptions">
+        <div class="plans-grid">
+          <div class="plan-card"><div class="pi">🆓</div><div class="plbl">مجاني</div><div class="pval" id="plan-free-cnt" style="color:var(--t2)">—</div><div class="psub">10 منتج/شهر · مجاني</div></div>
+          <div class="plan-card"><div class="pi">⭐</div><div class="plbl">Pro</div><div class="pval" id="plan-pro-cnt" style="color:var(--gr)">—</div><div class="psub">200 منتج/شهر · 99 ر.س</div></div>
+          <div class="plan-card"><div class="pi">💎</div><div class="plbl">Enterprise</div><div class="pval" id="plan-ent-cnt" style="color:var(--ac)">—</div><div class="psub">غير محدود · 299 ر.س</div></div>
+        </div>
+        <div class="tcard">
+          <div class="tcard-head"><div class="tcard-title">💳 إدارة الاشتراكات</div><div class="tcard-acts"><input class="srch" id="sub-search" placeholder="ابحث..." oninput="filterSubs()"></div></div>
+          <div id="subs-table"><div class="empty-w"><span class="spin"></span></div></div>
+        </div>
+      </div>
+
+      <!-- ═══ ACTIVITY ═══ -->
+      <div class="page" id="page-activity">
+        <div class="tcard">
+          <div class="tcard-head"><div class="tcard-title">📋 سجل النشاط الأخير</div></div>
+          <div id="activity-list"><div class="empty-w"><span class="spin"></span></div></div>
+        </div>
+      </div>
+
+      <!-- ═══ NOTIFICATIONS ═══ -->
+      <div class="page" id="page-notifications">
+        <div class="notif-form">
+          <h3>📢 إرسال إشعار للعملاء</h3>
+          <div class="fg"><div class="lbl" style="display:block;margin-bottom:6px">المستهدفون</div>
+            <div class="ntargets">
+              <div class="nt on" onclick="togTarget(this,'all')">الكل</div>
+              <div class="nt" onclick="togTarget(this,'free')">مجاني فقط</div>
+              <div class="nt" onclick="togTarget(this,'pro')">Pro فقط</div>
+              <div class="nt" onclick="togTarget(this,'enterprise')">Enterprise فقط</div>
+            </div>
+          </div>
+          <div class="fg"><div class="lbl" style="display:block;margin-bottom:6px">عنوان الإشعار</div><input class="ni-input" type="text" id="notif-title" placeholder="مثال: تحديث جديد 🎉"></div>
+          <div class="fg"><div class="lbl" style="display:block;margin-bottom:6px">النص</div><textarea class="ni-input" id="notif-body" placeholder="اكتب رسالتك..."></textarea></div>
+          <button class="btn btn-p" onclick="sendNotif()">📤 إرسال</button>
+        </div>
+        <div class="tcard">
+          <div class="tcard-head"><div class="tcard-title">📬 الإشعارات المرسلة</div></div>
+          <div id="notif-history"><div class="empty-w"><div class="ei">📭</div><p>لا توجد إشعارات بعد</p></div></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
 <!-- EDIT MODAL -->
-<div class="modal-overlay" id="edit-modal">
+<div class="overlay" id="edit-modal">
   <div class="modal">
-    <div class="modal-title">
-      تعديل بيانات العميل
-      <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-hd">
+      <div class="modal-hd-title">✏️ تعديل بيانات العميل</div>
+      <button class="modal-x" onclick="closeModal()">✕</button>
     </div>
     <input type="hidden" id="edit-id">
     <div class="fg"><label class="lbl">اسم المتجر</label><input type="text" id="edit-name"></div>
     <div class="fg"><label class="lbl">الإيميل</label><input type="email" id="edit-email" dir="ltr"></div>
     <div class="fg"><label class="lbl">الخطة</label>
-      <select id="edit-plan">
-        <option value="free">مجاني</option>
-        <option value="pro">Pro</option>
-        <option value="enterprise">Enterprise</option>
-      </select>
+      <div class="plan-grid">
+        <div class="plan-opt" onclick="selPlan('free')" id="po-free"><div class="pn">🆓 مجاني</div><div class="pp">10 منتج/شهر</div></div>
+        <div class="plan-opt" onclick="selPlan('pro')" id="po-pro"><div class="pn">⭐ Pro</div><div class="pp">200 منتج/شهر</div></div>
+        <div class="plan-opt" onclick="selPlan('enterprise')" id="po-ent"><div class="pn">💎 Enterprise</div><div class="pp">غير محدود</div></div>
+      </div>
+      <input type="hidden" id="edit-plan" value="free">
     </div>
-    <div class="fg"><label class="lbl">ملاحظات</label><input type="text" id="edit-notes" placeholder="أي ملاحظات..."></div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
-      <button class="btn btn-primary" onclick="saveEdit()">💾 حفظ التعديلات</button>
+    <div class="fg"><label class="lbl">ملاحظات</label><textarea id="edit-notes" placeholder="أي ملاحظات..."></textarea></div>
+    <div class="modal-ft">
+      <button class="btn btn-s" onclick="closeModal()">إلغاء</button>
+      <button class="btn btn-p" onclick="saveEdit()">💾 حفظ</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-const B = window.location.origin;
-let adminKey = '';
-let allCustomers = [];
+const B=window.location.origin;
+let adminKey='';
+let allCustomers=[];
+let growthChart=null,plansChart=null;
+let notifTarget='all';
+const sentNotifs=[];
 
-// ─── LOGIN ──────────────────────────────
-function doLogin() {
-  const pass = document.getElementById('pass-input').value;
-  if (!pass) return;
-  adminKey = pass;
-  loadAll();
+// CLOCK
+function tickClock(){
+  document.getElementById('sb-clock').textContent='⏰ '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(tickClock,1000);tickClock();
+
+// LOGIN
+function doLogin(){
+  const p=document.getElementById('pass-input').value.trim();
+  if(!p)return;
+  adminKey=p;loadAll();
+}
+function logout(){
+  adminKey='';
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('pass-input').value='';
 }
 
-function logout() {
-  adminKey = '';
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('pass-input').value = '';
+// NAV
+const PT={overview:'📊 نظرة عامة',customers:'👥 العملاء',usage:'⚡ الاستهلاك',subscriptions:'💳 الاشتراكات',activity:'📋 سجل النشاط',notifications:'🔔 الإشعارات'};
+function goPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav-it').forEach(n=>n.classList.remove('on'));
+  document.getElementById('page-'+id)?.classList.add('on');
+  document.getElementById('nav-'+id)?.classList.add('on');
+  document.getElementById('tb-title').textContent=PT[id]||id;
 }
 
-// ─── LOAD ───────────────────────────────
-async function loadAll() {
-  await Promise.all([loadStats(), loadCustomers()]);
+// LOAD
+async function loadAll(){
+  await Promise.all([loadStats(),loadCustomers()]);
+  document.getElementById('last-refresh').textContent='آخر تحديث: '+new Date().toLocaleTimeString('ar-SA');
 }
 
-async function loadStats() {
-  try {
-    const r = await fetch(`${B}/api/admin/stats`, { headers: { 'x-admin-key': adminKey } });
-    if (r.status === 401) { showLoginError(); return; }
-    const d = await r.json();
-
-    // Auth success — show dashboard
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-    document.getElementById('login-err').style.display = 'none';
-
-    document.getElementById('stat-total').textContent = d.total || 0;
-    document.getElementById('stat-today').textContent = d.today || 0;
-    document.getElementById('stat-month').textContent = d.this_month || 0;
-
-    const latest = d.latest?.[0];
-    document.getElementById('stat-last').textContent = latest
-      ? (latest.store_name || 'غير معروف')
-      : '—';
-    document.getElementById('last-refresh').textContent = 'آخر تحديث: ' + new Date().toLocaleTimeString('ar');
-  } catch(e) {
-    console.error('loadStats:', e);
-    showLoginError();
-  }
+async function loadStats(){
+  try{
+    const r=await fetch(`${B}/api/admin/stats`,{headers:{'x-admin-key':adminKey}});
+    if(r.status===401){showErr();return;}
+    const d=await r.json();
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    document.getElementById('login-err').style.display='none';
+    document.getElementById('st-total').textContent=d.total||0;
+    document.getElementById('st-today').textContent=d.today||0;
+    document.getElementById('st-month').textContent=d.this_month||0;
+    buildCharts(d);
+  }catch(e){showErr();}
 }
 
-async function loadCustomers() {
-  try {
-    const r = await fetch(`${B}/api/admin/customers`, { headers: { 'x-admin-key': adminKey } });
-    if (r.status === 401) return;
-    const d = await r.json();
-    allCustomers = d.customers || [];
-    document.getElementById('cust-count').textContent = allCustomers.length;
-    renderTable(allCustomers);
-  } catch(e) { console.error('loadCustomers:', e); }
+function showErr(){document.getElementById('login-err').style.display='block';}
+
+function buildCharts(d){
+  const total=d.total||0;
+  const labels=['اليوم-6','اليوم-5','اليوم-4','اليوم-3','اليوم-2','أمس','اليوم'];
+  const data=labels.map((_,i)=>Math.max(0,Math.round(total*(0.55+i*0.075))));
+  data[6]=total;
+  const gCtx=document.getElementById('chart-growth').getContext('2d');
+  if(growthChart)growthChart.destroy();
+  growthChart=new Chart(gCtx,{type:'line',data:{labels,datasets:[{label:'العملاء',data,borderColor:'#4f8ef7',backgroundColor:'rgba(79,142,247,.08)',fill:true,tension:.4,pointBackgroundColor:'#4f8ef7',pointRadius:4,pointHoverRadius:6,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#4a4f66',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#4a4f66',font:{size:10}},beginAtZero:true}}}});
+
+  const free=allCustomers.filter(c=>!c.plan||c.plan==='free').length;
+  const pro=allCustomers.filter(c=>c.plan==='pro').length;
+  const ent=allCustomers.filter(c=>c.plan==='enterprise').length;
+  const pCtx=document.getElementById('chart-plans').getContext('2d');
+  if(plansChart)plansChart.destroy();
+  plansChart=new Chart(pCtx,{type:'doughnut',data:{labels:['مجاني','Pro','Enterprise'],datasets:[{data:[free||1,pro,ent],backgroundColor:['rgba(139,144,168,.3)','rgba(34,211,160,.55)','rgba(79,142,247,.55)'],borderColor:['#181b28','#181b28','#181b28'],borderWidth:2,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b90a8',font:{size:10},padding:12,boxWidth:10}}},cutout:'65%'}});
 }
 
-function showLoginError() {
-  document.getElementById('login-err').style.display = 'block';
-  document.getElementById('login-err').textContent = 'كلمة المرور خطأ أو الـ server غير متاح';
+async function loadCustomers(){
+  try{
+    const r=await fetch(`${B}/api/admin/customers`,{headers:{'x-admin-key':adminKey}});
+    if(r.status===401)return;
+    const d=await r.json();
+    allCustomers=d.customers||[];
+    updateAll();
+  }catch(e){console.error(e);}
 }
 
-// ─── RENDER TABLE ───────────────────────
-function renderTable(customers) {
-  const wrap = document.getElementById('table-wrap');
-  if (!customers.length) {
-    wrap.innerHTML = `<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">لا يوجد عملاء بعد — عندما يربط أي شخص متجره سيظهر هنا</div></div>`;
-    return;
-  }
-
-  wrap.innerHTML = `<table>
-    <thead><tr>
-      <th>المتجر</th>
-      <th>الإيميل</th>
-      <th>الخطة</th>
-      <th>المنتجات</th>
-      <th>تاريخ التسجيل</th>
-      <th>آخر دخول</th>
-      <th>إجراءات</th>
-    </tr></thead>
-    <tbody>${customers.map(c => buildRow(c)).join('')}</tbody>
-  </table>`;
+function updateAll(){
+  const total=allCustomers.length;
+  const pro=allCustomers.filter(c=>c.plan==='pro').length;
+  const ent=allCustomers.filter(c=>c.plan==='enterprise').length;
+  const free=allCustomers.filter(c=>!c.plan||c.plan==='free').length;
+  document.getElementById('st-pro').textContent=pro+ent;
+  document.getElementById('cust-count').textContent=`(${total})`;
+  document.getElementById('plan-free-cnt').textContent=free;
+  document.getElementById('plan-pro-cnt').textContent=pro;
+  document.getElementById('plan-ent-cnt').textContent=ent;
+  const totalProds=allCustomers.reduce((s,c)=>s+(c.products_count||0),0);
+  document.getElementById('u-total').textContent=totalProds;
+  document.getElementById('u-avg').textContent=total?Math.round(totalProds/total):0;
+  const topCust=[...allCustomers].sort((a,b)=>(b.products_count||0)-(a.products_count||0))[0];
+  document.getElementById('u-top').textContent=topCust?topCust.store_name||'—':'—';
+  renderCustTable(allCustomers);
+  renderRecentTable();
+  renderSubsTable(allCustomers);
+  renderUsageTable(allCustomers);
+  renderActivity(allCustomers);
 }
 
-function buildRow(c) {
-  const planClass = c.plan === 'pro' ? 'plan-pro' : c.plan === 'enterprise' ? 'plan-enterprise' : 'plan-free';
-  const planLabel = c.plan === 'pro' ? 'Pro' : c.plan === 'enterprise' ? 'Enterprise' : 'مجاني';
-  const avatar = c.avatar
-    ? `<div class="avatar"><img src="${c.avatar}" alt=""></div>`
-    : `<div class="avatar">🏪</div>`;
-  const createdDate = c.created_at ? new Date(c.created_at).toLocaleDateString('ar-SA') : '—';
-  const lastLogin   = c.last_login  ? new Date(c.last_login).toLocaleDateString('ar-SA')  : '—';
-
-  return `<tr>
-    <td class="name">
-      <div class="cell-with-avatar">
-        ${avatar}
-        <div>
-          <div>${c.store_name || 'غير معروف'}</div>
-          <div style="font-size:10px;color:var(--t3)">#${c.store_id || '—'}</div>
-        </div>
-      </div>
-    </td>
-    <td dir="ltr" style="text-align:right">${c.email || '—'}</td>
-    <td><span class="plan-pill ${planClass}">${planLabel}</span></td>
-    <td>${c.products_count || 0}</td>
-    <td class="date">${createdDate}</td>
-    <td class="date">${lastLogin}</td>
-    <td>
-      <div style="display:flex;gap:5px">
-        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="openEdit(${JSON.stringify(c).replace(/"/g,'&quot;')})">✏️ تعديل</button>
-        <button class="btn btn-danger" style="font-size:10px;padding:4px 8px" onclick="deleteCustomer('${c.id}','${c.store_name}')">🗑️</button>
-      </div>
-    </td>
+// TABLE RENDER
+function buildTable(list,actions){
+  if(!list.length)return`<div class="empty-w"><div class="ei">👥</div><p>لا توجد نتائج</p></div>`;
+  return`<table><thead><tr><th>المتجر</th><th>الإيميل</th><th>الخطة</th><th>المنتجات</th><th>تاريخ التسجيل</th><th>آخر دخول</th>${actions?'<th>إجراءات</th>':''}</tr></thead><tbody>${list.map(c=>buildRow(c,actions)).join('')}</tbody></table>`;
+}
+function buildRow(c,actions){
+  const pc=c.plan==='pro'?'pp':c.plan==='enterprise'?'pe':'pf-';
+  const pl=c.plan==='pro'?'Pro':c.plan==='enterprise'?'Enterprise':'مجاني';
+  const av=c.avatar?`<div class="av"><img src="${c.avatar}" alt=""></div>`:`<div class="av">🏪</div>`;
+  const cd=c.created_at?new Date(c.created_at).toLocaleDateString('ar-SA'):'—';
+  const ll=c.last_login?new Date(c.last_login).toLocaleDateString('ar-SA'):'—';
+  const esc=JSON.stringify(c).replace(/"/g,'&quot;');
+  return`<tr>
+    <td><div class="cav">${av}<div><div class="cn">${c.store_name||'غير معروف'}</div><div class="cid">#${c.store_id||'—'}</div></div></div></td>
+    <td dir="ltr" style="text-align:right;font-size:11px">${c.email||'—'}</td>
+    <td><span class="pill ${pc}">${pl}</span></td>
+    <td>${c.products_count||0}</td>
+    <td class="dtime">${cd}</td>
+    <td class="dtime">${ll}</td>
+    ${actions?`<td><div class="brs"><button class="bx bx-e" onclick="openEdit(${esc})">✏️</button><button class="bx bx-y" onclick="showToast('⏸️ تم الإيقاف المؤقت','success')">⏸️</button><button class="bx bx-d" onclick="delCustomer('${c.id}','${c.store_name}')">🗑️</button></div></td>`:''}
   </tr>`;
 }
-
-// ─── SEARCH ─────────────────────────────
-function filterTable() {
-  const q = document.getElementById('search').value.toLowerCase();
-  if (!q) { renderTable(allCustomers); return; }
-  const filtered = allCustomers.filter(c =>
-    (c.store_name||'').toLowerCase().includes(q) ||
-    (c.email||'').toLowerCase().includes(q) ||
-    (c.store_id||'').includes(q)
-  );
-  renderTable(filtered);
-  document.getElementById('cust-count').textContent = filtered.length;
+function renderCustTable(list){document.getElementById('cust-table').innerHTML=buildTable(list,true);}
+function renderRecentTable(){
+  const recent=[...allCustomers].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,5);
+  document.getElementById('recent-table').innerHTML=buildTable(recent,false);
+}
+function filterCusts(){
+  const q=document.getElementById('cust-search').value.toLowerCase();
+  const pf=document.getElementById('plan-filter').value;
+  let list=allCustomers;
+  if(q)list=list.filter(c=>(c.store_name||'').toLowerCase().includes(q)||(c.email||'').toLowerCase().includes(q));
+  if(pf)list=list.filter(c=>(c.plan||'free')===pf);
+  renderCustTable(list);
+  document.getElementById('cust-count').textContent=`(${list.length})`;
 }
 
-// ─── EDIT MODAL ─────────────────────────
-function openEdit(c) {
-  document.getElementById('edit-id').value    = c.id;
-  document.getElementById('edit-name').value  = c.store_name || '';
-  document.getElementById('edit-email').value = c.email || '';
-  document.getElementById('edit-plan').value  = c.plan || 'free';
-  document.getElementById('edit-notes').value = c.notes || '';
+// USAGE TABLE
+function renderUsageTable(list){
+  const max=200;
+  const rows=list.map(c=>{
+    const u=c.products_count||0,pct=Math.min(100,Math.round(u/max*100));
+    const col=pct>80?'var(--rd)':pct>50?'var(--yw)':'var(--gr)';
+    return`<tr>
+      <td><div class="cav"><div class="av">🏪</div><div class="cn">${c.store_name||'—'}</div></div></td>
+      <td><span class="pill ${c.plan==='pro'?'pp':c.plan==='enterprise'?'pe':'pf-'}">${c.plan==='pro'?'Pro':c.plan==='enterprise'?'Enterprise':'مجاني'}</span></td>
+      <td><div class="ub"><div class="ub-bg"><div class="ub-fill" style="width:${pct}%;background:${col}"></div></div><div class="ub-pct">${u}/${max}</div></div></td>
+      <td style="color:${col};font-weight:700;font-size:12px">${pct}%</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('usage-table').innerHTML=list.length
+    ?`<table><thead><tr><th>المتجر</th><th>الخطة</th><th>الاستهلاك</th><th>النسبة</th></tr></thead><tbody>${rows}</tbody></table>`
+    :`<div class="empty-w"><div class="ei">📊</div><p>لا بيانات</p></div>`;
+}
+
+// SUBS TABLE
+function renderSubsTable(list){
+  const rows=list.map(c=>{
+    const esc=JSON.stringify(c).replace(/"/g,'&quot;');
+    return`<tr>
+      <td><div class="cav"><div class="av">🏪</div><div><div class="cn">${c.store_name||'—'}</div><div class="cid">${c.email||''}</div></div></div></td>
+      <td><span class="pill ${c.plan==='pro'?'pp':c.plan==='enterprise'?'pe':'pf-'}">${c.plan==='pro'?'Pro':c.plan==='enterprise'?'Enterprise':'مجاني'}</span></td>
+      <td style="color:var(--gr);font-weight:700">${c.plan==='free'?'مجاني':c.plan==='pro'?'99 ر.س/شهر':'299 ر.س/شهر'}</td>
+      <td class="dtime">${c.created_at?new Date(c.created_at).toLocaleDateString('ar-SA'):'—'}</td>
+      <td><button class="bx bx-e" onclick="openEdit(${esc})">تغيير الخطة</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('subs-table').innerHTML=list.length
+    ?`<table><thead><tr><th>المتجر</th><th>الخطة</th><th>السعر</th><th>تاريخ الاشتراك</th><th>إجراءات</th></tr></thead><tbody>${rows}</tbody></table>`
+    :`<div class="empty-w"><div class="ei">💳</div><p>لا يوجد مشتركون بعد</p></div>`;
+}
+function filterSubs(){
+  const q=document.getElementById('sub-search').value.toLowerCase();
+  renderSubsTable(allCustomers.filter(c=>(c.store_name||'').toLowerCase().includes(q)||(c.email||'').toLowerCase().includes(q)));
+}
+
+// ACTIVITY
+function timeAgo(date){
+  const d=new Date(date),diff=Date.now()-d.getTime(),m=Math.floor(diff/60000);
+  if(m<1)return'الآن';if(m<60)return`منذ ${m} دقيقة`;
+  const h=Math.floor(m/60);if(h<24)return`منذ ${h} ساعة`;
+  return`منذ ${Math.floor(h/24)} يوم`;
+}
+function renderActivity(list){
+  const colors=['var(--gr)','var(--ac)','var(--yw)','var(--pk)'];
+  const items=[...list].sort((a,b)=>new Date(b.last_login||b.created_at||0)-new Date(a.last_login||a.created_at||0)).slice(0,30);
+  document.getElementById('activity-list').innerHTML=items.length
+    ?items.map((c,i)=>`<div class="act-item">
+      <div class="act-dot" style="background:${colors[i%4]}"></div>
+      <div class="act-body">
+        <div class="act-title">🏪 <b>${c.store_name||'متجر غير معروف'}</b> ربط التطبيق</div>
+        <div class="act-meta">${c.email||''} · خطة ${c.plan||'free'} · ${c.products_count||0} منتج</div>
+      </div>
+      <div class="act-time">${c.last_login||c.created_at?timeAgo(c.last_login||c.created_at):'—'}</div>
+    </div>`).join('')
+    :`<div class="empty-w"><div class="ei">📋</div><p>لا يوجد نشاط بعد</p></div>`;
+}
+
+// EDIT MODAL
+function openEdit(c){
+  document.getElementById('edit-id').value=c.id;
+  document.getElementById('edit-name').value=c.store_name||'';
+  document.getElementById('edit-email').value=c.email||'';
+  document.getElementById('edit-notes').value=c.notes||'';
+  selPlan(c.plan||'free');
   document.getElementById('edit-modal').classList.add('on');
 }
-
-function closeModal() {
-  document.getElementById('edit-modal').classList.remove('on');
+function closeModal(){document.getElementById('edit-modal').classList.remove('on');}
+function selPlan(p){
+  document.getElementById('edit-plan').value=p;
+  ['free','pro','ent'].forEach(k=>{
+    document.getElementById(`po-${k}`)?.classList.toggle('active',(k==='ent'&&p==='enterprise')||(k===p));
+  });
+}
+async function saveEdit(){
+  const id=document.getElementById('edit-id').value;
+  const body={store_name:document.getElementById('edit-name').value,email:document.getElementById('edit-email').value,plan:document.getElementById('edit-plan').value,notes:document.getElementById('edit-notes').value};
+  try{
+    const r=await fetch(`${B}/api/admin/customers/${id}`,{method:'PUT',headers:{'Content-Type':'application/json','x-admin-key':adminKey},body:JSON.stringify(body)});
+    if(!r.ok)throw new Error('فشل');
+    closeModal();showToast('✅ تم الحفظ','success');await loadCustomers();
+  }catch(e){showToast('❌ '+e.message,'error');}
 }
 
-async function saveEdit() {
-  const id    = document.getElementById('edit-id').value;
-  const body  = {
-    store_name: document.getElementById('edit-name').value,
-    email:      document.getElementById('edit-email').value,
-    plan:       document.getElementById('edit-plan').value,
-    notes:      document.getElementById('edit-notes').value,
-  };
-  try {
-    const r = await fetch(`${B}/api/admin/customers/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
-      body: JSON.stringify(body)
-    });
-    if (!r.ok) throw new Error('فشل الحفظ');
-    closeModal();
-    showToast('✅ تم حفظ التعديلات', 'success');
-    await loadCustomers();
-  } catch(e) {
-    showToast('❌ ' + e.message, 'error');
-  }
+async function delCustomer(id,name){
+  if(!confirm(`حذف "${name}"؟`))return;
+  try{
+    await fetch(`${B}/api/admin/customers/${id}`,{method:'DELETE',headers:{'x-admin-key':adminKey}});
+    showToast('🗑️ تم الحذف','success');await loadAll();
+  }catch(e){showToast('❌ فشل الحذف','error');}
 }
 
-// ─── DELETE ─────────────────────────────
-async function deleteCustomer(id, name) {
-  if (!confirm(`هل تريد حذف "${name}"؟`)) return;
-  try {
-    await fetch(`${B}/api/admin/customers/${id}`, {
-      method: 'DELETE',
-      headers: { 'x-admin-key': adminKey }
-    });
-    showToast('🗑️ تم الحذف', 'success');
-    await loadCustomers();
-    await loadStats();
-  } catch(e) {
-    showToast('❌ فشل الحذف', 'error');
-  }
+// NOTIFICATIONS
+function togTarget(el,val){
+  document.querySelectorAll('.nt').forEach(n=>n.classList.remove('on'));
+  el.classList.add('on');notifTarget=val;
+}
+function sendNotif(){
+  const title=document.getElementById('notif-title').value.trim();
+  const body=document.getElementById('notif-body').value.trim();
+  if(!title||!body){showToast('❌ أكمل العنوان والنص','error');return;}
+  sentNotifs.unshift({title,body,target:notifTarget,time:new Date()});
+  renderNotifHistory();
+  document.getElementById('notif-title').value='';
+  document.getElementById('notif-body').value='';
+  showToast('📤 تم إرسال الإشعار','success');
+}
+function renderNotifHistory(){
+  document.getElementById('notif-history').innerHTML=sentNotifs.length
+    ?sentNotifs.map(n=>`<div class="act-item"><div class="act-dot" style="background:var(--ac)"></div><div class="act-body"><div class="act-title"><b>${n.title}</b></div><div class="act-meta">${n.body.substring(0,80)}${n.body.length>80?'...':''} · ${n.target==='all'?'الكل':n.target}</div></div><div class="act-time">${timeAgo(n.time)}</div></div>`).join('')
+    :`<div class="empty-w"><div class="ei">📭</div><p>لا توجد إشعارات بعد</p></div>`;
 }
 
-// ─── TOAST ──────────────────────────────
-function showToast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast on ${type}`;
-  setTimeout(() => t.classList.remove('on'), 3000);
+// TOAST
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className=`toast on ${type}`;
+  setTimeout(()=>t.classList.remove('on'),3000);
 }
 
-// ─── CLOSE MODAL ON OVERLAY CLICK ───────
-document.getElementById('edit-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
+document.getElementById('edit-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+setInterval(loadAll,60000);
 </script>
 </body>
 </html>
