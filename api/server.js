@@ -307,9 +307,14 @@ app.post('/api/excel/products', rateLimit(5, 60000), upload.single('file'), asyn
         });
 
         const text = msg.content[0].text;
-        const nm = (text.match(/###NAME###\s*([\s\S]*?)###DESC###/) || [])[1]?.trim().split('
-')[0] || p.name;
-        const dc = (text.match(/###DESC###\s*([\s\S]*)$/) || [])[1]?.trim() || '';
+        const nmMatch = text.indexOf('###NAME###');
+        const dcMatch = text.indexOf('###DESC###');
+        const nm = nmMatch>=0 && dcMatch>=0
+          ? text.substring(nmMatch+10, dcMatch).trim().split('\n')[0].trim()
+          : p.name;
+        const dc = dcMatch>=0
+          ? text.substring(dcMatch+10).trim()
+          : '';
 
         // Update ONLY col C (3) and col I (9)
         const row = ws.getRow(p.rowNum);
@@ -383,10 +388,10 @@ app.post('/api/excel/seo', rateLimit(5, 60000), upload.single('file'), async (re
         });
 
         const text = msg.content[0].text;
-        const newTitle = (text.match(/###TITLE###\s*([\s\S]*?)###DESC###/) || [])[1]?.trim().split('
-')[0] || '';
-        const newDesc  = (text.match(/###DESC###\s*([\s\S]*)$/) || [])[1]?.trim().split('
-')[0] || '';
+        const ti = text.indexOf('###TITLE###');
+        const di = text.indexOf('###DESC###');
+        const newTitle = (ti >= 0 && di >= 0) ? text.substring(ti+11, di).trim().split('\n')[0].trim() : '';
+        const newDesc  = (di >= 0) ? text.substring(di+10).trim().split('\n')[0].trim() : '';
 
         // Update ONLY col D (4) and col E (5) — do NOT touch col A, B, C
         const row = ws.getRow(p.rowNum);
