@@ -420,6 +420,36 @@ app.post('/api/excel/seo', rateLimit(5, 60000), upload.single('file'), async (re
   }
 });
 
+// ─────────────────────────────────────────
+// LEADS: حفظ الزوار من landing page
+// ─────────────────────────────────────────
+app.post('/api/leads', async (req, res) => {
+  try {
+    const { email, source } = req.body;
+    if (!email || !email.includes('@')) return res.status(400).json({ error: 'بريد إلكتروني غير صحيح' });
+    await dbQuery('POST', 'leads', {
+      email: email.toLowerCase().trim(),
+      source: source || 'excel',
+      created_at: new Date().toISOString()
+    });
+    res.json({ success: true, message: 'تم التسجيل بنجاح' });
+  } catch(e) {
+    if (e.response?.status === 409 || (e.message||'').includes('duplicate')) {
+      return res.json({ success: true, message: 'أنت مسجل مسبقاً' });
+    }
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/admin/leads', requireAdmin, async (req, res) => {
+  try {
+    const data = await dbQuery('GET', 'leads', null, '?order=created_at.desc');
+    res.json({ leads: data || [], total: (data||[]).length });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // Serve landing page
 app.get('/landing', (req, res) => {
   res.sendFile(require('path').join(__dirname, '..', 'public', 'landing.html'));
