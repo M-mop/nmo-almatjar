@@ -243,41 +243,77 @@ app.post('/api/generate-description', async (req, res) => {
     const toneMap = { professional:'احترافي ورسمي', youth:'شبابي وعصري', luxury:'فاخر وراقي', friendly:'ودي وقريب' };
     const modeInst = mode === 'improve' ? 'حسّن الوصف الحالي' : 'اكتب وصفاً احترافياً جديداً';
 
+    // ── Category Intelligence: auto-detect product category ──
+    const catMap = {
+      fashion:     { keywords:['فستان','بلوزة','قميص','بنطلون','جاكيت','عباءة','تيشيرت','ملابس','شنطة','حذاء','حقيبة'],    focus:'ركز على: القياسات والمقاسات المتاحة، نوع وجودة القماش، المناسبة المثالية للارتداء، عدد الألوان المتاحة، إمكانية التنسيق مع قطع أخرى' },
+      electronics: { keywords:['جوال','موبايل','لابتوب','تابلت','سماعة','شاشة','كاميرا','ساعة ذكية','إلكتروني','جهاز','طابعة'],  focus:'ركز على: المواصفات التقنية الدقيقة، الأداء والسرعة، مدة البطارية، الضمان والخدمة بعد البيع، التوافق مع الأجهزة الأخرى' },
+      perfume:     { keywords:['عطر','بخور','دهن','ورد','oud','عود','مسك','برفيوم'],                                          focus:'ركز على: العائلة العطرية (شرقي/غربي/زهري)، النوتات الرئيسية والقاعدة، ثبات العطر ومدة دوامه، المناسبات المثالية، من أين يُستخرج' },
+      food:        { keywords:['قهوة','شاي','تمر','عسل','زيت','مكسرات','شوكولاتة','حلوى','عضوي','طبيعي'],                  focus:'ركز على: الفوائد الصحية والغذائية، المكونات الطبيعية والمصدر، طريقة الاستخدام، الشهادات والاعتمادات، الحجم والكمية' },
+      home:        { keywords:['أثاث','كنب','طاولة','كرسي','ديكور','سجادة','ستارة','مطبخ','إناء','تحفة'],                  focus:'ركز على: الأبعاد الدقيقة، المواد المستخدمة وجودتها، سهولة التنظيف والصيانة، التصميم ومدى توافقه مع الديكور، الوزن والتجميع' },
+      jewelry:     { keywords:['خاتم','سوار','قلادة','أساور','مجوهرات','ذهب','فضة','ألماس','حجر'],                          focus:'ركز على: نوع المعدن والعيار، الحجر الكريم وخصائصه، المقاسات المتاحة، المناسبة (هدية/زفاف/يومي)، طريقة العناية والتخزين' },
+    };
+    let detectedCat = 'general';
+    let catFocus = 'ركز على: الفوائد الرئيسية، مواصفات المنتج، المناسبة، جودة الصنع';
+    const nameLower = name.toLowerCase();
+    for (const [cat, data] of Object.entries(catMap)) {
+      if (data.keywords.some(k => nameLower.includes(k) || (currentDescription||'').includes(k))) {
+        detectedCat = cat; catFocus = data.focus; break;
+      }
+    }
+
+    // ── Fetch reviews if available (Review-to-Content) ──
+    const reviewsText = instructions?.includes('###REVIEWS###')
+      ? instructions.split('###REVIEWS###')[1]?.trim() || ''
+      : '';
+    const reviewsSection = reviewsText
+      ? `
+تقييمات العملاء الفعلية (استخدمها لتعزيز الوصف):
+${reviewsText}
+`
+      : '';
+
     const message = await anthropic.messages.create({
       model: AI_MODEL,
       max_tokens: 2000,
       messages: [{
         role: 'user',
-        content: `أنت كاتب محتوى للتجارة الإلكترونية. اكتب بالعربية فقط. لا تستخدم markdown.
+        content: `أنت خبير كتابة محتوى تجارة إلكترونية متخصص. اكتب بالعربية فقط. لا تستخدم markdown أو نجوم أو **bold**.
 
 المنتج: ${name}
-${currentDescription ? `الوصف الحالي:\n${currentDescription}\n` : ''}الفئة المستهدفة: ${audience || 'العملاء السعوديين'}
+الفئة المكتشفة: ${detectedCat}
+${currentDescription ? `الوصف الحالي:
+${currentDescription}
+` : ''}الجمهور المستهدف: ${audience || 'العملاء السعوديين'}
 الأسلوب: ${toneMap[tone] || 'احترافي'}
-التعليمات: ${instructions || modeInst}
-
+تعليمات الفئة: ${catFocus}
+تعليمات إضافية: ${instructions?.split('###REVIEWS###')[0]?.trim() || modeInst}
+${reviewsSection}
 اكتب الرد بهذا الشكل بالضبط. لا تضف أي نص خارج هذه الأقسام:
 
 ###SEO_TITLE###
-[عنوان المنتج المحسّن لـ SEO بين 50-60 حرف]
+[عنوان المنتج المحسّن لـ SEO بين 50-60 حرف — يتضمن الكلمة الرئيسية]
 
 ###SEO_DESC###
 [وصف محركات البحث — جملة واحدة أو جملتان، 140-160 حرف]
 
 ###SHORT_DESC###
-[وصف قصير مقنع — جملتان فقط]
+[وصف قصير مقنع — جملتان فقط، يبرز أهم ميزة]
 
 ###LONG_DESC###
-[اكتب وصفاً كاملاً للمنتج بهذا الترتيب:
+[اكتب وصفاً كاملاً مراعياً تعليمات الفئة:
 - فقرة افتتاحية (3-4 جمل) تصف المنتج وقيمته
-- عنوان فرعي (مثل: تصميم متميز) ثم فقرة تفصيلية
-- عنوان فرعي (مثل: مميزات المنتج) ثم قائمة نقاط بعلامة - 
+- عنوان فرعي تفصيلي ثم فقرة
+- مميزات المنتج بعلامة - 
 - فقرة ختامية تحفز على الشراء]
 
 ###FEATURES###
-[5 مميزات، كل ميزة في سطر يبدأ بـ - ]
+[5 مميزات مخصصة للفئة، كل ميزة في سطر يبدأ بـ - ]
 
 ###TIKTOK_CAPTION###
-[كابشن TikTok — جملة جذابة + 5 هاشتاقات]`
+[كابشن TikTok — جملة جذابة + 5 هاشتاقات]
+
+###DETECTED_CATEGORY###
+[${detectedCat}]`
       }]
     });
 
@@ -289,14 +325,15 @@ ${currentDescription ? `الوصف الحالي:\n${currentDescription}\n` : ''}
       .split('\n').filter(f => f.trim().startsWith('-')).map(f => f.replace(/^-\s*/, '').trim());
 
     res.json({
-      seoTitle:        extractSection(text, 'SEO_TITLE'),
-      seoDescription:  extractSection(text, 'SEO_DESC'),
-      shortDescription:extractSection(text, 'SHORT_DESC'),
-      description:     longDesc,
-      descriptionHtml: descriptionToHtml(longDesc),
+      seoTitle:         extractSection(text, 'SEO_TITLE'),
+      seoDescription:   extractSection(text, 'SEO_DESC'),
+      shortDescription: extractSection(text, 'SHORT_DESC'),
+      description:      longDesc,
+      descriptionHtml:  descriptionToHtml(longDesc),
       features,
-      tiktokCaption:   extractSection(text, 'TIKTOK_CAPTION'),
-      oldDescription:  currentDescription || ''
+      tiktokCaption:    extractSection(text, 'TIKTOK_CAPTION'),
+      detectedCategory: extractSection(text, 'DETECTED_CATEGORY') || detectedCat,
+      oldDescription:   currentDescription || ''
     });
   } catch (e) {
     console.error('generate-description ERROR:', e.message);
@@ -588,6 +625,25 @@ app.post('/api/add-tags', async (req, res) => {
     res.json({ success: true, added: tagIds.length, tagIds });
   } catch (e) {
     res.status(500).json({ error: e.message });
+  }
+});
+
+// ─────────────────────────────────────────
+// PRODUCT REVIEWS (Review-to-Content)
+// ─────────────────────────────────────────
+app.post('/api/get-reviews', async (req, res) => {
+  try {
+    const { productId, token } = req.body;
+    if (!productId || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
+    const r = await sallaGet(`products/${productId}/reviews`, token);
+    const reviews = (r.data || []).slice(0, 10).map(rv => ({
+      rating: rv.rating,
+      comment: rv.comment || rv.body || '',
+      author: rv.reviewer?.name || 'عميل'
+    })).filter(rv => rv.comment && rv.comment.length > 5);
+    res.json({ reviews, count: reviews.length });
+  } catch (e) {
+    res.status(500).json({ error: e.message, reviews: [] });
   }
 });
 
