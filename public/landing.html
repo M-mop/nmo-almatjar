@@ -169,7 +169,7 @@ footer a{color:#94a3b8;text-decoration:none}.footer-logo{color:#fff;font-weight:
     <a href="#faq" class="nav-link">الأسئلة</a>
     <a href="/about.html" class="nav-link">من نحن</a>
     <a href="/privacy.html" class="nav-link">الخصوصية</a>
-    <button class="btn bp" onclick="window.location.href='/'" style="padding:8px 16px;font-size:13px">ابدأ مجاناً ←</button>
+    <button class="btn bp" onclick="openModal('start')" style="padding:8px 16px;font-size:13px">ابدأ مجاناً ←</button>
   </div>
 </nav>
 
@@ -179,7 +179,7 @@ footer a{color:#94a3b8;text-decoration:none}.footer-logo{color:#fff;font-weight:
   <h1 class="hero-title">حسّن منتجاتك وضاعف<br><span>مبيعاتك بالذكاء الاصطناعي</span></h1>
   <p class="hero-sub">أداة تحسين المحتوى الأولى المتخصصة لمتاجر سلة — تحسين الوصف والعنوان والـ SEO والوسوم بضغطة زر واحدة.</p>
   <div class="hero-btns">
-    <button class="btn bp" onclick="window.location.href='/'" style="font-size:15px;padding:14px 28px">🚀 ابدأ مجاناً الآن</button>
+    <button class="btn bp" onclick="openModal('start')" style="font-size:15px;padding:14px 28px">🚀 ابدأ مجاناً الآن</button>
     <a href="#features" class="btn bs" style="font-size:14px;padding:13px 24px">شاهد المميزات</a>
   </div>
   <div class="hero-stats">
@@ -344,7 +344,7 @@ footer a{color:#94a3b8;text-decoration:none}.footer-logo{color:#fff;font-weight:
         <li class="no">تحسين بالجملة</li>
       </ul>
       <div style="background:rgba(67,97,238,.06);border:1px dashed rgba(67,97,238,.2);border-radius:8px;padding:8px;text-align:center;margin-bottom:10px;font-size:11px;color:#4361ee;font-weight:600">🎯 جرّب 7 أيام كاملة مجاناً</div>
-      <button class="plan-btn plan-btn-s" onclick="window.location.href='/'">ابدأ مجاناً</button>
+      <button class="plan-btn plan-btn-s" onclick="openModal('start')">ابدأ مجاناً</button>
     </div>
     <div class="plan popular">
       <div class="plan-badge">الأكثر شعبية ⭐</div>
@@ -360,7 +360,7 @@ footer a{color:#94a3b8;text-decoration:none}.footer-logo{color:#fff;font-weight:
         <li>الرد على التقييمات</li>
         <li>تحسين 50 منتج دفعة</li>
       </ul>
-      <button class="plan-btn plan-btn-p" onclick="window.location.href='/'">ابدأ الآن ←</button>
+      <button class="plan-btn plan-btn-p" onclick="openModal('start')">ابدأ الآن ←</button>
     </div>
     <div class="plan">
       <div class="plan-name">Enterprise</div>
@@ -375,7 +375,7 @@ footer a{color:#94a3b8;text-decoration:none}.footer-logo{color:#fff;font-weight:
         <li>API مخصص</li>
         <li>دعم عبر واتساب</li>
       </ul>
-      <button class="plan-btn plan-btn-s" onclick="window.location.href='/'">تواصل معنا</button>
+      <button class="plan-btn plan-btn-s" onclick="openModal('start')">تواصل معنا</button>
     </div>
   </div>
 </section>
@@ -414,7 +414,7 @@ footer a{color:#94a3b8;text-decoration:none}.footer-logo{color:#fff;font-weight:
 <section class="cta">
   <div class="cta-title">ابدأ تحسين متجرك اليوم</div>
   <p class="cta-sub">انضم وابدأ مجاناً — لا تحتاج بطاقة ائتمانية</p>
-  <button class="btn" onclick="window.location.href='/'" style="background:#fff;color:var(--ac);font-size:15px;padding:14px 28px;font-weight:800;box-shadow:0 4px 20px rgba(0,0,0,.15)">🚀 ابدأ مجاناً الآن ←</button>
+  <button class="btn" onclick="openModal('start')" style="background:#fff;color:var(--ac);font-size:15px;padding:14px 28px;font-weight:800;box-shadow:0 4px 20px rgba(0,0,0,.15)">🚀 ابدأ مجاناً الآن ←</button>
 </section>
 
 <!-- FOOTER -->
@@ -450,35 +450,69 @@ function togFaq(el){
 
 // ── MODAL ────────────────────────────────
 function openModal(type){
-  const c = document.getElementById('modal-content');
-  if(type==='register'){
-    c.innerHTML = `
-      <div class="modal-title">ابدأ مجاناً 🚀</div>
-      <div class="modal-sub">أنشئ حسابك وابدأ تحسين منتجاتك فوراً</div>
-      <div class="fg"><label class="lbl">الاسم</label><input class="inp" id="reg-name" placeholder="اسمك الكامل" type="text"></div>
-      <div class="fg"><label class="lbl">البريد الإلكتروني</label><input class="inp" id="reg-email" placeholder="example@email.com" type="email" dir="ltr"></div>
-      <div class="fg"><label class="lbl">كلمة المرور</label><input class="inp" id="reg-pass" placeholder="8 أحرف على الأقل" type="password" dir="ltr"></div>
-      <button class="modal-btn" onclick="doRegister()">إنشاء الحساب ←</button>
-      <div class="divider">أو</div>
-      <button class="salla-btn" onclick="doSalla()">🔗 ربط متجر سلة مباشرة</button>
-      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--t3)">
-        عندك حساب؟ <span style="color:var(--ac);cursor:pointer;font-weight:600" onclick="window.location.href='/'">سجّل دخول</span>
-      </div>`;
-  } else {
-    c.innerHTML = `
-      <div class="modal-title">مرحباً بعودتك 👋</div>
-      <div class="modal-sub">سجّل دخولك للوصول لمتجرك</div>
-      <div class="fg"><label class="lbl">البريد الإلكتروني</label><input class="inp" id="log-email" placeholder="example@email.com" type="email" dir="ltr"></div>
-      <div class="fg"><label class="lbl">كلمة المرور</label><input class="inp" id="log-pass" placeholder="كلمة المرور" type="password" dir="ltr"></div>
-      <button class="modal-btn" onclick="doLogin()">دخول ←</button>
-      <div class="divider">أو</div>
-      <button class="salla-btn" onclick="doSalla()">🔗 دخول بحساب سلة</button>
-      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--t3)">
-        ليس عندك حساب؟ <span style="color:var(--ac);cursor:pointer;font-weight:600" onclick="window.location.href='/'">إنشاء حساب</span>
-      </div>`;
-  }
+  var mc = document.getElementById('modal-content');
   document.getElementById('modal-bg').classList.add('on');
-  setTimeout(()=>document.querySelector('.inp')?.focus(), 100);
+
+  if(type==='start'){
+    mc.innerHTML =
+      '<div style="text-align:center;margin-bottom:18px">' +
+        '<div class="modal-title" style="margin-bottom:4px">كيف تريد البدء؟</div>' +
+        '<div class="modal-sub">اختر الطريقة المناسبة لك</div>' +
+      '</div>' +
+      '<div style="border:1.5px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:10px;opacity:.5;background:#f8fafc">' +
+        '<div style="display:flex;align-items:center;gap:12px">' +
+          '<div style="width:44px;height:44px;background:#e0e7ff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🔗</div>' +
+          '<div style="flex:1">' +
+            '<div style="font-size:14px;font-weight:700;margin-bottom:2px">ربط متجر سلة مباشرة</div>' +
+            '<div style="font-size:12px;color:#64748b">تحسين فوري لمنتجاتك بدون تصدير</div>' +
+          '</div>' +
+          '<span style="background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px">قريباً ⏳</span>' +
+        '</div>' +
+      '</div>' +
+      '<div style="border:2px solid #4361ee;border-radius:12px;padding:16px;cursor:pointer;background:#f5f7ff" onclick="openModal(\'excel\')">' +
+        '<div style="display:flex;align-items:center;gap:12px">' +
+          '<div style="width:44px;height:44px;background:#e0e7ff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📊</div>' +
+          '<div style="flex:1">' +
+            '<div style="font-size:14px;font-weight:700;margin-bottom:2px">تحسين عبر Excel</div>' +
+            '<div style="font-size:12px;color:#64748b">صدّر منتجاتك، حسّنها، استوردها لسلة</div>' +
+          '</div>' +
+          '<span style="background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px">متاح الآن ✅</span>' +
+        '</div>' +
+      '</div>';
+    return;
+  }
+
+  if(type==='excel'){
+    mc.innerHTML =
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">' +
+        '<button onclick="openModal(&quot;start&quot;)" style="background:#f1f5f9;border:none;cursor:pointer;color:#64748b;font-size:16px;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center">←</button>' +
+        '<div class="modal-title" style="margin:0">ابدأ مجاناً 📊</div>' +
+      '</div>' +
+      '<div class="modal-sub" style="margin-bottom:16px">أدخل بريدك الإلكتروني للبدء</div>' +
+      '<div class="fg">' +
+        '<label class="lbl">البريد الإلكتروني</label>' +
+        '<input class="inp" id="excel-email" placeholder="example@email.com" type="email" dir="ltr">' +
+      '</div>' +
+      '<button class="modal-btn" onclick="doExcelRegister()">ابدأ مجاناً ←</button>' +
+      '<div style="margin-top:14px;background:#f8fafc;border-radius:10px;padding:12px;font-size:12px;color:#64748b;line-height:1.8">' +
+        '✅ منتجان مجانيان فوراً<br>' +
+        '📊 تحسين عبر ملفات Excel من سلة<br>' +
+        '🔒 لا نشارك بياناتك مع أحد' +
+      '</div>';
+    setTimeout(function(){ var el=document.getElementById('excel-email'); if(el)el.focus(); }, 100);
+    return;
+  }
+
+  if(type==='login'){
+    mc.innerHTML =
+      '<div class="modal-title">مرحباً بعودتك 👋</div>' +
+      '<div class="modal-sub" style="margin-bottom:16px">سجّل دخولك للوصول للتطبيق</div>' +
+      '<button class="salla-btn" onclick="doSalla()" style="margin-bottom:10px">🔗 دخول بحساب سلة</button>' +
+      '<div class="divider">أو</div>' +
+      '<div class="fg"><label class="lbl">البريد الإلكتروني</label><input class="inp" id="log-email" placeholder="example@email.com" type="email" dir="ltr"></div>' +
+      '<button class="modal-btn" onclick="doLogin()">دخول ←</button>';
+    return;
+  }
 }
 
 function closeModal(e){
@@ -486,6 +520,37 @@ function closeModal(e){
     document.getElementById('modal-bg').classList.remove('on');
 }
 
+async function doExcelRegister(){
+  const email = document.getElementById('excel-email')?.value?.trim();
+  if(!email||!email.includes('@')){
+    document.getElementById('excel-email').style.borderColor='#dc2626';
+    return;
+  }
+  const btn = document.querySelector('.modal-btn');
+  if(btn){btn.disabled=true;btn.textContent='جاري التسجيل...';}
+  try{
+    const r = await fetch(window.location.origin+'/api/leads',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email, source:'excel'})
+    });
+    const d = await r.json();
+    if(d.success){
+      document.getElementById('modal-content').innerHTML =
+        '<div style="text-align:center;padding:10px 0">'+
+        '<div style="font-size:48px;margin-bottom:14px">🎉</div>'+
+        '<div style="font-size:18px;font-weight:900;color:var(--tx);margin-bottom:8px">تم التسجيل!</div>'+
+        '<div style="font-size:13px;color:var(--t2);margin-bottom:20px;line-height:1.6">'+email+'<br>تم حفظ بريدك — يمكنك البدء الآن</div>'+
+        '<button onclick="goToApp()" style="width:100%;padding:13px;border-radius:10px;background:linear-gradient(135deg,#4361ee,#7c3aed);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">🚀 ابدأ التحسين ←</button>'+
+        '</div>';
+    }
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='ابدأ مجاناً ←';}
+    toast('حدث خطأ — حاول مرة ثانية','error');
+  }
+}
+
+function goToApp(){ window.location.href='/'; }
 function doSalla(){
   window.location.href = '/';
 }
