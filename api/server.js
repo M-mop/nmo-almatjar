@@ -188,7 +188,7 @@ app.post('/api/generate-description', async (req, res) => {
     const modeInst = mode === 'improve' ? 'حسّن الوصف الحالي' : 'اكتب وصفاً احترافياً جديداً';
 
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 2000,
       messages: [{
         role: 'user',
@@ -255,7 +255,7 @@ app.post('/api/improve-description', async (req, res) => {
   try {
     const { name, currentDescription, instructions } = req.body;
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1500,
       messages: [{
         role: 'user',
@@ -293,7 +293,7 @@ app.post('/api/generate-seo', async (req, res) => {
   try {
     const { name, description, keywords } = req.body;
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 600,
       messages: [{
         role: 'user',
@@ -328,7 +328,7 @@ app.post('/api/generate-tags', async (req, res) => {
   try {
     const { name, description } = req.body;
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 200,
       messages: [{
         role: 'user',
@@ -348,7 +348,7 @@ app.post('/api/optimize-title', async (req, res) => {
   try {
     const { name, description, category } = req.body;
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 400,
       messages: [{ role: 'user', content: `حسّن عنوان المنتج للـ SEO.
 العنوان الحالي: ${name}
@@ -382,7 +382,7 @@ app.post('/api/generate-social', async (req, res) => {
   try {
     const { name, description } = req.body;
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 800,
       messages: [{
         role: 'user',
@@ -419,7 +419,7 @@ app.post('/api/generate-blog', async (req, res) => {
     const { storeName, products, topic } = req.body;
     const productNames = products.map(p => p.name).join('، ');
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 2500,
       messages: [{
         role: 'user',
@@ -518,7 +518,7 @@ app.post('/api/generate-alt', async (req, res) => {
     const altTexts = [];
     for (let i = 1; i <= (count || 1); i++) {
       const msg = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514', max_tokens: 100,
+        model: 'claude-3-5-sonnet-20241022', max_tokens: 100,
         messages: [{ role: 'user', content: `Alt Text للصورة ${i} للمنتج: ${productName}. 50-100 حرف بالعربية. النص فقط:` }]
       });
       altTexts.push(msg.content[0].text.trim());
@@ -534,7 +534,7 @@ app.post('/api/seo-pages', async (req, res) => {
   try {
     const { products, storeName } = req.body;
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514', max_tokens: 800,
+      model: 'claude-3-5-sonnet-20241022', max_tokens: 800,
       messages: [{ role: 'user', content: `منتجات: ${products.map(p=>p.name).join('، ')} — متجر: ${storeName||'المتجر'}
 اقترح 5 صفحات SEO.
 
@@ -623,7 +623,7 @@ app.post('/api/edit-image', upload.single('image'), async (req, res) => {
     const base64 = req.file.buffer.toString('base64');
     const mime   = req.file.mimetype;
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514', max_tokens: 500,
+      model: 'claude-3-5-sonnet-20241022', max_tokens: 500,
       messages: [{
         role: 'user',
         content: [
@@ -644,7 +644,7 @@ app.post('/api/translate', async (req, res) => {
   try {
     const { text, language } = req.body;
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514', max_tokens: 500,
+      model: 'claude-3-5-sonnet-20241022', max_tokens: 500,
       messages: [{ role:'user', content:`ترجم إلى ${language} بشكل احترافي للتجارة الإلكترونية. الترجمة فقط:\n\n${text}` }]
     });
     res.json({ translation: msg.content[0].text });
