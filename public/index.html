@@ -501,6 +501,14 @@ function updU(){
 function incU(){localStorage.setItem('uC',(parseInt(localStorage.getItem('uC')||'0')+1));updU();}
 
 // ── Trial Modal ──────────────────────────
+function closeTrialModal(){
+  var m=document.getElementById('trial-modal');
+  if(m) m.remove();
+}
+function closeAnyModal(el){
+  var p=el;
+  for(var i=0;i<6;i++){if(!p)break;if(p.style&&p.style.position==='fixed'){p.remove();return;}p=p.parentElement;}
+}
 function showTrialModal(){
   const plan=localStorage.getItem('uP')||'free';
   if(plan!=='free'){toast('أنت مشترك بالفعل في خطة '+plan,'info');return;}
@@ -520,7 +528,7 @@ function showTrialModal(){
     +'<input id="ref-code" style="width:100%;background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;text-align:center;letter-spacing:2px" placeholder="مثال: REF4AB2K" dir="ltr">'
     +'</div>'
     +'<button onclick="activateTrial()" style="width:100%;background:linear-gradient(135deg,#4361ee,#7c3aed);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px">تفعيل التجربة المجانية ←</button>'
-    +'<button onclick="document.getElementById('trial-modal').remove()" style="width:100%;background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:10px;font-size:13px;cursor:pointer;font-family:inherit">لاحقاً</button>'
+    +'<button onclick="closeTrialModal()" style="width:100%;background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:10px;font-size:13px;cursor:pointer;font-family:inherit">لاحقاً</button>'
     +'</div>';
   document.body.appendChild(wrap);
 }
@@ -559,10 +567,18 @@ function showReferralCode(){
     +'<div style="font-size:13px;color:#64748b;margin-bottom:16px;line-height:1.6">شارك الكود — من يسجل به يحصل على شهر مجاني وأنت أيضاً!</div>'
     +'<div style="background:#f0f2ff;border:2px dashed rgba(67,97,238,.3);border-radius:12px;padding:16px;margin-bottom:16px">'
     +'<div style="font-size:28px;font-weight:900;color:#4361ee;letter-spacing:4px">'+code+'</div></div>'
-    +'<button onclick="navigator.clipboard.writeText(''+code+'').then(()=>toast('✅ تم النسخ','success'))" style="background:linear-gradient(135deg,#4361ee,#7c3aed);color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;width:100%">📋 نسخ الكود</button>'
-    +'<button onclick="this.closest('div[style]').remove()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:10px;font-size:13px;cursor:pointer;width:100%;font-family:inherit">إغلاق</button>'
+    +'<button onclick="copyReferralCode()" style="background:linear-gradient(135deg,#4361ee,#7c3aed);color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;width:100%">📋 نسخ الكود</button>'
+    +'<button onclick="closeAnyModal(this)" style="background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:10px;font-size:13px;cursor:pointer;width:100%;font-family:inherit">إغلاق</button>'
     +'</div>';
+  wrap._code = code;
   document.body.appendChild(wrap);
+}
+function copyReferralCode(){
+  var modal = document.querySelector('[data-ref-code]') || document.body;
+  // Get code from stored var
+  var btns = document.querySelectorAll('[style*="letter-spacing:4px"]');
+  var code = btns.length ? btns[0].textContent.trim() : '';
+  if(code) navigator.clipboard.writeText(code).then(()=>toast('✅ تم النسخ','success'));
 }
 
 // ── Category labels ──
@@ -872,8 +888,8 @@ function showLimitModal(info){
     +'<div style="font-size:12px;color:#64748b;margin-bottom:8px">الترقية لـ Pro = 200 منتج/شهر</div>'
     +'<div style="font-size:22px;font-weight:900;color:#4361ee">99 ر.س <span style="font-size:12px;font-weight:400;color:#94a3b8">/ شهر</span></div>'
     +'</div>'
-    +'<button onclick="this.closest('div[style]').remove()" style="background:linear-gradient(135deg,#4361ee,#7c3aed);color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;width:100%;font-family:inherit;margin-bottom:8px">تواصل للترقية ←</button>'
-    +'<button onclick="this.closest('div[style]').remove()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:10px;font-size:13px;cursor:pointer;width:100%;font-family:inherit">إغلاق</button>'
+    +'<button onclick="closeAnyModal(this)" style="background:linear-gradient(135deg,#4361ee,#7c3aed);color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;width:100%;font-family:inherit;margin-bottom:8px">تواصل للترقية ←</button>'
+    +'<button onclick="closeAnyModal(this)" style="background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:10px;font-size:13px;cursor:pointer;width:100%;font-family:inherit">إغلاق</button>'
     +'</div>';
   document.body.appendChild(wrap);
 }
