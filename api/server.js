@@ -538,28 +538,52 @@ app.post('/api/add-tags', async (req, res) => {
     const { productId, tags, token } = req.body;
     if (!productId || !tags?.length || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
     const tagIds = [];
+
+    // 1) جلب الوسوم الموجودة على المنتج
     try {
       const prod = await sallaGet(`products/${productId}`, token);
       (prod.data?.tags || []).forEach(t => { if (t.id) tagIds.push(t.id); });
     } catch(e) {}
-    for (const tagName of tags.slice(0, 8)) {
+
+    // 2) جلب كل الوسوم في المتجر مرة واحدة (لتجنب rate limit)
+    let allStoreTags = [];
+    try {
+      const list = await axios.get('https://api.salla.dev/admin/v2/products/tags', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      allStoreTags = list.data?.data || [];
+    } catch(e) {}
+
+    // 3) لكل وسم: إما موجود أو أنشئه
+    for (const tagName of tags.slice(0, 10)) {
       try {
+        // ابحث في الوسوم الموجودة أولاً
+        const existing = allStoreTags.find(t =>
+          t.name?.toLowerCase().trim() === tagName.toLowerCase().trim()
+        );
+        if (existing?.id) {
+          if (!tagIds.includes(existing.id)) tagIds.push(existing.id);
+          continue;
+        }
+        // أنشئ وسم جديد
         const r = await axios.post(
           `https://api.salla.dev/admin/v2/products/tags?tag_name=${encodeURIComponent(tagName)}`,
           {}, { headers: { Authorization: `Bearer ${token}` } }
         );
         const newId = r.data?.data?.id;
-        if (newId && !tagIds.includes(newId)) tagIds.push(newId);
+        if (newId && !tagIds.includes(newId)) {
+          tagIds.push(newId);
+          allStoreTags.push({ id: newId, name: tagName }); // أضفه للكاش
+        }
+        await new Promise(r => setTimeout(r, 200)); // delay بسيط بين الطلبات
       } catch(e) {
-        try {
-          const list = await axios.get('https://api.salla.dev/admin/v2/products/tags', { headers: { Authorization: `Bearer ${token}` } });
-          const found = list.data?.data?.find(t => t.name?.toLowerCase().trim() === tagName.toLowerCase().trim());
-          if (found?.id && !tagIds.includes(found.id)) tagIds.push(found.id);
-        } catch(e2) {}
+        console.warn(`Tag "${tagName}" failed:`, e.message);
       }
     }
+
+    // 4) حدّث المنتج بالوسوم
     if (tagIds.length > 0) await sallaUpdate(productId, { tags: tagIds }, token);
-    res.json({ success: true, added: tagIds.length });
+    res.json({ success: true, added: tagIds.length, tagIds });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -744,7 +768,7 @@ app.get('/api/debug', async (req, res) => {
 // ─────────────────────────────────────────
 // ADMIN — لوحة إدارة العملاء
 // ─────────────────────────────────────────
-const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'Mm1415mm@@';
+const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'admin2025';
 
 function checkAdmin(req, res) {
   const pass = req.headers['x-admin-key'] || req.query.key;
