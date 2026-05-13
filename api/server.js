@@ -744,7 +744,7 @@ app.get('/api/debug', async (req, res) => {
 // ─────────────────────────────────────────
 // ADMIN — لوحة إدارة العملاء
 // ─────────────────────────────────────────
-const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'admin2025';
+const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'Mm1415mm@@';
 
 function checkAdmin(req, res) {
   const pass = req.headers['x-admin-key'] || req.query.key;
