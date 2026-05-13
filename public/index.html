@@ -678,7 +678,7 @@ async function runAll(){
     allResults.push(result);
     // Update UI progressively
     renderAllResults();
-    await delay(800);
+    await delay(1200); // delay كافي بين المنتجات لتجنب rate limit
   }
 
   document.getElementById('all-prog').classList.remove('on');
@@ -806,7 +806,7 @@ async function uploadAll(){
   for(let ri=0;ri<allResults.length;ri++){
     if(allResults[ri].status!=='ready')continue;
     await uploadOne(ri,token);
-    await delay(500);
+    await delay(1500); // delay بين رفع كل منتج
   }
   const ok=allResults.filter(r=>r.status==='uploaded').length;
   btn.textContent=`✅ تم رفع ${ok} منتج`; btn.className='btn bg'; btn.disabled=false;
