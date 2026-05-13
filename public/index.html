@@ -7,352 +7,335 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#08090d;--s1:#0e1018;--s2:#141620;--s3:#1a1d2a;
-  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.1);--b3:rgba(255,255,255,0.16);
+  --bg:#07080c;--s1:#0d0f16;--s2:#131520;--s3:#191c28;--s4:#1f2233;
+  --b1:rgba(255,255,255,0.05);--b2:rgba(255,255,255,0.09);--b3:rgba(255,255,255,0.14);
   --ac:#4f8ef7;--ac2:#7c6df8;--gr:#22d3a0;--rd:#f87171;--yw:#fbbf24;--or:#fb923c;
-  --tx:#f0f2ff;--t2:#8b90a8;--t3:#4a4f66;--r:10px;--sb:240px
+  --tx:#eef0ff;--t2:#8b90a8;--t3:#4a4f66;--t4:#2a2f45;--r:10px;--sb:248px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--tx);display:flex;font-size:14px;min-height:100vh}
-
-/* ── SIDEBAR ── */
 .sb{width:var(--sb);background:var(--s1);border-left:1px solid var(--b1);position:fixed;right:0;top:0;bottom:0;z-index:50;display:flex;flex-direction:column;overflow-y:auto}
-.sb::-webkit-scrollbar{width:3px}.sb::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
-.sb-logo{padding:16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b1);flex-shrink:0}
-.sb-logo-ic{width:30px;height:30px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.sb::-webkit-scrollbar{width:3px}.sb::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px}
+.sb-logo{padding:18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b1);flex-shrink:0}
+.sb-logo-ic{width:32px;height:32px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 0 16px rgba(79,142,247,.3)}
 .sb-logo-tx{font-size:14px;font-weight:700}
-.sb-store{padding:8px 16px;font-size:11px;color:var(--t3);border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:6px;flex-shrink:0}
-.sb-dot{width:5px;height:5px;border-radius:50%;background:var(--gr);flex-shrink:0}
-.sb-sec{padding:12px 16px 4px;font-size:10px;font-weight:700;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase}
-.sb-it{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:12px;color:var(--t2);cursor:pointer;transition:all .12s;border-radius:7px;margin:1px 6px}
+.sb-logo-badge{font-size:9px;background:rgba(34,211,160,.12);color:var(--gr);border:1px solid rgba(34,211,160,.2);border-radius:100px;padding:1px 6px;margin-right:4px;font-weight:700}
+.sb-store{padding:10px 16px;border-bottom:1px solid var(--b1);flex-shrink:0}
+.sb-store-row{display:flex;align-items:center;gap:7px}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:var(--gr);flex-shrink:0;box-shadow:0 0 6px var(--gr)}
+.sb-store-name{font-size:12px;color:var(--t2);font-weight:500}
+.sb-store-sub{font-size:10px;color:var(--t3);margin-top:2px;padding-right:13px}
+.usage-bar-wrap{padding:10px 16px;border-bottom:1px solid var(--b1);flex-shrink:0}
+.usage-bar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.usage-bar-label{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.usage-bar-count{font-size:10px;color:var(--t2)}
+.usage-bar-bg{height:4px;background:var(--s3);border-radius:4px;overflow:hidden}
+.usage-bar-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:4px;transition:width .5s ease;width:0%}
+.sb-sec{padding:14px 16px 5px;font-size:9px;font-weight:700;color:var(--t4);letter-spacing:2px;text-transform:uppercase}
+.sb-it{display:flex;align-items:center;gap:9px;padding:8px 12px;font-size:12px;color:var(--t2);cursor:pointer;transition:all .12s;border-radius:8px;margin:1px 6px;border:1px solid transparent}
 .sb-it:hover{background:var(--s2);color:var(--tx)}
-.sb-it.on{background:rgba(79,142,247,.12);color:var(--ac)}
-.sb-it .ic{width:16px;text-align:center;font-size:13px}
-.sb-bot{margin-top:auto;padding:10px;border-top:1px solid var(--b1);flex-shrink:0}
+.sb-it.on{background:rgba(79,142,247,.1);color:var(--ac);border-color:rgba(79,142,247,.15)}
+.sb-it .ic{width:18px;text-align:center;font-size:13px;flex-shrink:0}
+.sb-bot{margin-top:auto;padding:10px;border-top:1px solid var(--b1);flex-shrink:0;display:flex;flex-direction:column;gap:6px}
 .sb-link{display:block;text-align:center;padding:7px;background:var(--s2);border:1px solid var(--b2);border-radius:7px;color:var(--t2);text-decoration:none;font-size:11px;transition:all .12s}
 .sb-link:hover{border-color:var(--ac);color:var(--ac)}
-
-/* ── MAIN ── */
+.sb-admin-link{display:block;text-align:center;padding:7px;background:rgba(124,109,248,.08);border:1px solid rgba(124,109,248,.2);border-radius:7px;color:var(--ac2);text-decoration:none;font-size:11px;transition:all .12s}
+.sb-admin-link:hover{background:rgba(124,109,248,.15)}
 .main{margin-right:var(--sb);flex:1;display:flex;flex-direction:column}
-.topbar{background:var(--s1);border-bottom:1px solid var(--b1);padding:0 20px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
-.topbar-title{font-size:14px;font-weight:600}
-.topbar-meta{font-size:11px;color:var(--t3)}
-.content{padding:20px;max-width:900px}
-
-/* ── PAGE ── */
-.page{display:none;animation:fi .18s ease}
-.page.on{display:block}
-@keyframes fi{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── WIZARD ── */
-.steps{display:flex;align-items:center;gap:0;margin-bottom:20px}
-.stp{display:flex;align-items:center;gap:7px}
-.stp:not(:last-child)::after{content:'';width:20px;height:1px;background:var(--b2);margin:0 4px}
-.stp-n{width:22px;height:22px;border-radius:50%;background:var(--s3);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--t3);flex-shrink:0;transition:all .15s}
-.stp-l{font-size:11px;color:var(--t3);white-space:nowrap;transition:color .15s}
-.stp.on .stp-n{background:var(--ac);border-color:var(--ac);color:#fff}
-.stp.on .stp-l{color:var(--tx)}
+.topbar{background:rgba(13,15,22,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--b1);padding:0 22px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-title{font-size:14px;font-weight:700}
+.topbar-tag{font-size:10px;color:var(--t3);background:var(--s3);border-radius:100px;padding:2px 8px}
+.topbar-stat{font-size:11px;color:var(--t3);background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:4px 10px}
+.content{padding:22px;max-width:940px;flex:1}
+.page{display:none;animation:fi .18s ease}.page.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.page-header{margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--b1)}
+.page-header-title{font-size:20px;font-weight:700;margin-bottom:4px}
+.page-header-sub{font-size:12px;color:var(--t2);line-height:1.6}
+.steps{display:flex;align-items:center;margin-bottom:22px;background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:12px 16px}
+.stp{display:flex;align-items:center;gap:8px}
+.stp:not(:last-child)::after{content:'';width:32px;height:1px;background:var(--b2);margin:0 6px}
+.stp-n{width:24px;height:24px;border-radius:50%;background:var(--s3);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--t3);flex-shrink:0;transition:all .2s}
+.stp-l{font-size:11px;color:var(--t3);white-space:nowrap;transition:color .2s;font-weight:500}
+.stp.on .stp-n{background:var(--ac);border-color:var(--ac);color:#fff;box-shadow:0 0 12px rgba(79,142,247,.4)}
+.stp.on .stp-l{color:var(--tx);font-weight:600}
 .stp.dn .stp-n{background:var(--gr);border-color:var(--gr);color:#fff}
 .stp.dn .stp-l{color:var(--gr)}
-
-/* ── CARDS ── */
-.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
-.ch{padding:14px 16px;border-bottom:1px solid var(--b1)}
-.ct{font-size:13px;font-weight:600;margin-bottom:2px}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.ch{padding:14px 18px;border-bottom:1px solid var(--b1)}
+.ct{font-size:13px;font-weight:700;margin-bottom:2px}
 .cd{font-size:11px;color:var(--t2);line-height:1.5}
-.cb{padding:16px}
-.ctip{background:rgba(79,142,247,.05);border-bottom:1px solid rgba(79,142,247,.1);padding:10px 16px;font-size:12px;color:#7aacff;line-height:1.6}
-
-/* ── FORM ── */
-.lbl{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:5px;display:block;letter-spacing:.5px;text-transform:uppercase}
-input,textarea,select{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:8px 11px;color:var(--tx);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;outline:none;transition:border-color .12s}
-input:focus,textarea:focus,select:focus{border-color:var(--ac)}
-textarea{resize:vertical;min-height:75px}
-.fg{margin-bottom:12px}
-
-/* ── TOGGLE ── */
-.trow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--b1)}
-.trow:last-child{border:none}
-.ti .tl{font-size:12px;color:var(--t2)}
-.ti .th{font-size:10px;color:var(--t3);margin-top:1px}
-.tog{position:relative;width:34px;height:19px;flex-shrink:0;margin-top:2px}
+.cb{padding:18px}
+.ctip{background:rgba(79,142,247,.04);border-bottom:1px solid rgba(79,142,247,.08);padding:10px 18px;font-size:12px;color:#7aacff;line-height:1.6;display:flex;gap:8px}
+.lbl{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:6px;display:block;letter-spacing:.6px;text-transform:uppercase}
+input,textarea,select{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:9px 12px;color:var(--tx);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;outline:none;transition:all .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(79,142,247,.08)}
+textarea{resize:vertical;min-height:80px;line-height:1.6}
+.fg{margin-bottom:14px}.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.trow{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--b1)}
+.trow:last-child{border:none;padding-bottom:0}
+.ti .tl{font-size:12px;color:var(--t2);font-weight:500}
+.ti .th{font-size:10px;color:var(--t3);margin-top:2px;line-height:1.5}
+.tog{position:relative;width:36px;height:20px;flex-shrink:0;margin-top:2px}
 .tog input{opacity:0;width:0;height:0;position:absolute}
-.ts{position:absolute;inset:0;background:var(--s3);border-radius:19px;cursor:pointer;transition:.12s;border:1px solid var(--b2)}
-.ts:before{content:'';position:absolute;height:13px;width:13px;left:2px;bottom:2px;background:var(--t3);border-radius:50%;transition:.12s}
+.ts{position:absolute;inset:0;background:var(--s3);border-radius:20px;cursor:pointer;transition:.15s;border:1px solid var(--b2)}
+.ts:before{content:'';position:absolute;height:14px;width:14px;left:2px;bottom:2px;background:var(--t3);border-radius:50%;transition:.15s}
 .tog input:checked+.ts{background:var(--ac);border-color:var(--ac)}
-.tog input:checked+.ts:before{transform:translateX(15px);background:#fff}
-.sh{font-size:10px;font-weight:700;color:var(--t3);padding:8px 0 6px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--b1);margin-bottom:2px}
-
-/* ── PRODUCT LIST ── */
-.pl{max-height:340px;overflow-y:auto}
-.pl::-webkit-scrollbar{width:3px}.pl::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
-.pr{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;cursor:pointer;transition:background .1s;border:1px solid transparent;margin-bottom:3px}
-.pr:hover{background:var(--s2)}
-.pr.sl{background:rgba(79,142,247,.07);border-color:rgba(79,142,247,.18)}
+.tog input:checked+.ts:before{transform:translateX(16px);background:#fff}
+.sh{font-size:10px;font-weight:700;color:var(--t3);padding:10px 0 6px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--b1);margin-bottom:4px}
+.pl{max-height:360px;overflow-y:auto}
+.pl::-webkit-scrollbar{width:3px}.pl::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px}
+.pr{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:all .1s;border:1px solid transparent;margin-bottom:3px}
+.pr:hover{background:var(--s2)}.pr.sl{background:rgba(79,142,247,.06);border-color:rgba(79,142,247,.15)}
 .pr-cb{width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0}
-.pr-img{width:34px;height:34px;border-radius:5px;object-fit:cover;background:var(--s3);flex-shrink:0}
+.pr-img{width:36px;height:36px;border-radius:6px;object-fit:cover;background:var(--s3);flex-shrink:0;border:1px solid var(--b1)}
 .pr-info{flex:1;min-width:0}
-.pr-n{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pr-p{font-size:11px;color:var(--t3)}
-.slbar{display:flex;align-items:center;gap:8px;padding:7px 0;margin-bottom:7px}
+.pr-n{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pr-p{font-size:11px;color:var(--t3);margin-top:1px}
+.pr-score{font-size:9px;font-weight:700;padding:2px 6px;border-radius:100px;flex-shrink:0}
+.slbar{display:flex;align-items:center;gap:10px;padding:8px 0;margin-bottom:8px;border-bottom:1px solid var(--b1)}
 .slcnt{font-size:11px;color:var(--t3)}
-
-/* ── BUTTONS ── */
-.btn{padding:8px 16px;border-radius:7px;font-size:12px;font-weight:600;font-family:'IBM Plex Sans Arabic',sans-serif;cursor:pointer;transition:all .12s;border:none;display:inline-flex;align-items:center;gap:5px}
-.bp{background:var(--ac);color:#fff}.bp:hover{background:#6ba0ff;transform:translateY(-1px)}.bp:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.bs{background:var(--s2);color:var(--t2);border:1px solid var(--b2)}.bs:hover{border-color:var(--b2);color:var(--tx)}
-.bg{background:var(--gr);color:#0a1a14}.bg:hover{background:#30e8b3}.bg:disabled{opacity:.4;cursor:not-allowed}
-.brow,.btn-row{display:flex;gap:7px;margin-top:14px;align-items:center;flex-wrap:wrap}
-
-/* ── PROGRESS ── */
-.prog{display:none;background:rgba(79,142,247,.05);border:1px solid rgba(79,142,247,.12);border-radius:8px;padding:12px;margin-top:10px;text-align:center}
-.prog.on{display:block}
-.prog-t{font-size:12px;color:#7aacff;margin-top:6px}
-.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(79,142,247,.2);border-top-color:var(--ac);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle}
+.slbar-actions{display:flex;gap:6px;margin-right:auto}
+.slbar-btn{font-size:10px;padding:3px 8px;border-radius:5px;background:var(--s3);border:1px solid var(--b2);color:var(--t2);cursor:pointer;font-family:'IBM Plex Sans Arabic',sans-serif;transition:all .12s}
+.slbar-btn:hover{border-color:var(--ac);color:var(--ac)}
+.btn{padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;font-family:'IBM Plex Sans Arabic',sans-serif;cursor:pointer;transition:all .15s;border:none;display:inline-flex;align-items:center;gap:6px}
+.bp{background:var(--ac);color:#fff;box-shadow:0 2px 12px rgba(79,142,247,.25)}.bp:hover{background:#6ba0ff;transform:translateY(-1px)}.bp:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.bs{background:var(--s2);color:var(--t2);border:1px solid var(--b2)}.bs:hover{border-color:var(--b3);color:var(--tx)}
+.bg{background:var(--gr);color:#051a12;font-weight:700;box-shadow:0 2px 12px rgba(34,211,160,.2)}.bg:hover{background:#2ef5ba;transform:translateY(-1px)}.bg:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.brow,.btn-row{display:flex;gap:8px;margin-top:16px;align-items:center;flex-wrap:wrap}
+.prog{display:none;background:rgba(79,142,247,.04);border:1px solid rgba(79,142,247,.1);border-radius:10px;padding:16px;margin-top:12px}.prog.on{display:block}
+.prog-inner{display:flex;flex-direction:column;align-items:center;gap:8px}
+.prog-t{font-size:12px;color:#7aacff;text-align:center}
+.prog-bar-wrap{width:100%;max-width:320px;height:3px;background:var(--s3);border-radius:3px;overflow:hidden;margin-top:4px}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:3px;width:0%;transition:width .4s ease}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(79,142,247,.2);border-top-color:var(--ac);border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-
-/* ── ALERTS ── */
-.al{padding:9px 12px;border-radius:7px;font-size:11px;margin-bottom:10px;line-height:1.5}
-.ai{background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.15);color:#7aacff}
-.aw{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);color:var(--yw)}
-.ag{background:rgba(34,211,160,.06);border:1px solid rgba(34,211,160,.15);color:var(--gr)}
-
-/* ── SCORE ── */
-.score-A{background:rgba(34,211,160,.15);color:var(--gr)}
-.score-B{background:rgba(79,142,247,.15);color:var(--ac)}
-.score-C{background:rgba(251,191,36,.15);color:var(--yw)}
-.score-D,.score-F{background:rgba(248,113,113,.15);color:var(--rd)}
-.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:16px}
-.score-card{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px}
-.score-card .sn{font-size:12px;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.score-card .sg{font-size:20px;font-weight:900;margin-bottom:4px}
-.score-card .si{font-size:10px;color:var(--t3);line-height:1.4}
-
-/* ── SOCIAL ── */
-.soc-card{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px;margin-bottom:8px}
-.soc-plat{font-size:11px;font-weight:700;margin-bottom:6px;color:var(--ac)}
-.soc-txt{font-size:12px;color:var(--t2);line-height:1.6;white-space:pre-wrap}
-.soc-copy{font-size:10px;padding:4px 10px;border-radius:6px;background:var(--s3);border:1px solid var(--b2);color:var(--t2);cursor:pointer;font-family:'IBM Plex Sans Arabic',sans-serif;transition:all .12s;margin-top:6px}
+.al{padding:10px 14px;border-radius:8px;font-size:11px;margin-bottom:12px;line-height:1.6;display:flex;gap:8px}
+.ai{background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.12);color:#7aacff}
+.aw{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.12);color:var(--yw)}
+.ag{background:rgba(34,211,160,.06);border:1px solid rgba(34,211,160,.12);color:var(--gr)}
+.ar{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.12);color:var(--rd)}
+.score-A,.score-Ap{background:rgba(34,211,160,.12);color:var(--gr)}
+.score-B{background:rgba(79,142,247,.12);color:var(--ac)}
+.score-C{background:rgba(251,191,36,.12);color:var(--yw)}
+.score-D,.score-F{background:rgba(248,113,113,.12);color:var(--rd)}
+.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:16px}
+.score-card{background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:14px}
+.score-card .sn{font-size:12px;font-weight:600;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.score-card .sg{font-size:22px;font-weight:900;margin-bottom:4px}
+.score-card .si{font-size:10px;color:var(--t3);line-height:1.5}
+.soc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:680px){.soc-grid{grid-template-columns:1fr}}
+.soc-card{background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:14px}
+.soc-plat{font-size:11px;font-weight:700;margin-bottom:8px;color:var(--ac)}
+.soc-txt{font-size:12px;color:var(--t2);line-height:1.7;white-space:pre-wrap;max-height:120px;overflow-y:auto}
+.soc-copy{font-size:10px;padding:4px 10px;border-radius:6px;background:var(--s3);border:1px solid var(--b2);color:var(--t2);cursor:pointer;font-family:'IBM Plex Sans Arabic',sans-serif;transition:all .12s;margin-top:8px}
 .soc-copy:hover{border-color:var(--ac);color:var(--ac)}
-
-/* ── BLOG ── */
-.blog-prev{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:16px;margin-top:12px}
-.blog-title{font-size:16px;font-weight:700;margin-bottom:10px;color:var(--tx)}
-.blog-body{font-size:12px;color:var(--t2);line-height:1.8;white-space:pre-wrap}
-
-/* ════════════════════════════════════════
-   PRODUCT RESULT CARDS  (new design)
-   ════════════════════════════════════════ */
-.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-@media(max-width:720px){.results-grid{grid-template-columns:1fr}}
-
+.blog-prev{background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:18px;margin-top:14px}
+.blog-title{font-size:17px;font-weight:700;margin-bottom:6px;color:var(--tx);line-height:1.4}
+.blog-meta{font-size:10px;color:var(--t3);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--b1)}
+.blog-body{font-size:12px;color:var(--t2);line-height:1.9;white-space:pre-wrap}
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:700px){.results-grid{grid-template-columns:1fr}}
 .pcard{background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
 .pcard-head{padding:12px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px}
-.pcard-img{width:44px;height:44px;border-radius:7px;object-fit:cover;background:var(--s3);flex-shrink:0}
-.pcard-name{font-size:13px;font-weight:700;flex:1;line-height:1.3}
-.pcard-badge{font-size:9px;padding:2px 7px;border-radius:100px;font-weight:700;flex-shrink:0}
+.pcard-img{width:42px;height:42px;border-radius:7px;object-fit:cover;background:var(--s3);flex-shrink:0;border:1px solid var(--b1)}
+.pcard-info{flex:1;min-width:0}
+.pcard-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pcard-price{font-size:11px;color:var(--t3);margin-top:1px}
+.pcard-badge{font-size:9px;padding:2px 8px;border-radius:100px;font-weight:700;flex-shrink:0}
 .badge-ready{background:rgba(34,211,160,.12);color:var(--gr)}
 .badge-err{background:rgba(248,113,113,.12);color:var(--rd)}
 .badge-loading{background:rgba(79,142,247,.12);color:var(--ac)}
-
-.pcard-body{padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:12px}
-
-/* SEO block */
-.seo-block{background:rgba(79,142,247,.05);border:1px solid rgba(79,142,247,.12);border-radius:8px;padding:10px}
-.seo-block-title{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
+.pcard-body{padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:10px}
+.seo-block{background:rgba(79,142,247,.04);border:1px solid rgba(79,142,247,.12);border-radius:8px;padding:10px}
+.seo-block-label{font-size:9px;font-weight:700;color:var(--t3);margin-bottom:7px;letter-spacing:.7px;text-transform:uppercase}
 .seo-meta-title{font-size:13px;color:#60a5fa;font-weight:600;margin-bottom:2px;line-height:1.4}
 .seo-meta-url{font-size:10px;color:var(--gr);margin-bottom:5px}
 .seo-meta-desc{font-size:11px;color:var(--t2);line-height:1.6}
-
-/* Title options */
 .title-block{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:10px}
-.block-lbl{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:7px;letter-spacing:.5px;text-transform:uppercase}
-.title-opt{padding:7px 10px;border-radius:6px;border:1px solid var(--b2);margin-bottom:4px;cursor:pointer;font-size:12px;transition:all .12s;display:flex;justify-content:space-between;align-items:center;gap:8px;line-height:1.4}
-.title-opt:hover{border-color:var(--ac)}
-.title-opt.selected{border-color:var(--ac);background:rgba(79,142,247,.08)}
+.block-lbl{font-size:9px;font-weight:700;color:var(--t3);margin-bottom:8px;letter-spacing:.7px;text-transform:uppercase}
+.title-opt{padding:8px 10px;border-radius:6px;border:1px solid var(--b2);margin-bottom:4px;cursor:pointer;font-size:12px;transition:all .12s;display:flex;justify-content:space-between;align-items:center;gap:8px;line-height:1.4}
+.title-opt:hover{border-color:var(--ac)}.title-opt.selected{border-color:var(--ac);background:rgba(79,142,247,.07)}
 .title-opt-len{font-size:10px;color:var(--t3);flex-shrink:0}
-
-/* Description block */
 .desc-block{background:var(--s2);border:1px solid var(--b1);border-radius:8px;overflow:hidden}
 .desc-block-head{padding:8px 12px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
 .desc-block-head .block-lbl{margin:0}
 .desc-toggle{font-size:10px;color:var(--ac);cursor:pointer;background:none;border:none;font-family:'IBM Plex Sans Arabic',sans-serif;padding:0}
-.desc-content{padding:12px;font-size:12px;color:var(--t2);line-height:1.8;max-height:200px;overflow-y:auto}
-.desc-content::-webkit-scrollbar{width:3px}.desc-content::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
-.desc-content h3{font-size:13px;font-weight:700;color:var(--tx);margin:12px 0 6px}
+.desc-content{padding:12px;font-size:12px;color:var(--t2);line-height:1.8;max-height:180px;overflow-y:auto}
+.desc-content::-webkit-scrollbar{width:3px}.desc-content::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px}
+.desc-content h3{font-size:13px;font-weight:700;color:var(--tx);margin:14px 0 6px}
+.desc-content h3:first-child{margin-top:0}
 .desc-content p{margin-bottom:10px;line-height:1.9}
 .desc-content ul{padding-right:18px;margin-bottom:10px}
 .desc-content li{margin-bottom:5px;line-height:1.7}
 .desc-full{max-height:none !important}
-
-/* Tags block */
 .tags-block{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:10px}
-.rtags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.rtags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
 .tpill{background:var(--s3);border:1px solid var(--b2);border-radius:100px;padding:3px 9px;font-size:10px;color:var(--t2)}
-
-/* Short desc */
-.short-desc{font-size:11px;color:var(--t2);font-style:italic;line-height:1.6;padding:8px 10px;border-right:2px solid var(--ac);background:rgba(79,142,247,.04);border-radius:0 6px 6px 0}
-
-/* TikTok */
-.tiktok-pill{font-size:10px;background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.15);border-radius:6px;padding:6px 10px;color:#7aacff;line-height:1.5}
-
-/* Card footer */
-.pcard-foot{padding:10px 14px;border-top:1px solid var(--b1);display:flex;gap:6px;align-items:center;background:rgba(0,0,0,.15)}
+.short-desc{font-size:11px;color:var(--t2);font-style:italic;line-height:1.7;padding:9px 12px;border-right:2px solid var(--ac);background:rgba(79,142,247,.03);border-radius:0 8px 8px 0}
+.tiktok-pill{font-size:11px;background:rgba(79,142,247,.05);border:1px solid rgba(79,142,247,.12);border-radius:7px;padding:7px 10px;color:#7aacff;line-height:1.6}
+.pcard-foot{padding:9px 14px;border-top:1px solid var(--b1);display:flex;gap:6px;align-items:center;background:rgba(0,0,0,.2)}
 .status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.status-dot.pending{background:var(--yw)}
-.status-dot.uploaded{background:var(--gr)}
-.status-dot.err{background:var(--rd)}
+.status-dot.pending{background:var(--yw)}.status-dot.uploading{background:var(--ac)}.status-dot.uploaded{background:var(--gr)}.status-dot.err{background:var(--rd)}
 .status-label{font-size:10px;color:var(--t3);flex:1}
-
-/* Upload bar */
-.upload-bar{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.upload-bar{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
 .upload-bar-info{font-size:12px;color:var(--t2)}
-.upload-bar-actions{display:flex;gap:7px}
+.upload-bar-actions{display:flex;gap:7px;flex-wrap:wrap}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--s1);border:1px solid var(--b2);border-radius:9px;padding:10px 18px;font-size:12px;z-index:999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.toast.on{display:flex;align-items:center;gap:8px;animation:slideup .2s ease}
+@keyframes slideup{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.toast.success{border-color:rgba(34,211,160,.3);color:var(--gr)}.toast.error{border-color:rgba(248,113,113,.3);color:var(--rd)}.toast.info{border-color:rgba(79,142,247,.3);color:var(--ac)}
+.empty-state{text-align:center;padding:40px 24px;color:var(--t3)}
+.empty-state-icon{font-size:36px;margin-bottom:12px;opacity:.5}
+.empty-state-title{font-size:13px;font-weight:600;color:var(--t2);margin-bottom:4px}
 </style>
 </head>
 <body>
-
-<!-- SIDEBAR -->
 <div class="sb">
   <div class="sb-logo">
     <div class="sb-logo-ic">✦</div>
-    <div class="sb-logo-tx">ذكاء المتجر</div>
+    <div><div class="sb-logo-tx">ذكاء المتجر</div></div>
+    <span class="sb-logo-badge">AI</span>
   </div>
-  <div class="sb-store"><div class="sb-dot"></div><span id="sn" style="color:var(--t2);font-size:11px">جاري التحميل...</span></div>
-
+  <div class="sb-store">
+    <div class="sb-store-row"><div class="sb-dot"></div><span class="sb-store-name" id="sn">جاري التحميل...</span></div>
+    <div class="sb-store-sub" id="store-sub">متجر سلة مرتبط</div>
+  </div>
+  <div class="usage-bar-wrap">
+    <div class="usage-bar-top"><span class="usage-bar-label">الاستخدام</span><span class="usage-bar-count" id="usage-count">0 عملية</span></div>
+    <div class="usage-bar-bg"><div class="usage-bar-fill" id="usage-fill"></div></div>
+  </div>
   <div class="sb-sec">أدوات المنتجات</div>
   <div class="sb-it on" onclick="go('all')" id="nav-all"><span class="ic">⚡</span> تحسين شامل</div>
   <div class="sb-it" onclick="go('score')" id="nav-score"><span class="ic">📊</span> تقييم SEO</div>
-
   <div class="sb-sec">المحتوى والتسويق</div>
   <div class="sb-it" onclick="go('social')" id="nav-social"><span class="ic">📱</span> محتوى سوشال</div>
   <div class="sb-it" onclick="go('blog')" id="nav-blog"><span class="ic">📝</span> مقالات AI</div>
   <div class="sb-it" onclick="go('seopages')" id="nav-seopages"><span class="ic">📄</span> صفحات SEO</div>
-
   <div class="sb-sec">الصور</div>
   <div class="sb-it" onclick="go('imggen')" id="nav-imggen"><span class="ic">🖼️</span> توليد الصور</div>
   <div class="sb-it" onclick="go('imgedit')" id="nav-imgedit"><span class="ic">🎨</span> تحرير الصور</div>
-
   <div class="sb-sec">أدوات أخرى</div>
   <div class="sb-it" onclick="go('trans')" id="nav-trans"><span class="ic">🌐</span> الترجمة</div>
   <div class="sb-it" onclick="go('templates')" id="nav-templates"><span class="ic">📋</span> القوالب</div>
-
   <div class="sb-bot">
+    <div style="background:var(--s2);border-radius:8px;padding:10px;margin-bottom:2px">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-bottom:6px">
+        <span>الاستهلاك الشهري</span><span id="usage-txt" style="color:var(--ac)">0 / 10</span>
+      </div>
+      <div style="height:5px;background:var(--s3);border-radius:5px;overflow:hidden">
+        <div id="usage-fill" style="height:100%;width:0%;border-radius:5px;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .4s ease"></div>
+      </div>
+      <div style="font-size:9px;color:var(--t3);margin-top:4px" id="usage-plan-lbl">خطة مجانية</div>
+    </div>
     <a href="/auth/salla" class="sb-link">🔗 إعادة ربط المتجر</a>
+    <a href="/admin" target="_blank" class="sb-admin-link">🛡️ لوحة الإدارة</a>
   </div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 <div class="topbar">
-  <div class="topbar-title" id="pt">⚡ تحسين شامل</div>
-  <div class="topbar-meta" id="pm">0 منتج</div>
+  <div class="topbar-left">
+    <div class="topbar-title" id="pt">⚡ تحسين شامل</div>
+    <span class="topbar-tag" id="pt-tag">أدوات المنتجات</span>
+  </div>
+  <span class="topbar-stat" id="pm">0 منتج</span>
 </div>
 <div class="content">
 
-<!-- ═══ تقييم SEO ═══ -->
 <div class="page" id="page-score">
-  <div class="card">
-    <div class="ch"><div class="ct">📊 تقييم SEO لمنتجاتك</div><div class="cd">يحلل كل منتج ويعطيه درجة ويكشف المشاكل</div></div>
-    <div class="cb">
-      <button class="btn bp" onclick="runScore()" id="scbtn">📊 تحليل المنتجات</button>
-      <div class="prog" id="scp"><span class="spin"></span><div class="prog-t">جاري التحليل...</div></div>
-      <div id="scr" style="display:none;margin-top:14px"><div id="scrl"></div></div>
-    </div>
-  </div>
+  <div class="page-header"><div class="page-header-title">📊 تقييم SEO</div><div class="page-header-sub">يحلل كل منتج ويعطيه درجة A-F ويكشف نقاط الضعف</div></div>
+  <div class="card"><div class="cb">
+    <button class="btn bp" onclick="runScore()" id="scbtn">📊 تحليل جميع المنتجات</button>
+    <div class="prog" id="scp"><div class="prog-inner"><span class="spin"></span><div class="prog-t">جاري التحليل...</div></div></div>
+    <div id="scr" style="display:none;margin-top:16px"><div id="scrl"></div></div>
+  </div></div>
 </div>
 
-<!-- ═══ محتوى سوشال ═══ -->
 <div class="page" id="page-social">
-  <div class="card">
-    <div class="ch"><div class="ct">📱 توليد محتوى السوشال ميديا</div><div class="cd">كابشن Instagram + سكريبت TikTok + تغريدة X + هاشتاقات</div></div>
-    <div class="cb">
-      <div class="fg"><label class="lbl">المنتج</label>
-      <select id="soc-prod"><option value="">-- اختر منتجاً --</option></select></div>
-      <div class="fg"><label class="lbl">أو أدخل اسم المنتج يدوياً</label>
-      <input type="text" id="soc-name" placeholder="اسم المنتج..."></div>
-      <div class="fg"><label class="lbl">وصف إضافي (اختياري)</label>
-      <textarea id="soc-desc" placeholder="أي تفاصيل إضافية..."></textarea></div>
-      <button class="btn bp" onclick="runSocial()" id="socbtn">📱 توليد المحتوى</button>
-      <div class="prog" id="socp"><span class="spin"></span><div class="prog-t">جاري التوليد...</div></div>
-      <div id="socr" style="display:none;margin-top:14px"></div>
+  <div class="page-header"><div class="page-header-title">📱 محتوى سوشال ميديا</div><div class="page-header-sub">كابشن Instagram + TikTok + X + هاشتاقات جاهزة للنشر</div></div>
+  <div class="card"><div class="cb">
+    <div class="frow">
+      <div class="fg"><label class="lbl">اختر منتجاً</label><select id="soc-prod"><option value="">-- اختر --</option></select></div>
+      <div class="fg"><label class="lbl">أو أدخل اسم المنتج يدوياً</label><input type="text" id="soc-name" placeholder="اسم المنتج..."></div>
     </div>
-  </div>
+    <div class="fg"><label class="lbl">وصف إضافي (اختياري)</label><textarea id="soc-desc" placeholder="أي تفاصيل إضافية..."></textarea></div>
+    <button class="btn bp" onclick="runSocial()" id="socbtn">📱 توليد المحتوى</button>
+    <div class="prog" id="socp"><div class="prog-inner"><span class="spin"></span><div class="prog-t">جاري التوليد...</div></div></div>
+    <div id="socr" style="display:none;margin-top:16px"></div>
+  </div></div>
 </div>
 
-<!-- ═══ مقالات AI ═══ -->
 <div class="page" id="page-blog">
-  <div class="card">
-    <div class="ch"><div class="ct">📝 توليد مقالات SEO</div><div class="cd">مقالات مرتبطة بمنتجاتك تجلب زيارات Google مجاناً</div></div>
-    <div class="cb">
+  <div class="page-header"><div class="page-header-title">📝 مقالات SEO</div><div class="page-header-sub">مقالات احترافية تجلب زيارات مجانية من Google</div></div>
+  <div class="card"><div class="cb">
+    <div class="frow">
       <div class="fg"><label class="lbl">اسم المتجر</label><input type="text" id="bl-store" placeholder="مثال: متجر العطور الفاخرة"></div>
-      <div class="fg"><label class="lbl">موضوع المقالة</label><input type="text" id="bl-topic" placeholder="مثال: أفضل عطور رجالية لصيف 2025"></div>
-      <div class="fg"><label class="lbl">المنتجات المرتبطة (اختر)</label>
-      <select id="bl-prods" multiple style="min-height:80px"></select></div>
-      <button class="btn bp" onclick="runBlog()" id="blbtn">📝 توليد المقالة</button>
-      <div class="prog" id="blp"><span class="spin"></span><div class="prog-t">جاري كتابة المقالة...</div></div>
-      <div id="blr" style="display:none;margin-top:14px"></div>
+      <div class="fg"><label class="lbl">موضوع المقالة</label><input type="text" id="bl-topic" placeholder="مثال: أفضل عطور رجالية 2025"></div>
     </div>
-  </div>
+    <div class="fg"><label class="lbl">المنتجات المرتبطة</label><select id="bl-prods" multiple style="min-height:90px"></select></div>
+    <button class="btn bp" onclick="runBlog()" id="blbtn">📝 كتابة المقالة</button>
+    <div class="prog" id="blp"><div class="prog-inner"><span class="spin"></span><div class="prog-t">جاري الكتابة...</div></div></div>
+    <div id="blr" style="display:none;margin-top:16px"></div>
+  </div></div>
 </div>
 
-<!-- ═══ توليد الصور ═══ -->
 <div class="page" id="page-imggen">
-  <div class="card">
-    <div class="ch"><div class="ct">🖼️ توليد صورة منتج احترافية</div></div>
-    <div class="cb">
-      <div class="fg"><label class="lbl">اسم المنتج</label><input type="text" id="ig-n" placeholder="مثال: عطر ورد الطائف"></div>
-      <div class="fg"><label class="lbl">وصف الصورة</label><textarea id="ig-p" placeholder="مثال: زجاجة عطر فاخرة على خلفية بيضاء، إضاءة استوديو"></textarea></div>
-      <div class="fg"><label class="lbl">نوع الصورة</label>
-      <select id="ig-s">
-        <option value="product photography, white background, studio lighting">خلفية بيضاء — استوديو</option>
-        <option value="lifestyle product photography, natural lighting">لايف ستايل — طبيعي</option>
-        <option value="luxury product photography, dark background, dramatic lighting">فاخر — خلفية داكنة</option>
-        <option value="flat lay product photography">فلات لاي — من أعلى</option>
-      </select></div>
-      <button class="btn bp" onclick="genImg()">✨ توليد</button>
-      <div class="prog" id="igp"><span class="spin"></span><div class="prog-t">جاري التوليد...</div></div>
-      <div id="igr" style="display:none;margin-top:12px;text-align:center">
-        <img id="ig-img" src="" style="max-width:100%;border-radius:8px;border:1px solid var(--b2)">
-        <div style="margin-top:8px"><a id="ig-dl" href="#" download="product.png" class="btn bs" style="text-decoration:none">⬇️ تحميل</a></div>
-      </div>
+  <div class="page-header"><div class="page-header-title">🖼️ توليد صور المنتجات</div><div class="page-header-sub">أنشئ صور احترافية بالذكاء الاصطناعي (DALL-E 3)</div></div>
+  <div class="card"><div class="cb">
+    <div class="al ai"><span>ℹ️</span> تستخدم DALL-E 3 من OpenAI — تأكد من توفر الرصيد</div>
+    <div class="fg"><label class="lbl">اسم المنتج</label><input type="text" id="ig-n" placeholder="مثال: عطر ورد الطائف الفاخر"></div>
+    <div class="fg"><label class="lbl">وصف الصورة</label><textarea id="ig-p" placeholder="مثال: زجاجة عطر فاخرة على خلفية بيضاء، إضاءة استوديو"></textarea></div>
+    <div class="fg"><label class="lbl">نوع الصورة</label>
+    <select id="ig-s">
+      <option value="product photography, white background, studio lighting">خلفية بيضاء — استوديو</option>
+      <option value="lifestyle product photography, natural lighting">لايف ستايل — طبيعي</option>
+      <option value="luxury product photography, dark background, dramatic lighting">فاخر — خلفية داكنة</option>
+      <option value="flat lay product photography">فلات لاي — من أعلى</option>
+    </select></div>
+    <button class="btn bp" onclick="genImg()">✨ توليد الصورة</button>
+    <div class="prog" id="igp"><div class="prog-inner"><span class="spin"></span><div class="prog-t">جاري التوليد...</div></div></div>
+    <div id="igr" style="display:none;margin-top:16px;text-align:center">
+      <img id="ig-img" src="" style="max-width:100%;border-radius:10px;border:1px solid var(--b2)">
+      <div style="margin-top:10px"><a id="ig-dl" href="#" download="product.png" class="btn bs" style="text-decoration:none">⬇️ تحميل</a></div>
     </div>
-  </div>
+  </div></div>
 </div>
 
-<!-- ═══ تحرير الصور ═══ -->
 <div class="page" id="page-imgedit">
-  <div class="card">
-    <div class="ch"><div class="ct">🎨 تحرير صورة بالذكاء الاصطناعي</div></div>
-    <div class="cb">
-      <div class="fg"><label class="lbl">ارفع الصورة</label><input type="file" id="ie-f" accept="image/*"></div>
-      <div class="fg"><label class="lbl">التعديل المطلوب</label><textarea id="ie-p" placeholder="مثال: احذف الخلفية واجعلها بيضاء..."></textarea></div>
-      <button class="btn bp" onclick="editImg()">🎨 تحرير</button>
-      <div class="prog" id="iep"><span class="spin"></span><div class="prog-t">جاري التحرير...</div></div>
-      <div id="ier" style="display:none;margin-top:12px;text-align:center">
-        <img id="ie-img" src="" style="max-width:100%;border-radius:8px">
-        <div style="margin-top:8px"><a id="ie-dl" href="#" download="edited.png" class="btn bs" style="text-decoration:none">⬇️ تحميل</a></div>
-      </div>
+  <div class="page-header"><div class="page-header-title">🎨 تحرير الصور بالذكاء الاصطناعي</div><div class="page-header-sub">عدّل صور منتجاتك — احذف الخلفية، غيّر الإضاءة، أضف تفاصيل</div></div>
+  <div class="card"><div class="cb">
+    <div class="fg"><label class="lbl">ارفع صورة المنتج</label><input type="file" id="ie-f" accept="image/*"></div>
+    <div class="fg"><label class="lbl">التعديل المطلوب</label><textarea id="ie-p" placeholder="مثال: احذف الخلفية واجعلها بيضاء نقية..."></textarea></div>
+    <button class="btn bp" onclick="editImg()">🎨 تطبيق التعديل</button>
+    <div class="prog" id="iep"><div class="prog-inner"><span class="spin"></span><div class="prog-t">جاري التحرير...</div></div></div>
+    <div id="ier" style="display:none;margin-top:16px;text-align:center">
+      <img id="ie-img" src="" style="max-width:100%;border-radius:10px;border:1px solid var(--b2)">
+      <div style="margin-top:10px"><a id="ie-dl" href="#" download="edited.png" class="btn bs" style="text-decoration:none">⬇️ تحميل</a></div>
     </div>
-  </div>
+  </div></div>
 </div>
 
-<!-- ═══ الترجمة ═══ -->
 <div class="page" id="page-trans">
-  <div class="card">
-    <div class="ch"><div class="ct">🌐 ترجمة احترافية</div></div>
-    <div class="cb">
-      <div class="fg"><label class="lbl">النص</label><textarea id="tr-t" placeholder="أدخل النص..."></textarea></div>
-      <div class="fg"><label class="lbl">ترجمة إلى</label>
-      <select id="tr-l"><option value="English">الإنجليزية</option><option value="French">الفرنسية</option><option value="Turkish">التركية</option><option value="Urdu">الأردية</option></select></div>
-      <button class="btn bp" onclick="runTrans()">🌐 ترجمة</button>
-      <div class="prog" id="trp"><span class="spin"></span></div>
-      <div id="trr" style="display:none;margin-top:12px;background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:12px;font-size:12px;line-height:1.8;color:var(--t2)"></div>
-    </div>
-  </div>
+  <div class="page-header"><div class="page-header-title">🌐 الترجمة الاحترافية</div><div class="page-header-sub">ترجم أوصاف منتجاتك للأسواق العالمية بأسلوب تسويقي</div></div>
+  <div class="card"><div class="cb">
+    <div class="fg"><label class="lbl">النص</label><textarea id="tr-t" placeholder="أدخل النص..." style="min-height:120px"></textarea></div>
+    <div class="fg"><label class="lbl">ترجمة إلى</label>
+    <select id="tr-l">
+      <option value="English">🇬🇧 الإنجليزية</option>
+      <option value="French">🇫🇷 الفرنسية</option>
+      <option value="Turkish">🇹🇷 التركية</option>
+      <option value="Urdu">🇵🇰 الأردية</option>
+      <option value="Chinese">🇨🇳 الصينية</option>
+    </select></div>
+    <button class="btn bp" onclick="runTrans()">🌐 ترجمة</button>
+    <div class="prog" id="trp"><div class="prog-inner"><span class="spin"></span><div class="prog-t">جاري الترجمة...</div></div></div>
+    <div id="trr" style="display:none;margin-top:14px;background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:14px;font-size:13px;line-height:1.9;color:var(--t2);direction:ltr;text-align:left"></div>
+  </div></div>
 </div>
 
-<!-- ═══ تحسين شامل ═══ -->
 <div class="page on" id="page-all">
   <div class="steps">
     <div class="stp on" id="s-all-1"><div class="stp-n">١</div><div class="stp-l">اختر المنتجات</div></div>
@@ -360,83 +343,79 @@ textarea{resize:vertical;min-height:75px}
     <div class="stp" id="s-all-3"><div class="stp-n">٣</div><div class="stp-l">المعاينة والموافقة</div></div>
   </div>
 
-  <!-- Step 1 -->
   <div id="all-s1">
     <div class="card">
-      <div class="ctip">اختر منتجاً أو أكثر ثم حدد ماذا تريد أن يتغير — الوصف، العنوان، SEO، الوسوم، أو كل شيء.</div>
+      <div class="ctip"><span>💡</span> اختر منتجاً أو أكثر لتحسين الوصف والعنوان وSEO والوسوم دفعة واحدة</div>
       <div class="cb">
         <div class="slbar">
           <input type="checkbox" class="pr-cb" id="all-a" onchange="saAll(this.checked)">
           <label for="all-a" style="font-size:11px;color:var(--t3);cursor:pointer">تحديد الكل</label>
-          <span class="slcnt" id="all-cnt" style="margin-right:auto">0 محدد</span>
+          <span class="slcnt" id="all-cnt">0 محدد</span>
+          <div class="slbar-actions">
+            <button class="slbar-btn" onclick="filterProds('all')">الكل</button>
+            <button class="slbar-btn" onclick="filterProds('no-desc')">بدون وصف</button>
+          </div>
         </div>
-        <div class="pl" id="all-pl">
-          <div style="padding:20px;text-align:center;color:var(--t3);font-size:12px">جاري تحميل المنتجات...</div>
-        </div>
+        <div class="pl" id="all-pl"><div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-title">جاري تحميل المنتجات...</div></div></div>
       </div>
     </div>
     <div class="brow"><button class="btn bp" onclick="goStep2()">التالي ←</button></div>
   </div>
 
-  <!-- Step 2 -->
   <div id="all-s2" style="display:none">
     <div class="card">
-      <div class="ch"><div class="ct">اختر ماذا تريد أن يتحسّن</div><div class="cd">كل خيار اختياري — فعّل ما تريده فقط</div></div>
+      <div class="ch"><div class="ct">خيارات التحسين</div><div class="cd">فعّل ما تريد — كل خيار اختياري</div></div>
       <div class="cb">
-        <div class="sh" style="margin-bottom:8px">الوصف</div>
+        <div class="sh">✍️ الوصف</div>
         <div class="trow">
-          <div class="ti"><div class="tl">✍️ كتابة وصف جديد</div><div class="th">يكتب وصفاً احترافياً من الصفر</div></div>
+          <div class="ti"><div class="tl">كتابة وصف احترافي جديد</div><div class="th">وصف كامل مع عناوين فرعية ونقاط مميزات</div></div>
           <label class="tog"><input type="checkbox" id="all-newdesc" checked><span class="ts"></span></label>
         </div>
         <div class="trow">
           <div style="width:100%;padding-top:6px">
-            <div class="fg"><label class="lbl">الأسلوب</label>
-            <select id="all-tone">
-              <option value="professional">احترافي</option>
-              <option value="youth">شبابي</option>
-              <option value="luxury">فاخر</option>
-              <option value="friendly">ودي</option>
-            </select></div>
-            <div class="fg"><label class="lbl">تعليمات إضافية (اختياري)</label>
-            <input type="text" id="all-inst" placeholder="مثال: ركز على الجودة، موجه للنساء..."></div>
+            <div class="frow">
+              <div class="fg"><label class="lbl">الأسلوب</label>
+              <select id="all-tone"><option value="professional">احترافي</option><option value="youth">شبابي</option><option value="luxury">فاخر</option><option value="friendly">ودي</option></select></div>
+              <div class="fg"><label class="lbl">تعليمات إضافية</label><input type="text" id="all-inst" placeholder="مثال: موجه للنساء..."></div>
+            </div>
           </div>
         </div>
-
-        <div class="sh" style="margin:10px 0 8px">العنوان</div>
+        <div class="sh" style="margin-top:6px">🔤 العنوان</div>
         <div class="trow">
-          <div class="ti"><div class="tl">🔤 تحسين عنوان المنتج</div><div class="th">يقترح عنواناً محسّناً لمحركات البحث</div></div>
+          <div class="ti"><div class="tl">تحسين عنوان المنتج</div><div class="th">يقترح 3 عناوين محسّنة لـ SEO لتختار منها</div></div>
           <label class="tog"><input type="checkbox" id="all-title" checked><span class="ts"></span></label>
         </div>
-
-        <div class="sh" style="margin:10px 0 8px">SEO</div>
+        <div class="sh" style="margin-top:6px">🔍 SEO</div>
         <div class="trow">
-          <div class="ti"><div class="tl">🔍 عنوان الصفحة (SEO Title)</div><div class="th">يحدّث عنوان الصفحة في محركات البحث</div></div>
+          <div class="ti"><div class="tl">عنوان الصفحة (SEO Title)</div><div class="th">يحدّث العنوان في نتائج Google</div></div>
           <label class="tog"><input type="checkbox" id="all-seotitle" checked><span class="ts"></span></label>
         </div>
         <div class="trow">
-          <div class="ti"><div class="tl">🔍 وصف الصفحة (Meta Description)</div><div class="th">يحدّث وصف الصفحة في محركات البحث</div></div>
+          <div class="ti"><div class="tl">وصف الصفحة (Meta Description)</div><div class="th">يحدّث الوصف في نتائج Google</div></div>
           <label class="tog"><input type="checkbox" id="all-seodesc" checked><span class="ts"></span></label>
         </div>
-
-        <div class="sh" style="margin:10px 0 8px">الوسوم</div>
+        <div class="sh" style="margin-top:6px">🏷️ الوسوم</div>
         <div class="trow">
-          <div class="ti"><div class="tl">🏷️ إضافة وسوم (Tags)</div><div class="th">يولّد ويضيف وسوماً قريبة من اسم المنتج</div></div>
+          <div class="ti"><div class="tl">إضافة وسوم (Tags)</div><div class="th">يولّد 5 وسوم مناسبة لكل منتج</div></div>
           <label class="tog"><input type="checkbox" id="all-tags" checked><span class="ts"></span></label>
         </div>
       </div>
     </div>
     <div class="brow">
       <button class="btn bs" onclick="gs(1)">← رجوع</button>
-      <button class="btn bp" onclick="gs(3);runAll()">توليد المعاينة ←</button>
+      <button class="btn bp" onclick="gs(3);runAll()">🚀 بدء التوليد ←</button>
     </div>
   </div>
 
-  <!-- Step 3 -->
   <div id="all-s3" style="display:none">
-    <div class="prog" id="all-prog"><span class="spin"></span><div class="prog-t" id="all-prog-t">جاري التوليد...</div></div>
-
+    <div class="prog" id="all-prog">
+      <div class="prog-inner">
+        <span class="spin"></span>
+        <div class="prog-t" id="all-prog-t">جاري التوليد...</div>
+        <div class="prog-bar-wrap"><div class="prog-bar" id="all-prog-bar"></div></div>
+      </div>
+    </div>
     <div id="all-results" style="display:none">
-      <!-- Upload action bar -->
       <div class="upload-bar">
         <div class="upload-bar-info" id="all-summary">جاهز للرفع</div>
         <div class="upload-bar-actions">
@@ -446,111 +425,87 @@ textarea{resize:vertical;min-height:75px}
         </div>
       </div>
       <div id="all-up-status" style="margin-bottom:12px"></div>
-
-      <!-- Cards grid -->
       <div class="results-grid" id="all-results-list"></div>
     </div>
   </div>
 </div>
 
-<!-- ═══ صفحات SEO ═══ -->
 <div class="page" id="page-seopages">
-  <div class="card">
-    <div class="ch"><div class="ct">📄 صفحات SEO تلقائية</div><div class="cd">يقترح صفحات فئات تجلب زيارات Google مجاناً</div></div>
-    <div class="cb">
-      <div class="fg"><label class="lbl">اسم المتجر</label><input type="text" id="sp-store" placeholder="مثال: متجر العطور الفاخرة"></div>
-      <div class="al ai" style="margin-bottom:12px">سيحلل منتجاتك ويقترح صفحات فئات مثل "عطور رجالية"</div>
-      <button class="btn bp" onclick="runSEOPages()" id="spbtn">📄 توليد الصفحات</button>
-      <div class="prog" id="spp"><span class="spin"></span><div class="prog-t">جاري التحليل...</div></div>
-      <div id="spr" style="display:none;margin-top:14px"><div id="sprl"></div></div>
-    </div>
-  </div>
+  <div class="page-header"><div class="page-header-title">📄 صفحات SEO تلقائية</div><div class="page-header-sub">يحلل منتجاتك ويقترح صفحات فئات تجلب زيارات مجانية من Google</div></div>
+  <div class="card"><div class="cb">
+    <div class="fg"><label class="lbl">اسم المتجر</label><input type="text" id="sp-store" placeholder="مثال: متجر العطور الفاخرة"></div>
+    <div class="al ai" style="margin-bottom:14px"><span>💡</span> سيقترح صفحات مثل "عطور رجالية فاخرة" لاستهداف كلمات مفتاحية جديدة</div>
+    <button class="btn bp" onclick="runSEOPages()" id="spbtn">📄 توليد الصفحات المقترحة</button>
+    <div class="prog" id="spp"><div class="prog-inner"><span class="spin"></span><div class="prog-t">جاري التحليل...</div></div></div>
+    <div id="spr" style="display:none;margin-top:16px"><div id="sprl"></div></div>
+  </div></div>
 </div>
 
-<!-- ═══ القوالب ═══ -->
 <div class="page" id="page-templates">
-  <div class="card">
-    <div class="ch"><div class="ct">📋 القوالب الجاهزة</div><div class="cd">اختر قالباً يناسب فئة منتجاتك</div></div>
-    <div class="cb">
-      <div id="tmpl-list" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
-      <div id="tmpl-selected" style="display:none;margin-top:14px">
-        <div class="al ag" id="tmpl-msg"></div>
-        <button class="btn bp" onclick="go('all')">← انتقل لتحسين شامل</button>
-      </div>
+  <div class="page-header"><div class="page-header-title">📋 القوالب الجاهزة</div><div class="page-header-sub">اختر قالباً يناسب فئة منتجاتك — يُطبَّق على خيارات التحسين تلقائياً</div></div>
+  <div class="card"><div class="cb">
+    <div id="tmpl-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px"></div>
+    <div id="tmpl-selected" style="display:none;margin-top:16px">
+      <div class="al ag"><span>✅</span><span id="tmpl-msg"></span></div>
+      <button class="btn bp" onclick="go('all')">← انتقل لتحسين شامل</button>
     </div>
-  </div>
+  </div></div>
 </div>
 
-</div><!-- content -->
-</div><!-- main -->
+</div></div>
+<div class="toast" id="toast"></div>
 
 <script>
-const B = window.location.origin;
-let prods = [];
-let selAll = {};       // idx → bool
-let allResults = [];   // [{product, data, status}]
+const B=window.location.origin;
+let prods=[],selAll={},allResults=[],usageCount=0;
+const pageTitle={all:'تحسين شامل',score:'تقييم SEO',social:'محتوى سوشال',blog:'مقالات AI',imggen:'توليد الصور',imgedit:'تحرير الصور',trans:'الترجمة',seopages:'صفحات SEO',templates:'القوالب'};
+const pageIcon={all:'⚡',score:'📊',social:'📱',blog:'📝',imggen:'🖼️',imgedit:'🎨',trans:'🌐',seopages:'📄',templates:'📋'};
+const pageTag={all:'أدوات المنتجات',score:'أدوات المنتجات',social:'التسويق',blog:'التسويق',imggen:'الصور',imgedit:'الصور',trans:'أدوات أخرى',seopages:'التسويق',templates:'أدوات أخرى'};
 
-const pageTitle = {all:'⚡ تحسين شامل',score:'📊 تقييم SEO',social:'📱 محتوى سوشال',blog:'📝 مقالات AI',imggen:'🖼️ توليد الصور',imgedit:'🎨 تحرير الصور',trans:'🌐 الترجمة',seopages:'📄 صفحات SEO',templates:'📋 القوالب'};
-
-// ─── INIT ───────────────────────────────
 async function init(){
-  const p=new URLSearchParams(window.location.search), t=p.get('token');
+  const p=new URLSearchParams(window.location.search),t=p.get('token');
   if(t){localStorage.setItem('st',t);window.history.replaceState({},'','/');}
-  await loadProds();
+  await loadProds(); loadUsage();
 }
 
-// Demo products used when backend not available
-const DEMO_PRODUCTS = [
-  {id:1, name:'جاكيت نسائي خفيف الوزن', price:{amount:84}, description:'جاكيت نسائي أنيق خفيف الوزن متوفر بألوان متعددة ومقاسات من S إلى XL'},
-  {id:2, name:'طاولة بلوت خشبية فاخرة', price:{amount:349}, description:'طاولة بلوت متينة وأنيقة من أجود أنواع الخشب الطبيعي'},
-  {id:3, name:'تيشيرت الهلال الجديد 2025', price:{amount:129}, description:'تيشيرت الهلال الرسمي الجديد لموسم 2025 بتصميم أنيق'},
-  {id:4, name:'عطر ورد الطائف الفاخر', price:{amount:599}, description:'عطر فاخر من ورد الطائف الأصيل، يدوم طويلاً'},
+const DEMO=[
+  {id:1,name:'جاكيت نسائي خفيف الوزن',price:{amount:84},description:'جاكيت نسائي أنيق خفيف الوزن'},
+  {id:2,name:'طاولة بلوت خشبية فاخرة',price:{amount:349},description:'طاولة بلوت متينة من الخشب الطبيعي'},
+  {id:3,name:'تيشيرت الهلال 2025',price:{amount:129},description:'تيشيرت الهلال الرسمي الجديد'},
+  {id:4,name:'عطر ورد الطائف',price:{amount:599},description:'عطر فاخر من ورد الطائف الأصيل'},
 ];
 
-async function safeJson(response){
-  const text=await response.text();
-  // If response is HTML (error page), throw descriptive error
-  if(text.trim().startsWith('<')){
-    throw new Error('الـ server غير متاح — تحقق من تشغيل Vercel');
-  }
-  return JSON.parse(text);
-}
+async function safeJson(r){const t=await r.text();if(t.trim().startsWith('<'))throw new Error('Server غير متاح');return JSON.parse(t);}
 
 async function loadProds(){
   const token=localStorage.getItem('st')||'demo';
-  if(token==='demo'){
-    prods=DEMO_PRODUCTS;
-    document.getElementById('sn').textContent=`${prods.length} منتج (تجريبي)`;
-    document.getElementById('pm').textContent=`${prods.length} منتج (تجريبي)`;
-    renderAllPL(); renderSelects(); return;
-  }
+  if(token==='demo'){prods=DEMO;document.getElementById('sn').textContent='تجريبي';document.getElementById('store-sub').textContent='ربط المتجر للبيانات الحقيقية';document.getElementById('pm').textContent=`${prods.length} منتج تجريبي`;renderAllPL();renderSelects();return;}
   try{
     const r=await fetch(`${B}/api/products`,{headers:{Authorization:`Bearer ${token}`}});
     const d=await safeJson(r);
-    prods=(d.products||[]).length ? d.products : DEMO_PRODUCTS;
+    prods=(d.products||[]).length?d.products:DEMO;
     document.getElementById('sn').textContent=`${prods.length} منتج`;
     document.getElementById('pm').textContent=`${prods.length} منتج`;
-    renderAllPL();
-    renderSelects();
-  }catch(e){
-    console.warn('loadProds fallback to demo:',e.message);
-    prods=DEMO_PRODUCTS;
-    document.getElementById('sn').textContent=`${prods.length} منتج (تجريبي)`;
-    document.getElementById('pm').textContent=`${prods.length} منتج (تجريبي)`;
-    renderAllPL(); renderSelects();
-  }
+    renderAllPL();renderSelects();
+  }catch(e){prods=DEMO;document.getElementById('sn').textContent='خطأ';renderAllPL();renderSelects();}
 }
 
-// ─── NAV ────────────────────────────────
+function loadUsage(){
+  usageCount=parseInt(localStorage.getItem('uc')||'0');
+  document.getElementById('usage-count').textContent=`${usageCount} عملية`;
+  document.getElementById('usage-fill').style.width=Math.min((usageCount/100)*100,100)+'%';
+}
+function incUsage(){usageCount++;localStorage.setItem('uc',usageCount);loadUsage();}
+
 function go(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.sb-it').forEach(i=>i.classList.remove('on'));
   document.getElementById('page-'+id)?.classList.add('on');
   document.getElementById('nav-'+id)?.classList.add('on');
-  document.getElementById('pt').textContent=pageTitle[id]||id;
+  document.getElementById('pt').textContent=`${pageIcon[id]||''} ${pageTitle[id]||id}`;
+  document.getElementById('pt-tag').textContent=pageTag[id]||'';
 }
 
-// ─── WIZARD STEPS ───────────────────────
 function gs(step){
   for(let i=1;i<=3;i++){
     document.getElementById(`all-s${i}`).style.display=i===step?'block':'none';
@@ -558,470 +513,326 @@ function gs(step){
     if(w){w.classList.remove('on','dn');if(i===step)w.classList.add('on');else if(i<step)w.classList.add('dn');}
   }
 }
-function goStep2(){
-  const n=Object.values(selAll).filter(Boolean).length;
-  if(!n){alert('اختر منتجاً على الأقل');return;}
-  gs(2);
-}
+function goStep2(){if(!Object.values(selAll).filter(Boolean).length){showToast('اختر منتجاً على الأقل','error');return;}gs(2);}
 
-// ─── PRODUCT LIST ────────────────────────
 function gp(p){if(!p.price)return'0';if(typeof p.price==='object')return p.price.amount||p.price.regular||'0';return p.price;}
 
-function renderAllPL(){
-  const el=document.getElementById('all-pl');
-  if(!el)return;
-  if(!prods.length){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--t3);font-size:12px">لا توجد منتجات — تأكد من ربط المتجر</div>';return;}
-  el.innerHTML=prods.map((p,i)=>{
+function renderAllPL(list){
+  const el=document.getElementById('all-pl');if(!el)return;
+  const items=list||prods;
+  if(!items.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-title">لا توجد منتجات</div></div>';return;}
+  el.innerHTML=items.map((p)=>{
+    const ri=prods.indexOf(p);if(ri===-1)return'';
     const img=p.images?.[0]?.url||p.thumbnail||'';
-    return`<div class="pr" id="all-p-${i}" onclick="togAll(${i})">
-      <input type="checkbox" class="pr-cb all-cb" data-i="${i}" onclick="event.stopPropagation();togAll(${i})">
-      ${img?`<img class="pr-img" src="${img}" alt="">`:'<div class="pr-img" style="display:flex;align-items:center;justify-content:center;font-size:18px">📦</div>'}
-      <div class="pr-info">
-        <div class="pr-n">${p.name}</div>
-        <div class="pr-p">${gp(p)} ر.س</div>
-      </div>
+    const hasDesc=!!(p.description&&p.description.length>20);
+    return`<div class="pr ${selAll[ri]?'sl':''}" id="all-p-${ri}" onclick="togAll(${ri})">
+      <input type="checkbox" class="pr-cb all-cb" data-i="${ri}" ${selAll[ri]?'checked':''} onclick="event.stopPropagation();togAll(${ri})">
+      ${img?`<img class="pr-img" src="${img}" alt="">`:'<div class="pr-img" style="display:flex;align-items:center;justify-content:center;font-size:16px">📦</div>'}
+      <div class="pr-info"><div class="pr-n">${p.name}</div><div class="pr-p">${gp(p)} ر.س</div></div>
+      <span class="pr-score ${hasDesc?'score-A':'score-F'}">${hasDesc?'✓':'!وصف'}</span>
     </div>`;
   }).join('');
 }
 
+function filterProds(type){
+  if(type==='all')renderAllPL();
+  else if(type==='no-desc')renderAllPL(prods.filter(p=>!p.description||p.description.length<20));
+}
+
 function togAll(idx){
-  const cb=document.querySelector(`.all-cb[data-i="${idx}"]`);
-  const el=document.getElementById(`all-p-${idx}`);
+  const cb=document.querySelector(`.all-cb[data-i="${idx}"]`),el=document.getElementById(`all-p-${idx}`);
   if(!cb||!el)return;
-  selAll[idx]=!selAll[idx];
-  cb.checked=selAll[idx];
-  el.classList.toggle('sl',selAll[idx]);
-  updAllCount();
+  selAll[idx]=!selAll[idx];cb.checked=selAll[idx];el.classList.toggle('sl',selAll[idx]);updAllCount();
 }
 function saAll(checked){
   document.querySelectorAll('.all-cb').forEach(cb=>{
-    const idx=parseInt(cb.dataset.i);
-    cb.checked=checked;
-    document.getElementById(`all-p-${idx}`)?.classList.toggle('sl',checked);
-    selAll[idx]=checked;
-  });
-  updAllCount();
+    const idx=parseInt(cb.dataset.i);cb.checked=checked;
+    document.getElementById(`all-p-${idx}`)?.classList.toggle('sl',checked);selAll[idx]=checked;
+  });updAllCount();
 }
-function updAllCount(){
-  const n=Object.values(selAll).filter(Boolean).length;
-  document.getElementById('all-cnt').textContent=`${n} محدد`;
-}
+function updAllCount(){document.getElementById('all-cnt').textContent=`${Object.values(selAll).filter(Boolean).length} محدد`;}
 
 function renderSelects(){
   ['soc-prod','bl-prods'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
-    const multi=el.multiple;
-    el.innerHTML=(multi?'':'<option value="">-- اختر --</option>')+prods.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
+    el.innerHTML=(el.multiple?'':'<option value="">-- اختر --</option>')+prods.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
   });
 }
 
-// ─── ALL-IN-ONE ─────────────────────────
 async function runAll(){
   const ps=Object.entries(selAll).filter(([,v])=>v).map(([i])=>prods[parseInt(i)]).filter(Boolean);
-  if(!ps.length){gs(1);alert('اختر منتجاً على الأقل');return;}
-
-  const doDesc    =document.getElementById('all-newdesc').checked;
-  const doTitle   =document.getElementById('all-title').checked;
+  if(!ps.length){gs(1);showToast('اختر منتجاً','error');return;}
+  const doDesc=document.getElementById('all-newdesc').checked;
+  const doTitle=document.getElementById('all-title').checked;
   const doSeoTitle=document.getElementById('all-seotitle').checked;
-  const doSeoDesc =document.getElementById('all-seodesc').checked;
-  const doTags    =document.getElementById('all-tags').checked;
-  const tone      =document.getElementById('all-tone').value;
-  const inst      =document.getElementById('all-inst').value;
-
-  // reset
+  const doSeoDesc=document.getElementById('all-seodesc').checked;
+  const doTags=document.getElementById('all-tags').checked;
+  const tone=document.getElementById('all-tone').value;
+  const inst=document.getElementById('all-inst').value;
+  incUsage(); // احسب الاستهلاك
   document.getElementById('all-prog').classList.add('on');
   document.getElementById('all-results').style.display='none';
+  document.getElementById('all-up-btn').disabled=false;
+  document.getElementById('all-up-btn').textContent='🚀 رفع الكل للمتجر';
+  document.getElementById('all-up-btn').className='btn bg';
+  document.getElementById('all-up-status').innerHTML='';
   allResults=[];
-
   for(let i=0;i<ps.length;i++){
     const p=ps[i];
     document.getElementById('all-prog-t').textContent=`${i+1}/${ps.length}: جاري تحليل "${p.name}"...`;
-
-    const result={product:p, data:{}, status:'pending'};
-
+    document.getElementById('all-prog-bar').style.width=Math.round((i/ps.length)*100)+'%';
+    const result={product:p,data:{},status:'pending'};
     try{
-      // 1) Description + SEO
       if(doDesc||doSeoTitle||doSeoDesc){
-        const d=await apiCall('/api/generate-description',{
-          name:p.name, currentDescription:p.description||'',
-          audience:'العملاء السعوديين', tone, instructions:inst, mode:'write'
-        });
-        console.log(`[${p.name}] desc response:`, JSON.stringify(d).substring(0,300));
+        const d=await apiCall('/api/generate-description',{name:p.name,currentDescription:p.description||'',audience:'العملاء السعوديين',tone,instructions:inst,mode:'write'});
         if(doDesc){result.data.description=d.description||'';result.data.descriptionHtml=d.descriptionHtml||'';}
-        if(doSeoTitle) result.data.seoTitle      =d.seoTitle||'';
-        if(doSeoDesc)  result.data.seoDescription=d.seoDescription||'';
+        if(doSeoTitle)result.data.seoTitle=d.seoTitle||'';
+        if(doSeoDesc)result.data.seoDescription=d.seoDescription||'';
         result.data.shortDescription=d.shortDescription||'';
-        result.data.features        =d.features||[];
-        result.data.tiktokCaption   =d.tiktokCaption||'';
+        result.data.features=d.features||[];
+        result.data.tiktokCaption=d.tiktokCaption||'';
       }
-
-      // 2) Title options
       if(doTitle){
         const t=await apiCall('/api/optimize-title',{name:p.name,description:p.description||''});
-        console.log(`[${p.name}] title response:`, t);
-        result.data.titleOptions =[t.title1,t.title2,t.title3].filter(Boolean);
+        result.data.titleOptions=[t.title1,t.title2,t.title3].filter(Boolean);
         result.data.selectedTitle=t.title1||p.name;
       }
-
-      // 3) Tags
       if(doTags){
         const tg=await apiCall('/api/generate-tags',{name:p.name,description:p.description||''});
         result.data.tags=tg.tags||[];
       }
-
-      result.status='ready';
-    }catch(e){
-      console.error(`[${p.name}] ERROR:`,e);
-      result.status='error'; result.error=e.message;
-    }
-
-    allResults.push(result);
-    // Update UI progressively
-    renderAllResults();
-    await delay(1200); // delay كافي بين المنتجات لتجنب rate limit
+      result.status='ready';incUsage();
+    }catch(e){result.status='error';result.error=e.message;}
+    allResults.push(result);renderAllResults();await delay(1200);
   }
-
+  document.getElementById('all-prog-bar').style.width='100%';
+  await delay(300);
   document.getElementById('all-prog').classList.remove('on');
   document.getElementById('all-results').style.display='block';
-  document.getElementById('all-summary').textContent=`✅ ${allResults.filter(r=>r.status==='ready').length} منتج جاهز للرفع`;
+  const ok=allResults.filter(r=>r.status==='ready').length;
+  document.getElementById('all-summary').textContent=`✅ ${ok} منتج جاهز — ${allResults.length-ok} خطأ`;
   renderAllResults();
 }
 
-// ─── RENDER CARDS ───────────────────────
 function renderAllResults(){
-  const container=document.getElementById('all-results-list');
-  if(!container)return;
-  container.innerHTML=allResults.map((r,ri)=>buildCard(r,ri)).join('');
+  const c=document.getElementById('all-results-list');if(!c)return;
+  c.innerHTML=allResults.map((r,ri)=>buildCard(r,ri)).join('');
   document.getElementById('all-results').style.display='block';
 }
 
 function buildCard(r,ri){
   const p=r.product;
   const img=p.images?.[0]?.url||p.thumbnail||'';
-  const imgHtml=img?`<img class="pcard-img" src="${img}" alt="">`:`<div class="pcard-img" style="display:flex;align-items:center;justify-content:center;font-size:20px">📦</div>`;
-
-  if(r.status==='error'){
-    return`<div class="pcard">
-      <div class="pcard-head">${imgHtml}<div class="pcard-name">${p.name}</div><span class="pcard-badge badge-err">خطأ</span></div>
-      <div class="pcard-body"><div class="al aw">❌ ${r.error}</div></div>
-    </div>`;
-  }
-  if(r.status==='pending'&&!r.data?.seoTitle&&!r.data?.description&&!r.data?.titleOptions){
-    return`<div class="pcard">
-      <div class="pcard-head">${imgHtml}<div class="pcard-name">${p.name}</div><span class="pcard-badge badge-loading">جاري...</span></div>
-      <div class="pcard-body" style="justify-content:center;align-items:center;min-height:80px"><span class="spin"></span></div>
-    </div>`;
-  }
-
+  const imgHtml=img?`<img class="pcard-img" src="${img}" alt="">`:`<div class="pcard-img" style="display:flex;align-items:center;justify-content:center;font-size:18px">📦</div>`;
+  if(r.status==='error')return`<div class="pcard"><div class="pcard-head">${imgHtml}<div class="pcard-info"><div class="pcard-name">${p.name}</div></div><span class="pcard-badge badge-err">خطأ</span></div><div class="pcard-body"><div class="al ar"><span>❌</span>${r.error}</div></div></div>`;
+  if(r.status==='pending'&&!r.data?.seoTitle&&!r.data?.description&&!r.data?.titleOptions)return`<div class="pcard"><div class="pcard-head">${imgHtml}<div class="pcard-info"><div class="pcard-name">${p.name}</div></div><span class="pcard-badge badge-loading">جاري...</span></div><div class="pcard-body" style="align-items:center;justify-content:center;min-height:80px"><span class="spin"></span></div></div>`;
   const d=r.data;
-
-  // SEO block
-  const seoHtml=d.seoTitle?`
-    <div class="seo-block">
-      <div class="seo-block-title">🔍 نتيجة SEO في Google</div>
-      <div class="seo-meta-title">${d.seoTitle}</div>
-      <div class="seo-meta-url">salla.sa › ${p.name.replace(/\s+/g,'-').toLowerCase().substring(0,30)}</div>
-      <div class="seo-meta-desc">${d.seoDescription||''}</div>
-    </div>`:'';
-
-  // Title options
-  const titleHtml=d.titleOptions?.length?`
-    <div class="title-block">
-      <div class="block-lbl">🔤 اختر العنوان الجديد</div>
-      ${d.titleOptions.map((t,ti)=>`
-        <div class="title-opt ${ti===0?'selected':''}" id="to-${ri}-${ti}" onclick="selectTitle(${ri},${ti})">
-          <span>${t}</span><span class="title-opt-len">${t.length} حرف</span>
-        </div>`).join('')}
-    </div>`:'';
-
-  // Short desc
+  const seoHtml=d.seoTitle?`<div class="seo-block"><div class="seo-block-label">🔍 معاينة Google</div><div class="seo-meta-title">${d.seoTitle}</div><div class="seo-meta-url">salla.sa › ${p.name.replace(/\s+/g,'-').toLowerCase().substring(0,25)}</div><div class="seo-meta-desc">${d.seoDescription||''}</div></div>`:'';
+  const titleHtml=d.titleOptions?.length?`<div class="title-block"><div class="block-lbl">🔤 اختر العنوان</div>${d.titleOptions.map((t,ti)=>`<div class="title-opt ${ti===0?'selected':''}" id="to-${ri}-${ti}" onclick="selectTitle(${ri},${ti})"><span>${t}</span><span class="title-opt-len">${t.length} حرف</span></div>`).join('')}</div>`:'';
   const shortHtml=d.shortDescription?`<div class="short-desc">${d.shortDescription}</div>`:'';
-
-  // Description
-  const descHtml=d.descriptionHtml||d.description?`
-    <div class="desc-block">
-      <div class="desc-block-head">
-        <span class="block-lbl">📝 الوصف الكامل</span>
-        <button class="desc-toggle" onclick="toggleDesc(${ri})">عرض المزيد ↓</button>
-      </div>
-      <div class="desc-content" id="desc-${ri}">${d.descriptionHtml||escHtml(d.description||'')}</div>
-    </div>`:'';
-
-  // Tags
-  const tagsHtml=d.tags?.length?`
-    <div class="tags-block">
-      <div class="block-lbl">🏷️ الوسوم المقترحة</div>
-      <div class="rtags">${d.tags.map(t=>`<span class="tpill">${t}</span>`).join('')}</div>
-    </div>`:'';
-
-  // TikTok
+  const descHtml=d.descriptionHtml||d.description?`<div class="desc-block"><div class="desc-block-head"><span class="block-lbl">📝 الوصف الكامل</span><button class="desc-toggle" onclick="toggleDesc(${ri})">عرض المزيد ↓</button></div><div class="desc-content" id="desc-${ri}">${d.descriptionHtml||escHtml(d.description||'')}</div></div>`:'';
+  const tagsHtml=d.tags?.length?`<div class="tags-block"><div class="block-lbl">🏷️ الوسوم</div><div class="rtags">${d.tags.map(t=>`<span class="tpill">${t}</span>`).join('')}</div></div>`:'';
   const ttHtml=d.tiktokCaption?`<div class="tiktok-pill">📱 ${d.tiktokCaption}</div>`:'';
-
-  // Status foot
-  const dotClass=r.status==='uploaded'?'uploaded':r.status==='error'?'err':'pending';
-  const dotLabel=r.status==='uploaded'?'تم الرفع':r.status==='uploading'?'جاري الرفع...':'لم يتم الرفع بعد';
-
+  const dotCls=r.status==='uploaded'?'uploaded':r.status==='uploading'?'uploading':r.status==='error'?'err':'pending';
+  const dotLabel=r.status==='uploaded'?'✅ تم الرفع':r.status==='uploading'?'جاري الرفع...':'لم يُرفع بعد';
   return`<div class="pcard" id="pcard-${ri}">
-    <div class="pcard-head">
-      ${imgHtml}
-      <div class="pcard-name">${p.name}</div>
-      <span class="pcard-badge badge-ready">جاهز</span>
-    </div>
-    <div class="pcard-body">
-      ${seoHtml}${titleHtml}${shortHtml}${descHtml}${tagsHtml}${ttHtml}
-    </div>
-    <div class="pcard-foot">
-      <div class="status-dot ${dotClass}" id="dot-${ri}"></div>
-      <span class="status-label" id="status-label-${ri}">${dotLabel}</span>
-      <button class="btn bs" style="font-size:10px;padding:4px 10px" onclick="uploadOne(${ri})">رفع هذا المنتج</button>
-    </div>
+    <div class="pcard-head">${imgHtml}<div class="pcard-info"><div class="pcard-name">${p.name}</div><div class="pcard-price">${gp(p)} ر.س</div></div><span class="pcard-badge badge-ready">جاهز</span></div>
+    <div class="pcard-body">${seoHtml}${titleHtml}${shortHtml}${descHtml}${tagsHtml}${ttHtml}</div>
+    <div class="pcard-foot"><div class="status-dot ${dotCls}" id="dot-${ri}"></div><span class="status-label" id="status-label-${ri}">${dotLabel}</span><button class="btn bs" style="font-size:10px;padding:4px 10px" onclick="uploadOne(${ri})">رفع ↑</button></div>
   </div>`;
 }
 
 function selectTitle(ri,ti){
-  const r=allResults[ri]; if(!r?.data?.titleOptions)return;
+  const r=allResults[ri];if(!r?.data?.titleOptions)return;
   r.data.selectedTitle=r.data.titleOptions[ti];
-  r.data.titleOptions.forEach((_,i)=>{
-    const el=document.getElementById(`to-${ri}-${i}`);
-    if(el)el.classList.toggle('selected',i===ti);
-  });
+  r.data.titleOptions.forEach((_,i)=>document.getElementById(`to-${ri}-${i}`)?.classList.toggle('selected',i===ti));
 }
-
 function toggleDesc(ri){
   const el=document.getElementById(`desc-${ri}`);
   const btn=el?.previousElementSibling?.querySelector('.desc-toggle');
-  if(!el)return;
-  const expanded=el.classList.toggle('desc-full');
-  if(btn)btn.textContent=expanded?'طي ↑':'عرض المزيد ↓';
+  if(!el)return;const exp=el.classList.toggle('desc-full');
+  if(btn)btn.textContent=exp?'طي ↑':'عرض المزيد ↓';
 }
-
 function escHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
 
-// ─── UPLOAD ALL ──────────────────────────
 async function uploadAll(){
   const token=localStorage.getItem('st');
-  if(!token||token==='demo'){alert('لم يتم ربط المتجر — اضغط "إعادة ربط المتجر"');return;}
+  if(!token||token==='demo'){showToast('لم يتم ربط المتجر','error');return;}
   const btn=document.getElementById('all-up-btn');
-  btn.disabled=true; btn.textContent='جاري الرفع...';
-  for(let ri=0;ri<allResults.length;ri++){
-    if(allResults[ri].status!=='ready')continue;
-    await uploadOne(ri,token);
-    await delay(1500); // delay بين رفع كل منتج
-  }
+  btn.disabled=true;btn.textContent='جاري الرفع...';
+  for(let ri=0;ri<allResults.length;ri++){if(allResults[ri].status!=='ready')continue;await uploadOne(ri,token);await delay(1500);}
   const ok=allResults.filter(r=>r.status==='uploaded').length;
-  btn.textContent=`✅ تم رفع ${ok} منتج`; btn.className='btn bg'; btn.disabled=false;
+  btn.textContent=`✅ تم رفع ${ok} منتج`;btn.className='btn bg';btn.disabled=false;
+  showToast(`✅ تم رفع ${ok} منتج`,'success');
 }
 
 async function uploadOne(ri,token){
   token=token||localStorage.getItem('st');
-  if(!token||token==='demo'){alert('لم يتم ربط المتجر');return;}
-  const r=allResults[ri]; if(!r||r.status==='uploaded')return;
-  const d=r.data;
-  setCardStatus(ri,'uploading','جاري الرفع...');
+  if(!token||token==='demo'){showToast('لم يتم ربط المتجر','error');return;}
+  const r=allResults[ri];if(!r||r.status==='uploaded')return;
+  const d=r.data;setCardStatus(ri,'uploading','جاري الرفع...');
   try{
-    const payload={productId:r.product.id,token};
-    if(d.descriptionHtml) payload.descriptionHtml=d.descriptionHtml;
-    else if(d.description) payload.description=d.description;
-    if(d.seoTitle)       payload.seoTitle=d.seoTitle;
-    if(d.seoDescription) payload.seoDescription=d.seoDescription;
-    if(d.selectedTitle&&d.selectedTitle!==r.product.name) payload.name=d.selectedTitle;
-    await apiCall('/api/update-product',payload);
-    if(d.tags?.length) await apiCall('/api/add-tags',{productId:r.product.id,tags:d.tags,token});
-    allResults[ri].status='uploaded';
-    setCardStatus(ri,'uploaded','✅ تم الرفع');
-  }catch(e){
-    console.error('uploadOne error:',e);
-    setCardStatus(ri,'err','❌ فشل: '+e.message);
-  }
+    const pl={productId:r.product.id,token};
+    if(d.descriptionHtml)pl.descriptionHtml=d.descriptionHtml;else if(d.description)pl.description=d.description;
+    if(d.seoTitle)pl.seoTitle=d.seoTitle;if(d.seoDescription)pl.seoDescription=d.seoDescription;
+    if(d.selectedTitle&&d.selectedTitle!==r.product.name)pl.name=d.selectedTitle;
+    await apiCall('/api/update-product',pl);
+    if(d.tags?.length)await apiCall('/api/add-tags',{productId:r.product.id,tags:d.tags,token});
+    allResults[ri].status='uploaded';setCardStatus(ri,'uploaded','✅ تم الرفع');
+  }catch(e){setCardStatus(ri,'err','❌ '+e.message);}
 }
 
 function setCardStatus(ri,cls,label){
-  document.getElementById(`dot-${ri}`)?.classList.replace('pending',cls)||document.getElementById(`dot-${ri}`)?.classList.replace('uploading',cls);
-  const d=document.getElementById(`dot-${ri}`);
-  if(d){d.className=`status-dot ${cls}`;}
-  const l=document.getElementById(`status-label-${ri}`);
-  if(l)l.textContent=label;
+  const d=document.getElementById(`dot-${ri}`);if(d)d.className=`status-dot ${cls}`;
+  const l=document.getElementById(`status-label-${ri}`);if(l)l.textContent=label;
 }
 
-// ─── API ─────────────────────────────────
-async function apiCall(endpoint,body){
-  const r=await fetch(`${B}${endpoint}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const text=await r.text();
-  if(text.trim().startsWith('<')){
-    throw new Error(`Server غير متاح (${endpoint}) — تأكد أن Vercel يعمل`);
-  }
-  const data=JSON.parse(text);
-  if(data.error) throw new Error(data.error);
-  return data;
+async function apiCall(ep,body){
+  const r=await fetch(`${B}${ep}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const text=await r.text();if(text.trim().startsWith('<'))throw new Error('Server غير متاح');
+  const data=JSON.parse(text);if(data.error)throw new Error(data.error);return data;
 }
 function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+function showToast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast on ${type}`;setTimeout(()=>t.classList.remove('on'),3000);}
 
-// ─── SEO SCORE ───────────────────────────
 async function runScore(){
-  const btn=document.getElementById('scbtn'); btn.disabled=true;
+  const btn=document.getElementById('scbtn');btn.disabled=true;
   document.getElementById('scp').classList.add('on');
   try{
     const d=await apiCall('/api/seo-score',{products:prods});
     document.getElementById('scp').classList.remove('on');
     document.getElementById('scr').style.display='block';
-    const gc={'A+':'score-A','A':'score-A','B':'score-B','C':'score-C','D':'score-D','F':'score-F'};
-    document.getElementById('scrl').innerHTML=`<div class="score-grid">${d.results.map(r=>`
-      <div class="score-card">
-        <div class="sn">${r.name}</div>
-        <div class="sg ${gc[r.grade]||'score-F'}">${r.grade} — ${r.score}%</div>
-        <div class="si">${r.issues.slice(0,2).join(' • ')}</div>
-      </div>`).join('')}</div>`;
-  }catch(e){document.getElementById('scp').classList.remove('on');alert('خطأ: '+e.message);}
+    const gc={'A+':'score-Ap','A':'score-A','B':'score-B','C':'score-C','D':'score-D','F':'score-F'};
+    const avg=Math.round(d.results.reduce((s,r)=>s+r.score,0)/d.results.length);
+    document.getElementById('scrl').innerHTML=`<div class="al ${avg>=70?'ag':avg>=50?'aw':'ar'}" style="margin-bottom:14px"><span>${avg>=70?'🎉':avg>=50?'⚠️':'🔴'}</span>متوسط SEO: <strong>${avg}%</strong> — ${avg>=70?'ممتاز':avg>=50?'جيد':'يحتاج تحسين'}</div><div class="score-grid">${d.results.map(r=>`<div class="score-card"><div class="sn">${r.name}</div><div class="sg ${gc[r.grade]||'score-F'}">${r.grade} — ${r.score}%</div><div class="si">${r.issues.slice(0,2).join(' • ')}</div></div>`).join('')}</div>`;
+  }catch(e){document.getElementById('scp').classList.remove('on');showToast('خطأ: '+e.message,'error');}
   btn.disabled=false;
 }
 
-// ─── SOCIAL ──────────────────────────────
 async function runSocial(){
   const idx=document.getElementById('soc-prod').value;
   const name=idx!==''?prods[idx]?.name:document.getElementById('soc-name').value;
   const desc=idx!==''?prods[idx]?.description:document.getElementById('soc-desc').value;
-  if(!name)return alert('اختر منتجاً أو أدخل اسمه');
-  const btn=document.getElementById('socbtn'); btn.disabled=true;
-  document.getElementById('socp').classList.add('on');
-  document.getElementById('socr').style.display='none';
+  if(!name){showToast('اختر منتجاً أو أدخل اسمه','error');return;}
+  const btn=document.getElementById('socbtn');btn.disabled=true;
+  document.getElementById('socp').classList.add('on');document.getElementById('socr').style.display='none';
   try{
     const d=await apiCall('/api/generate-social',{name,description:desc||''});
-    document.getElementById('socp').classList.remove('on');
-    document.getElementById('socr').style.display='block';
-    document.getElementById('socr').innerHTML=[
-      {label:'📸 Instagram',text:d.instagram},
-      {label:'🎵 TikTok',text:d.tiktok},
-      {label:'🐦 X (Twitter)',text:d.twitter},
-      {label:'#️⃣ هاشتاقات',text:d.hashtags}
-    ].map(item=>`<div class="soc-card">
-      <div class="soc-plat">${item.label}</div>
-      <div class="soc-txt">${item.text||''}</div>
-      <button class="soc-copy" onclick="copyTxt(this,'${encodeURIComponent(item.text||'')}')">نسخ</button>
-    </div>`).join('');
-  }catch(e){document.getElementById('socp').classList.remove('on');alert('خطأ: '+e.message);}
+    document.getElementById('socp').classList.remove('on');document.getElementById('socr').style.display='block';
+    document.getElementById('socr').innerHTML=`<div class="soc-grid">${[{label:'📸 Instagram',text:d.instagram},{label:'🎵 TikTok',text:d.tiktok},{label:'🐦 X (Twitter)',text:d.twitter},{label:'#️⃣ هاشتاقات',text:d.hashtags}].map(item=>`<div class="soc-card"><div class="soc-plat">${item.label}</div><div class="soc-txt">${item.text||''}</div><button class="soc-copy" onclick="copyTxt(this,'${encodeURIComponent(item.text||'')}')">نسخ</button></div>`).join('')}</div>`;
+    incUsage();
+  }catch(e){document.getElementById('socp').classList.remove('on');showToast('خطأ: '+e.message,'error');}
   btn.disabled=false;
 }
 function copyTxt(btn,enc){navigator.clipboard.writeText(decodeURIComponent(enc));btn.textContent='✅ تم';setTimeout(()=>btn.textContent='نسخ',2000);}
 
-// ─── BLOG ────────────────────────────────
 async function runBlog(){
-  const store=document.getElementById('bl-store').value;
-  const topic=document.getElementById('bl-topic').value;
-  if(!store||!topic)return alert('أدخل اسم المتجر والموضوع');
-  const selectedIdxs=[...document.getElementById('bl-prods').selectedOptions].map(o=>parseInt(o.value));
-  const selProds=selectedIdxs.map(i=>prods[i]).filter(Boolean);
-  const btn=document.getElementById('blbtn'); btn.disabled=true;
-  document.getElementById('blp').classList.add('on');
-  document.getElementById('blr').style.display='none';
+  const store=document.getElementById('bl-store').value,topic=document.getElementById('bl-topic').value;
+  if(!store||!topic){showToast('أدخل اسم المتجر والموضوع','error');return;}
+  const selProds=[...document.getElementById('bl-prods').selectedOptions].map(o=>prods[parseInt(o.value)]).filter(Boolean);
+  const btn=document.getElementById('blbtn');btn.disabled=true;
+  document.getElementById('blp').classList.add('on');document.getElementById('blr').style.display='none';
   try{
     const d=await apiCall('/api/generate-blog',{storeName:store,topic,products:selProds});
-    document.getElementById('blp').classList.remove('on');
-    document.getElementById('blr').style.display='block';
+    document.getElementById('blp').classList.remove('on');document.getElementById('blr').style.display='block';
     const full=[d.title,d.intro,d.body,d.conclusion].join('\n\n');
-    document.getElementById('blr').innerHTML=`<div class="blog-prev">
-      <div class="blog-title">${d.title}</div>
-      <div style="font-size:10px;color:var(--t3);margin-bottom:10px">وصف SEO: ${d.meta}</div>
-      <div class="blog-body">${d.intro}\n\n${d.body}\n\n${d.conclusion}</div>
-      <div style="margin-top:10px"><button class="soc-copy" onclick="copyTxt(this,'${encodeURIComponent(full)}')">نسخ المقالة كاملة</button></div>
-    </div>`;
-  }catch(e){document.getElementById('blp').classList.remove('on');alert('خطأ: '+e.message);}
+    document.getElementById('blr').innerHTML=`<div class="blog-prev"><div class="blog-title">${d.title}</div><div class="blog-meta">وصف SEO: ${d.meta}</div><div class="blog-body">${d.intro}\n\n${d.body}\n\n${d.conclusion}</div><div style="margin-top:12px"><button class="soc-copy" onclick="copyTxt(this,'${encodeURIComponent(full)}')">نسخ المقالة</button></div></div>`;
+    incUsage();
+  }catch(e){document.getElementById('blp').classList.remove('on');showToast('خطأ: '+e.message,'error');}
   btn.disabled=false;
 }
 
-// ─── IMAGE GEN ───────────────────────────
 async function genImg(){
-  const name=document.getElementById('ig-n').value;if(!name)return alert('أدخل اسم المنتج');
-  const btn=document.querySelector('#page-imggen .bp'); btn.disabled=true;
-  document.getElementById('igp').classList.add('on'); document.getElementById('igr').style.display='none';
+  const name=document.getElementById('ig-n').value;if(!name){showToast('أدخل اسم المنتج','error');return;}
+  const btn=document.querySelector('#page-imggen .bp');btn.disabled=true;
+  document.getElementById('igp').classList.add('on');document.getElementById('igr').style.display='none';
   try{
     const d=await apiCall('/api/generate-image',{name,prompt:document.getElementById('ig-p').value,style:document.getElementById('ig-s').value});
     if(d.imageUrl){document.getElementById('ig-img').src=d.imageUrl;document.getElementById('ig-dl').href=d.imageUrl;document.getElementById('igr').style.display='block';}
-    else alert('خطأ: '+(d.error||''));
-  }catch(e){alert('خطأ: '+e.message);}
-  btn.disabled=false; document.getElementById('igp').classList.remove('on');
+    else showToast('خطأ: '+(d.error||''),'error');
+  }catch(e){showToast('خطأ: '+e.message,'error');}
+  btn.disabled=false;document.getElementById('igp').classList.remove('on');
 }
 
-// ─── EDIT IMAGE ──────────────────────────
 async function editImg(){
   const file=document.getElementById('ie-f').files[0],prompt=document.getElementById('ie-p').value;
-  if(!file||!prompt)return alert('ارفع صورة وأدخل التعديل');
-  const btn=document.querySelector('#page-imgedit .bp'); btn.disabled=true;
+  if(!file||!prompt){showToast('ارفع صورة وأدخل التعديل','error');return;}
+  const btn=document.querySelector('#page-imgedit .bp');btn.disabled=true;
   document.getElementById('iep').classList.add('on');
-  const fd=new FormData(); fd.append('image',file); fd.append('prompt',prompt);
+  const fd=new FormData();fd.append('image',file);fd.append('prompt',prompt);
   try{
     const r=await fetch(`${B}/api/edit-image`,{method:'POST',body:fd});
     const d=await r.json();
     if(d.imageUrl){document.getElementById('ie-img').src=d.imageUrl;document.getElementById('ie-dl').href=d.imageUrl;document.getElementById('ier').style.display='block';}
-  }catch(e){alert('خطأ: '+e.message);}
-  btn.disabled=false; document.getElementById('iep').classList.remove('on');
+  }catch(e){showToast('خطأ: '+e.message,'error');}
+  btn.disabled=false;document.getElementById('iep').classList.remove('on');
 }
 
-// ─── TRANSLATE ───────────────────────────
 async function runTrans(){
-  const text=document.getElementById('tr-t').value; if(!text)return alert('أدخل النص');
-  const btn=document.querySelector('#page-trans .bp'); btn.disabled=true;
-  document.getElementById('trp').classList.add('on'); document.getElementById('trr').style.display='none';
+  const text=document.getElementById('tr-t').value;if(!text){showToast('أدخل النص','error');return;}
+  const btn=document.querySelector('#page-trans .bp');btn.disabled=true;
+  document.getElementById('trp').classList.add('on');document.getElementById('trr').style.display='none';
   try{
     const d=await apiCall('/api/translate',{text,language:document.getElementById('tr-l').value});
     if(d.translation){document.getElementById('trr').textContent=d.translation;document.getElementById('trr').style.display='block';}
-  }catch(e){alert('خطأ: '+e.message);}
-  btn.disabled=false; document.getElementById('trp').classList.remove('on');
+    incUsage();
+  }catch(e){showToast('خطأ: '+e.message,'error');}
+  btn.disabled=false;document.getElementById('trp').classList.remove('on');
 }
 
-// ─── SEO PAGES ───────────────────────────
 async function runSEOPages(){
   const store=document.getElementById('sp-store').value||'المتجر';
-  const btn=document.getElementById('spbtn'); btn.disabled=true;
+  const btn=document.getElementById('spbtn');btn.disabled=true;
   document.getElementById('spp').classList.add('on');
   try{
     const d=await apiCall('/api/seo-pages',{products:prods,storeName:store});
-    document.getElementById('spp').classList.remove('on');
-    document.getElementById('spr').style.display='block';
-    document.getElementById('sprl').innerHTML=(d.pages||[]).map(p=>`
-      <div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:7px">${p.title}<span style="font-size:9px;padding:2px 7px;border-radius:100px;background:rgba(34,211,160,.12);color:var(--gr);font-weight:700">مقترح</span></div>
-        <div style="font-size:11px;color:var(--gr);margin-bottom:4px">/${p.url||''}</div>
-        <div style="font-size:11px;color:var(--t2)">${p.description||''}</div>
-      </div>`).join('');
-  }catch(e){document.getElementById('spp').classList.remove('on');alert('خطأ: '+e.message);}
+    document.getElementById('spp').classList.remove('on');document.getElementById('spr').style.display='block';
+    document.getElementById('sprl').innerHTML=(d.pages||[]).map((p,i)=>`<div class="card" style="margin-bottom:8px"><div class="cb" style="padding:14px 16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:12px;font-weight:700">${p.title}</span><span style="font-size:9px;padding:2px 7px;border-radius:100px;background:rgba(34,211,160,.12);color:var(--gr);font-weight:700">مقترح ${i+1}</span></div><div style="font-size:11px;color:var(--gr);margin-bottom:5px">/${p.url||''}</div><div style="font-size:11px;color:var(--t2)">${p.description||''}</div></div></div>`).join('');
+  }catch(e){document.getElementById('spp').classList.remove('on');showToast('خطأ: '+e.message,'error');}
   btn.disabled=false;
 }
 
-// ─── TEMPLATES ───────────────────────────
 const DEMO_TEMPLATES=[
-  {id:'fashion',    name:'👗 ملابس وأزياء',        tone:'youth',        instructions:'ركز على الأناقة والتناسق، اذكر المقاسات والألوان، أسلوب شبابي'},
-  {id:'electronics',name:'📱 إلكترونيات',           tone:'professional', instructions:'ركز على المواصفات التقنية والأداء، اذكر الضمان، أسلوب احترافي'},
-  {id:'perfume',    name:'🌸 عطور ومستحضرات',       tone:'luxury',       instructions:'ركز على الرائحة والثبات، اجعله فاخراً شاعرياً، اذكر المناسبات'},
-  {id:'food',       name:'🍃 غذاء وصحة',            tone:'friendly',     instructions:'ركز على الفوائد الصحية والمكونات الطبيعية، أسلوب ودي'},
-  {id:'home',       name:'🏠 منزل وديكور',          tone:'professional', instructions:'ركز على الجودة والتصميم، اذكر الأبعاد والمواد'},
-  {id:'jewelry',    name:'💍 مجوهرات',              tone:'luxury',       instructions:'ركز على المواد والتصميم الفريد، اذكر المناسبات والهدايا'},
+  {id:'fashion',name:'👗 ملابس وأزياء',tone:'youth',instructions:'ركز على الأناقة والتناسق، اذكر المقاسات والألوان'},
+  {id:'electronics',name:'📱 إلكترونيات',tone:'professional',instructions:'ركز على المواصفات التقنية، اذكر الضمان'},
+  {id:'perfume',name:'🌸 عطور',tone:'luxury',instructions:'ركز على الرائحة والثبات، أسلوب فاخر شاعري'},
+  {id:'food',name:'🍃 غذاء وصحة',tone:'friendly',instructions:'ركز على الفوائد الصحية والمكونات الطبيعية'},
+  {id:'home',name:'🏠 منزل وديكور',tone:'professional',instructions:'ركز على الجودة والتصميم، اذكر الأبعاد'},
+  {id:'jewelry',name:'💍 مجوهرات',tone:'luxury',instructions:'ركز على المواد والتصميم الفريد، اذكر المناسبات'},
 ];
 async function loadTemplates(){
   let templates=DEMO_TEMPLATES;
-  try{
-    const r=await fetch(`${B}/api/templates`);
-    const text=await r.text();
-    if(!text.trim().startsWith('<')){
-      const d=JSON.parse(text);
-      if(d.templates?.length) templates=d.templates;
-    }
-  }catch(e){console.warn('loadTemplates: using demo',e.message);}
-  document.getElementById('tmpl-list').innerHTML=templates.map(t=>`
-    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px;cursor:pointer" onclick="applyTemplate('${encodeURIComponent(t.instructions)}','${t.tone}','${t.name}')">
-      <div style="font-size:14px;margin-bottom:4px">${t.name}</div>
-      <div style="font-size:10px;color:var(--t3)">انقر للتطبيق</div>
-    </div>`).join('');
+  try{const r=await fetch(`${B}/api/templates`);const text=await r.text();if(!text.trim().startsWith('<')){const d=JSON.parse(text);if(d.templates?.length)templates=d.templates;}}catch(e){}
+  document.getElementById('tmpl-list').innerHTML=templates.map(t=>`<div class="card" style="cursor:pointer" onclick="applyTemplate('${encodeURIComponent(t.instructions)}','${t.tone}','${t.name}')"><div class="cb" style="padding:14px 16px"><div style="font-size:16px;margin-bottom:6px">${t.name}</div><div style="font-size:10px;color:var(--t3);margin-bottom:6px">أسلوب: ${t.tone==='professional'?'احترافي':t.tone==='youth'?'شبابي':t.tone==='luxury'?'فاخر':'ودي'}</div><div style="font-size:10px;color:var(--ac)">انقر للتطبيق ←</div></div></div>`).join('');
 }
 function applyTemplate(enc,tone,name){
   const el=document.getElementById('all-inst'),toneEl=document.getElementById('all-tone');
-  if(el)el.value=decodeURIComponent(enc);
-  if(toneEl)toneEl.value=tone;
+  if(el)el.value=decodeURIComponent(enc);if(toneEl)toneEl.value=tone;
   document.getElementById('tmpl-selected').style.display='block';
-  document.getElementById('tmpl-msg').textContent=`✅ تم تطبيق قالب: ${name}`;
+  document.getElementById('tmpl-msg').textContent=`تم تطبيق: ${name}`;
+  showToast(`✅ تم تطبيق قالب ${name}`,'success');
 }
 
-// ─── BOOT ────────────────────────────────
-document.addEventListener('DOMContentLoaded',()=>{init();loadTemplates();go('all');});
+// ─── USAGE BAR ──────────────────────────
+function updateUsageBar(){
+  const used=parseInt(localStorage.getItem('usage_count')||'0');
+  const plan=localStorage.getItem('user_plan')||'free';
+  const limits={free:10,pro:200,enterprise:99999};
+  const limit=limits[plan]||10;
+  const pct=Math.min(100,Math.round(used/limit*100));
+  const el=document.getElementById('usage-fill');
+  const txt=document.getElementById('usage-txt');
+  const lbl=document.getElementById('usage-plan-lbl');
+  if(el){el.style.width=pct+'%';el.style.background=pct>80?'linear-gradient(90deg,var(--yw),var(--rd))':pct>50?'linear-gradient(90deg,var(--ac),var(--yw))':'linear-gradient(90deg,var(--ac),var(--ac2))';}
+  if(txt)txt.textContent=`${used} / ${limit===99999?'∞':limit}`;
+  if(lbl)lbl.textContent=plan==='free'?'خطة مجانية':plan==='pro'?'⭐ خطة Pro':'💎 Enterprise';
+}
+function incUsage(){
+  localStorage.setItem('usage_count',(parseInt(localStorage.getItem('usage_count')||'0')+1));
+  updateUsageBar();
+}
+
+document.addEventListener('DOMContentLoaded',()=>{init();loadTemplates();go('all');updateUsageBar();});
 </script>
 </body>
 </html>
