@@ -20,11 +20,13 @@ app.get('/', (req, res) => {
   fs.existsSync(f) ? res.sendFile(f) : res.send('<h1>ذكاء المتجر</h1>');
 });
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai  = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const REDIRECT_URI = 'https://salla-ai-app-indol.vercel.app/auth/callback';
 
-// ===== HELPERS =====
+// ─────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────
 function getToken(req) {
   return req.headers.authorization?.replace('Bearer ', '') || req.body?.token || '';
 }
@@ -43,35 +45,71 @@ async function sallaUpdate(productId, data, token) {
   return r.data;
 }
 
-function textToHtml(text) {
+// ─────────────────────────────────────────
+// EXTRACT HELPER  — robust triple-strategy
+// ─────────────────────────────────────────
+function extractSection(text, key) {
+  // Strategy 1: ###KEY### delimiter
+  let m = text.match(new RegExp(`###${key}###\\s*\\n([\\s\\S]+?)(?=\\n###[A-Z0-9_]+###|$)`));
+  if (m && m[1].trim()) return m[1].trim();
+
+  // Strategy 2: KEY:\n multi-line
+  m = text.match(new RegExp(`(?:^|\\n)${key}:\\s*\\n([\\s\\S]+?)(?=\\n[A-Z0-9_]+:|$)`, 'm'));
+  if (m && m[1].trim()) return m[1].trim();
+
+  // Strategy 3: KEY: single line
+  m = text.match(new RegExp(`(?:^|\\n)${key}:\\s*([^\\n]+)`, 'm'));
+  return m ? m[1].trim() : '';
+}
+
+// ─────────────────────────────────────────
+// CONVERT PLAIN TEXT → RICH HTML
+// ─────────────────────────────────────────
+function descriptionToHtml(text) {
   if (!text) return '';
-  const sections = text.split('\n\n').filter(s => s.trim());
+  const lines = text.split('\n');
   let html = '';
-  let featuresAdded = false;
+  let inList = false;
 
-  for (let i = 0; i < sections.length; i++) {
-    const s = sections[i].trim();
-    const lines = s.split('\n');
-    const isList = lines.some(l => l.trim().startsWith('- '));
+  for (let line of lines) {
+    line = line.trim();
+    if (!line) {
+      if (inList) { html += '</ul>'; inList = false; }
+      continue;
+    }
 
-    if (isList) {
-      const items = lines.filter(l => l.trim().startsWith('- ')).map(l => l.replace(/^-\s*/, '').trim());
-      if (!featuresAdded) {
-        html += `<h3 style="font-size:16px;font-weight:700;margin:16px 0 8px;">مميزات المنتج</h3>`;
-        featuresAdded = true;
+    // Bullet point
+    if (line.startsWith('- ') || line.startsWith('• ')) {
+      if (!inList) {
+        html += '<ul style="padding-right:20px;margin:10px 0;">';
+        inList = true;
       }
-      html += `<ul style="padding-right:20px;margin-bottom:12px;">${items.map(item => `<li style="margin-bottom:6px;line-height:1.7;">${item}</li>`).join('')}</ul>`;
-    } else if (i === 0) {
-      html += `<p style="font-size:16px;font-weight:600;line-height:1.8;margin-bottom:16px;">${s}</p>`;
+      html += `<li style="margin-bottom:6px;line-height:1.8;color:#444;">${line.replace(/^[-•]\s*/, '')}</li>`;
+      continue;
+    }
+
+    if (inList) { html += '</ul>'; inList = false; }
+
+    // Heading: line ends with : or wrapped in ** or is short (< 50 chars, no period)
+    const isHeading = (line.endsWith(':') && line.length < 60)
+      || /^\*\*(.+)\*\*$/.test(line)
+      || (line.length < 55 && !line.endsWith('.') && !line.endsWith('،'));
+
+    if (isHeading) {
+      const clean = line.replace(/\*\*/g, '').replace(/:$/, '');
+      html += `<h3 style="font-size:16px;font-weight:700;color:#222;margin:18px 0 8px;">${clean}</h3>`;
     } else {
-      html += `<p style="font-size:14px;line-height:1.9;margin-bottom:14px;">${s}</p>`;
+      html += `<p style="font-size:14px;line-height:1.9;color:#444;margin-bottom:12px;">${line.replace(/\*\*/g, '<strong>').replace(/\*\*/g, '</strong>')}</p>`;
     }
   }
+
+  if (inList) html += '</ul>';
   return html;
 }
 
-
-// ===== AUTH =====
+// ─────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────
 app.get('/auth/salla', (req, res) => {
   const state = Math.random().toString(36).substring(2, 15);
   res.redirect(`https://accounts.salla.sa/oauth2/auth?client_id=${process.env.SALLA_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=offline_access&state=${state}`);
@@ -97,14 +135,16 @@ app.get('/auth/callback', async (req, res) => {
   }
 });
 
-// ===== PRODUCTS =====
+// ─────────────────────────────────────────
+// PRODUCTS
+// ─────────────────────────────────────────
 app.get('/api/products', async (req, res) => {
   try {
     const token = getToken(req);
     if (!token || token === 'demo') {
       return res.json({ products: [
-        { id: 1, name: 'منتج تجريبي', price: { amount: 99 }, description: 'وصف قصير' },
-        { id: 2, name: 'منتج آخر', price: { amount: 149 }, description: '' }
+        { id: 1, name: 'منتج تجريبي', price: { amount: 99 },  description: 'وصف قصير' },
+        { id: 2, name: 'منتج آخر',    price: { amount: 149 }, description: '' }
       ]});
     }
     const data = await sallaGet('products?per_page=50', token);
@@ -114,7 +154,9 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// ===== SEO SCORE =====
+// ─────────────────────────────────────────
+// SEO SCORE
+// ─────────────────────────────────────────
 app.post('/api/seo-score', async (req, res) => {
   try {
     const { products } = req.body;
@@ -122,333 +164,308 @@ app.post('/api/seo-score', async (req, res) => {
       let score = 0;
       const issues = [];
       const desc = p.description || '';
-      const name = p.name || '';
-
-      if (desc.length > 100) score += 25; else issues.push('الوصف قصير جداً أو غير موجود');
+      if (desc.length > 100) score += 25; else issues.push('الوصف قصير جداً');
       if (desc.length > 300) score += 15;
-      if (name.length > 20) score += 20; else issues.push('العنوان قصير — أضف تفاصيل');
-      if (p.tags?.length > 0) score += 15; else issues.push('لا توجد وسوم (Tags)');
-      if (p.images?.length > 0) score += 15; else issues.push('لا توجد صور');
-      if (p.metadata_title) score += 10; else issues.push('عنوان SEO غير موجود');
-
-      let grade = 'F';
-      if (score >= 90) grade = 'A+';
-      else if (score >= 80) grade = 'A';
-      else if (score >= 70) grade = 'B';
-      else if (score >= 60) grade = 'C';
-      else if (score >= 40) grade = 'D';
-
+      if ((p.name||'').length > 20) score += 20; else issues.push('العنوان قصير');
+      if (p.tags?.length > 0) score += 15;    else issues.push('لا توجد وسوم');
+      if (p.images?.length > 0) score += 15;  else issues.push('لا توجد صور');
+      if (p.metadata_title) score += 10;      else issues.push('عنوان SEO غير موجود');
+      let grade = score >= 90 ? 'A+' : score >= 80 ? 'A' : score >= 70 ? 'B' : score >= 60 ? 'C' : score >= 40 ? 'D' : 'F';
       return { id: p.id, name: p.name, score, grade, issues };
     });
     res.json({ results: scored });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ===== GENERATE DESCRIPTION (FULL FEATURED) =====
+// ─────────────────────────────────────────
+// GENERATE DESCRIPTION  ★ MAIN FIX ★
+// ─────────────────────────────────────────
 app.post('/api/generate-description', async (req, res) => {
   try {
-    const { name, currentDescription, audience, tone, instructions, mode, platform } = req.body;
+    const { name, currentDescription, audience, tone, instructions, mode } = req.body;
 
-    const toneMap = {
-      professional: 'احترافي ورسمي',
-      youth: 'شبابي وعصري',
-      luxury: 'فاخر وراقي',
-      friendly: 'ودي وقريب'
-    };
-
-    const platformMap = {
-      salla: 'متجر سلة',
-      google: 'Google Shopping',
-      tiktok: 'TikTok Shop',
-      all: 'جميع المنصات'
-    };
-
-    const currentDesc = currentDescription ? `الوصف الحالي:\n${currentDescription}\n\n` : '';
-    const modeInst = mode === 'improve' ? 'حسّن الوصف الحالي' : mode === 'renew' ? 'اكتب وصفاً جديداً كلياً' : 'اكتب وصفاً احترافياً';
+    const toneMap = { professional:'احترافي ورسمي', youth:'شبابي وعصري', luxury:'فاخر وراقي', friendly:'ودي وقريب' };
+    const modeInst = mode === 'improve' ? 'حسّن الوصف الحالي' : 'اكتب وصفاً احترافياً جديداً';
 
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
       messages: [{
         role: 'user',
-        content: `أنت كاتب محتوى للتجارة الإلكترونية. اكتب بالعربية فقط بدون رموز markdown.
+        content: `أنت كاتب محتوى للتجارة الإلكترونية. اكتب بالعربية فقط. لا تستخدم markdown.
 
 المنتج: ${name}
-${currentDesc}الفئة المستهدفة: ${audience || 'العملاء السعوديين'}
+${currentDescription ? `الوصف الحالي:\n${currentDescription}\n` : ''}الفئة المستهدفة: ${audience || 'العملاء السعوديين'}
 الأسلوب: ${toneMap[tone] || 'احترافي'}
-المنصة: ${platformMap[platform] || 'متجر سلة'}
-التعليمات الإضافية: ${instructions || modeInst}
+التعليمات: ${instructions || modeInst}
 
-اكتب بهذا الترتيب بالضبط — لا تتجاوز أي قسم:
+اكتب الرد بهذا الشكل بالضبط. لا تضف أي نص خارج هذه الأقسام:
 
-SEO_TITLE:
-[عنوان المنتج المحسّن لـ SEO — 50-60 حرف — يتضمن الكلمة الرئيسية وميزة مهمة]
+###SEO_TITLE###
+[عنوان المنتج المحسّن لـ SEO بين 50-60 حرف]
 
-SEO_DESC:
-[وصف محركات البحث — 150 حرف بالضبط — يحفز النقر ويتضمن الكلمة المفتاحية]
+###SEO_DESC###
+[وصف محركات البحث — جملة واحدة أو جملتان، 140-160 حرف]
 
-SHORT_DESC:
-[وصف قصير مقنع — جملتان فقط — يوضح الفائدة الرئيسية للمنتج]
+###SHORT_DESC###
+[وصف قصير مقنع — جملتان فقط]
 
-LONG_DESC:
-[فقرة افتتاحية مقنعة تصف المنتج وقيمته]
+###LONG_DESC###
+[اكتب وصفاً كاملاً للمنتج بهذا الترتيب:
+- فقرة افتتاحية (3-4 جمل) تصف المنتج وقيمته
+- عنوان فرعي (مثل: تصميم متميز) ثم فقرة تفصيلية
+- عنوان فرعي (مثل: مميزات المنتج) ثم قائمة نقاط بعلامة - 
+- فقرة ختامية تحفز على الشراء]
 
-[فقرة ثانية تصف تجربة الاستخدام والفرق الذي يحدثه]
+###FEATURES###
+[5 مميزات، كل ميزة في سطر يبدأ بـ - ]
 
-[فقرة ختامية تحفز على الشراء مع ذكر القيمة]
-
-FEATURES:
-- [الميزة الأولى: وصف موجز لفائدتها]
-- [الميزة الثانية: وصف موجز لفائدتها]
-- [الميزة الثالثة: وصف موجز لفائدتها]
-- [الميزة الرابعة: وصف موجز لفائدتها]
-- [الميزة الخامسة: وصف موجز لفائدتها]
-
-TIKTOK_CAPTION:
-[كابشن TikTok جذاب — جملة واحدة تشد الانتباه + 5 هاشتاقات]
-
-GOOGLE_TITLE:
-[عنوان Google Shopping — 70 حرف كحد أقصى — وصفي ودقيق]`
+###TIKTOK_CAPTION###
+[كابشن TikTok — جملة جذابة + 5 هاشتاقات]`
       }]
     });
 
     const text = message.content[0].text;
-    const extract = (key) => {
-      const m = text.match(new RegExp(`${key}:\\n([\\s\\S]+?)(?=\\n[A-Z_]+:|$)`));
-      return m ? m[1].trim() : '';
-    };
+    console.log('=== generate-description RAW (first 600) ===\n', text.substring(0, 600));
 
-    const features = extract('FEATURES').split('\n').filter(f => f.trim().startsWith('-')).map(f => f.replace(/^-\s*/, '').trim());
+    const longDesc = extractSection(text, 'LONG_DESC');
+    const features = extractSection(text, 'FEATURES')
+      .split('\n').filter(f => f.trim().startsWith('-')).map(f => f.replace(/^-\s*/, '').trim());
 
     res.json({
-      seoTitle: extract('SEO_TITLE'),
-      seoDescription: extract('SEO_DESC'),
-      shortDescription: extract('SHORT_DESC'),
-      description: extract('LONG_DESC'),
+      seoTitle:        extractSection(text, 'SEO_TITLE'),
+      seoDescription:  extractSection(text, 'SEO_DESC'),
+      shortDescription:extractSection(text, 'SHORT_DESC'),
+      description:     longDesc,
+      descriptionHtml: descriptionToHtml(longDesc),
       features,
-      tiktokCaption: extract('TIKTOK_CAPTION'),
-      googleTitle: extract('GOOGLE_TITLE'),
-      oldDescription: currentDescription || ''
+      tiktokCaption:   extractSection(text, 'TIKTOK_CAPTION'),
+      oldDescription:  currentDescription || ''
     });
   } catch (e) {
+    console.error('generate-description ERROR:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
 
-// ===== IMPROVE DESCRIPTION =====
+// ─────────────────────────────────────────
+// IMPROVE DESCRIPTION
+// ─────────────────────────────────────────
 app.post('/api/improve-description', async (req, res) => {
   try {
     const { name, currentDescription, instructions } = req.body;
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 1500,
       messages: [{
         role: 'user',
-        content: `أنت خبير تحسين محتوى للتجارة الإلكترونية. اكتب بالعربية بدون markdown.
-
+        content: `خبير تحسين محتوى للتجارة الإلكترونية. بالعربية بدون markdown.
 المنتج: ${name}
 الوصف الحالي: ${currentDescription || 'لا يوجد'}
 تعليمات: ${instructions || 'حسّن الوصف وارفع جودته'}
 
-SEO_TITLE:
+###SEO_TITLE###
 [عنوان محسّن]
 
-SEO_DESC:
-[وصف SEO محسّن 150 حرف]
+###SEO_DESC###
+[وصف SEO 150 حرف]
 
-DESCRIPTION:
-[الوصف المحسّن — فقرتان + نقاط مميزات + خاتمة]`
+###LONG_DESC###
+[وصف محسّن كامل مع عناوين فرعية ونقاط]`
       }]
     });
-
     const text = message.content[0].text;
-    const extract = (key) => {
-      const m = text.match(new RegExp(`${key}:\\n([\\s\\S]+?)(?=\\n[A-Z_]+:|$)`));
-      return m ? m[1].trim() : '';
-    };
-
+    const longDesc = extractSection(text, 'LONG_DESC');
     res.json({
-      seoTitle: extract('SEO_TITLE'),
-      seoDescription: extract('SEO_DESC'),
-      description: extract('DESCRIPTION'),
+      seoTitle:       extractSection(text, 'SEO_TITLE'),
+      seoDescription: extractSection(text, 'SEO_DESC'),
+      description:    longDesc,
+      descriptionHtml:descriptionToHtml(longDesc),
       oldDescription: currentDescription || ''
     });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ===== GENERATE SEO =====
+// ─────────────────────────────────────────
+// GENERATE SEO
+// ─────────────────────────────────────────
 app.post('/api/generate-seo', async (req, res) => {
   try {
     const { name, description, keywords } = req.body;
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 600,
       messages: [{
         role: 'user',
-        content: `خبير SEO للتجارة الإلكترونية. بالعربية فقط بدون markdown.
-
+        content: `خبير SEO. بالعربية فقط.
 المنتج: ${name}
 الوصف: ${description || name}
 كلمات إضافية: ${keywords || ''}
 
-SEO_TITLE:
+###SEO_TITLE###
 [عنوان SEO 50-60 حرف]
 
-SEO_DESC:
-[وصف SEO 150-160 حرف يحفز النقر]
+###SEO_DESC###
+[وصف SEO 150-160 حرف]
 
-SEO_KEYWORDS:
-[15 كلمة مفتاحية بالعربية مفصولة بفاصلة]`
+###SEO_KEYWORDS###
+[15 كلمة مفتاحية مفصولة بفاصلة]`
       }]
     });
-
     const text = message.content[0].text;
-    const extract = (key) => {
-      const m = text.match(new RegExp(`${key}:\\n([^\\n]+)`));
-      return m ? m[1].trim() : '';
-    };
-
     res.json({
-      seoTitle: extract('SEO_TITLE'),
-      seoDescription: extract('SEO_DESC'),
-      seoKeywords: extract('SEO_KEYWORDS')
+      seoTitle:    extractSection(text, 'SEO_TITLE'),
+      seoDescription: extractSection(text, 'SEO_DESC'),
+      seoKeywords: extractSection(text, 'SEO_KEYWORDS')
     });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ===== GENERATE TAGS =====
+// ─────────────────────────────────────────
+// GENERATE TAGS
+// ─────────────────────────────────────────
 app.post('/api/generate-tags', async (req, res) => {
   try {
     const { name, description } = req.body;
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 200,
       messages: [{
         role: 'user',
-        content: `وسوم (tags) للمنتج: ${name}. الوصف: ${description || ''}.
-أعطني 10 وسوم قصيرة (1-3 كلمات) مفصولة بفاصلة. عربية وإنجليزية. فقط الوسوم بدون شرح:`
+        content: `وسوم للمنتج: ${name}. الوصف: ${description || ''}.
+أعطني 10 وسوم قصيرة (1-3 كلمات) مفصولة بفاصلة. عربية وإنجليزية. الوسوم فقط:`
       }]
     });
-
     const tags = message.content[0].text.split(',').map(t => t.trim()).filter(t => t && t.length < 40);
     res.json({ tags });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ===== GENERATE SOCIAL CONTENT =====
+// ─────────────────────────────────────────
+// OPTIMIZE TITLE
+// ─────────────────────────────────────────
+app.post('/api/optimize-title', async (req, res) => {
+  try {
+    const { name, description, category } = req.body;
+    const msg = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 400,
+      messages: [{ role: 'user', content: `حسّن عنوان المنتج للـ SEO.
+العنوان الحالي: ${name}
+الفئة: ${category || 'عام'}
+الوصف: ${description || ''}
+اكتب 3 عناوين محسّنة بالعربية، لا تتجاوز 70 حرفاً.
+
+###TITLE1###
+[العنوان الأول]
+
+###TITLE2###
+[العنوان الثاني]
+
+###TITLE3###
+[العنوان الثالث]` }]
+    });
+    const text = msg.content[0].text;
+    res.json({
+      original: name,
+      title1: extractSection(text, 'TITLE1'),
+      title2: extractSection(text, 'TITLE2'),
+      title3: extractSection(text, 'TITLE3')
+    });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ─────────────────────────────────────────
+// GENERATE SOCIAL
+// ─────────────────────────────────────────
 app.post('/api/generate-social', async (req, res) => {
   try {
-    const { name, description, platform } = req.body;
+    const { name, description } = req.body;
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 800,
       messages: [{
         role: 'user',
-        content: `اكتب محتوى سوشال ميديا لمنتج: ${name}
-الوصف: ${description || ''}
-المنصة: ${platform || 'عام'}
+        content: `محتوى سوشال ميديا للمنتج: ${name}. الوصف: ${description || ''}
 
-INSTAGRAM:
-[كابشن انستغرام جذاب + هاشتاقات]
+###INSTAGRAM###
+[كابشن انستغرام + هاشتاقات]
 
-TIKTOK:
-[سكريبت TikTok قصير 15-30 ثانية]
+###TIKTOK###
+[سكريبت TikTok 15-30 ثانية]
 
-TWITTER:
-[تغريدة مقنعة 280 حرف]
+###TWITTER###
+[تغريدة 280 حرف]
 
-HASHTAGS:
-[20 هاشتاق مناسب]`
+###HASHTAGS###
+[20 هاشتاق]`
       }]
     });
-
     const text = message.content[0].text;
-    const extract = (key) => {
-      const m = text.match(new RegExp(`${key}:\\n([\\s\\S]+?)(?=\\n[A-Z]+:|$)`));
-      return m ? m[1].trim() : '';
-    };
-
     res.json({
-      instagram: extract('INSTAGRAM'),
-      tiktok: extract('TIKTOK'),
-      twitter: extract('TWITTER'),
-      hashtags: extract('HASHTAGS')
+      instagram: extractSection(text, 'INSTAGRAM'),
+      tiktok:    extractSection(text, 'TIKTOK'),
+      twitter:   extractSection(text, 'TWITTER'),
+      hashtags:  extractSection(text, 'HASHTAGS')
     });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ===== GENERATE BLOG POST =====
+// ─────────────────────────────────────────
+// GENERATE BLOG
+// ─────────────────────────────────────────
 app.post('/api/generate-blog', async (req, res) => {
   try {
     const { storeName, products, topic } = req.body;
     const productNames = products.map(p => p.name).join('، ');
-
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 2500,
       messages: [{
         role: 'user',
-        content: `اكتب مقالة SEO احترافية بالعربية لمتجر "${storeName}".
-الموضوع: ${topic}
-المنتجات المرتبطة: ${productNames}
+        content: `مقالة SEO لمتجر "${storeName}". الموضوع: ${topic}. المنتجات: ${productNames}
 
-BLOG_TITLE:
-[عنوان المقالة — جذاب ومحسّن لـ SEO]
+###BLOG_TITLE###
+[عنوان المقالة]
 
-BLOG_INTRO:
-[مقدمة قوية — 2 فقرة]
+###BLOG_INTRO###
+[مقدمة — فقرتان]
 
-BLOG_BODY:
-[جسم المقالة — 4-5 فقرات تتضمن معلومات مفيدة وربط طبيعي بالمنتجات]
+###BLOG_BODY###
+[جسم المقالة — 4-5 فقرات]
 
-BLOG_CONCLUSION:
+###BLOG_CONCLUSION###
 [خاتمة تحفز على الشراء]
 
-BLOG_META:
-[وصف SEO للمقالة — 150 حرف]`
+###BLOG_META###
+[وصف SEO للمقالة 150 حرف]`
       }]
     });
-
     const text = message.content[0].text;
-    const extract = (key) => {
-      const m = text.match(new RegExp(`${key}:\\n([\\s\\S]+?)(?=\\n[A-Z_]+:|$)`));
-      return m ? m[1].trim() : '';
-    };
-
     res.json({
-      title: extract('BLOG_TITLE'),
-      intro: extract('BLOG_INTRO'),
-      body: extract('BLOG_BODY'),
-      conclusion: extract('BLOG_CONCLUSION'),
-      meta: extract('BLOG_META')
+      title:      extractSection(text, 'BLOG_TITLE'),
+      intro:      extractSection(text, 'BLOG_INTRO'),
+      body:       extractSection(text, 'BLOG_BODY'),
+      conclusion: extractSection(text, 'BLOG_CONCLUSION'),
+      meta:       extractSection(text, 'BLOG_META')
     });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ===== UPDATE PRODUCT =====
+// ─────────────────────────────────────────
+// UPDATE PRODUCT
+// ─────────────────────────────────────────
 app.post('/api/update-product', async (req, res) => {
   try {
-    const { productId, description, seoTitle, seoDescription, name, token } = req.body;
+    const { productId, description, descriptionHtml, seoTitle, seoDescription, name, token } = req.body;
     if (!productId || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
-
     const updateData = {};
-    if (description) updateData.description = textToHtml(description);
-    if (seoTitle) updateData.metadata_title = seoTitle;
+    // Prefer pre-built HTML; fall back to converter
+    if (descriptionHtml) updateData.description = descriptionHtml;
+    else if (description) updateData.description = descriptionToHtml(description);
+    if (seoTitle)       updateData.metadata_title       = seoTitle;
     if (seoDescription) updateData.metadata_description = seoDescription;
-    if (name) updateData.name = name;
-
+    if (name)           updateData.name = name;
     const result = await sallaUpdate(productId, updateData, token);
     res.json({ success: true, product: result.data });
   } catch (e) {
@@ -457,95 +474,52 @@ app.post('/api/update-product', async (req, res) => {
   }
 });
 
-// ===== ADD TAGS =====
+// ─────────────────────────────────────────
+// ADD TAGS
+// ─────────────────────────────────────────
 app.post('/api/add-tags', async (req, res) => {
   try {
     const { productId, tags, token } = req.body;
-    if (!productId || !tags?.length || !token) {
-      return res.status(400).json({ error: 'بيانات ناقصة' });
-    }
-
+    if (!productId || !tags?.length || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
     const tagIds = [];
-
-    // Get existing product tags
     try {
       const prod = await sallaGet(`products/${productId}`, token);
-      const existing = prod.data?.tags || [];
-      existing.forEach(t => { if (t.id) tagIds.push(t.id); });
+      (prod.data?.tags || []).forEach(t => { if (t.id) tagIds.push(t.id); });
     } catch(e) {}
-
-    // Create tags using correct endpoint: POST /products/tags?tag_name=X
     for (const tagName of tags.slice(0, 8)) {
       try {
         const r = await axios.post(
           `https://api.salla.dev/admin/v2/products/tags?tag_name=${encodeURIComponent(tagName)}`,
-          {},
-          { headers: { Authorization: `Bearer ${token}` } }
+          {}, { headers: { Authorization: `Bearer ${token}` } }
         );
         const newId = r.data?.data?.id;
         if (newId && !tagIds.includes(newId)) tagIds.push(newId);
       } catch(e) {
-        // Tag might already exist — get its ID from list
         try {
-          const list = await axios.get(
-            'https://api.salla.dev/admin/v2/products/tags',
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          const found = list.data?.data?.find(t =>
-            t.name?.toLowerCase().trim() === tagName.toLowerCase().trim()
-          );
+          const list = await axios.get('https://api.salla.dev/admin/v2/products/tags', { headers: { Authorization: `Bearer ${token}` } });
+          const found = list.data?.data?.find(t => t.name?.toLowerCase().trim() === tagName.toLowerCase().trim());
           if (found?.id && !tagIds.includes(found.id)) tagIds.push(found.id);
         } catch(e2) {}
       }
     }
-
-    // Update product with all tag IDs
-    if (tagIds.length > 0) {
-      await sallaUpdate(productId, { tags: tagIds }, token);
-    }
-
+    if (tagIds.length > 0) await sallaUpdate(productId, { tags: tagIds }, token);
     res.json({ success: true, added: tagIds.length });
   } catch (e) {
-    console.error('Add tags error:', e.response?.data || e.message);
     res.status(500).json({ error: e.message });
   }
 });
 
-// ===== OPTIMIZE PRODUCT TITLE =====
-app.post('/api/optimize-title', async (req, res) => {
-  try {
-    const { name, description, category } = req.body;
-    const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6', max_tokens: 400,
-      messages: [{ role: 'user', content: `حسّن عنوان المنتج للـ SEO. العنوان الحالي: ${name}. الفئة: ${category||'عام'}. الوصف: ${description||''}
-
-اكتب 3 عناوين محسّنة مختلفة بالعربية، كل عنوان:
-- يحتوي كلمة مفتاحية رئيسية
-- يذكر ميزة مهمة
-- لا يتجاوز 70 حرفاً
-
-TITLE1:
-[العنوان الأول]
-TITLE2:
-[العنوان الثاني]
-TITLE3:
-[العنوان الثالث]` }]
-    });
-    const text = msg.content[0].text;
-    const ex = k => { const m = text.match(new RegExp(`${k}:\\n([^\\n]+)`)); return m ? m[1].trim() : ''; };
-    res.json({ original: name, title1: ex('TITLE1'), title2: ex('TITLE2'), title3: ex('TITLE3') });
-  } catch(e) { res.status(500).json({ error: e.message }); }
-});
-
-// ===== GENERATE ALT TEXT =====
+// ─────────────────────────────────────────
+// ALT TEXT
+// ─────────────────────────────────────────
 app.post('/api/generate-alt', async (req, res) => {
   try {
     const { productName, count } = req.body;
     const altTexts = [];
     for (let i = 1; i <= (count || 1); i++) {
       const msg = await anthropic.messages.create({
-        model: 'claude-sonnet-4-6', max_tokens: 100,
-        messages: [{ role: 'user', content: `اكتب Alt Text للصورة رقم ${i} للمنتج: ${productName}. 50-100 حرف بالعربية. الـ Alt Text فقط:` }]
+        model: 'claude-sonnet-4-20250514', max_tokens: 100,
+        messages: [{ role: 'user', content: `Alt Text للصورة ${i} للمنتج: ${productName}. 50-100 حرف بالعربية. النص فقط:` }]
       });
       altTexts.push(msg.content[0].text.trim());
     }
@@ -553,103 +527,133 @@ app.post('/api/generate-alt', async (req, res) => {
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-// ===== SEO CATEGORY PAGES =====
+// ─────────────────────────────────────────
+// SEO PAGES
+// ─────────────────────────────────────────
 app.post('/api/seo-pages', async (req, res) => {
   try {
     const { products, storeName } = req.body;
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6', max_tokens: 800,
-      messages: [{ role: 'user', content: `من هذه المنتجات: ${products.map(p=>p.name).join('، ')} لمتجر: ${storeName||'المتجر'}
+      model: 'claude-sonnet-4-20250514', max_tokens: 800,
+      messages: [{ role: 'user', content: `منتجات: ${products.map(p=>p.name).join('، ')} — متجر: ${storeName||'المتجر'}
+اقترح 5 صفحات SEO.
 
-اقترح 5 صفحات SEO تلقائية لجلب زيارات Google. لكل صفحة:
-PAGE1_TITLE:
-PAGE1_URL:
-PAGE1_DESC:
+###PAGE1_TITLE###
+[عنوان]
+###PAGE1_URL###
+[slug]
+###PAGE1_DESC###
+[وصف]
 
-(حتى PAGE5)` }]
+###PAGE2_TITLE###
+[عنوان]
+###PAGE2_URL###
+[slug]
+###PAGE2_DESC###
+[وصف]
+
+###PAGE3_TITLE###
+[عنوان]
+###PAGE3_URL###
+[slug]
+###PAGE3_DESC###
+[وصف]
+
+###PAGE4_TITLE###
+[عنوان]
+###PAGE4_URL###
+[slug]
+###PAGE4_DESC###
+[وصف]
+
+###PAGE5_TITLE###
+[عنوان]
+###PAGE5_URL###
+[slug]
+###PAGE5_DESC###
+[وصف]` }]
     });
     const text = msg.content[0].text;
     const pages = [];
     for (let i = 1; i <= 5; i++) {
-      const t = text.match(new RegExp(`PAGE${i}_TITLE:\\n([^\\n]+)`))?.[1]?.trim();
-      const u = text.match(new RegExp(`PAGE${i}_URL:\\n([^\\n]+)`))?.[1]?.trim();
-      const d = text.match(new RegExp(`PAGE${i}_DESC:\\n([^\\n]+)`))?.[1]?.trim();
+      const t = extractSection(text, `PAGE${i}_TITLE`);
+      const u = extractSection(text, `PAGE${i}_URL`);
+      const d = extractSection(text, `PAGE${i}_DESC`);
       if (t) pages.push({ title: t, url: u, description: d });
     }
     res.json({ pages });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-// ===== TEMPLATES =====
+// ─────────────────────────────────────────
+// TEMPLATES
+// ─────────────────────────────────────────
 app.get('/api/templates', (req, res) => {
   res.json({ templates: [
-    { id: 'fashion', name: '👗 ملابس وأزياء', tone: 'youth', instructions: 'ركز على الأناقة والتناسق، اذكر المقاسات والألوان، أسلوب شبابي' },
-    { id: 'electronics', name: '📱 إلكترونيات', tone: 'professional', instructions: 'ركز على المواصفات التقنية والأداء، اذكر الضمان، أسلوب احترافي' },
-    { id: 'perfume', name: '🌸 عطور ومستحضرات', tone: 'luxury', instructions: 'ركز على الرائحة والثبات، اجعله فاخراً شاعرياً، اذكر المناسبات' },
-    { id: 'food', name: '🍃 غذاء وصحة', tone: 'friendly', instructions: 'ركز على الفوائد الصحية والمكونات الطبيعية، أسلوب ودي' },
-    { id: 'home', name: '🏠 منزل وديكور', tone: 'professional', instructions: 'ركز على الجودة والتصميم، اذكر الأبعاد والمواد' },
-    { id: 'jewelry', name: '💍 مجوهرات', tone: 'luxury', instructions: 'ركز على المواد والتصميم الفريد، اذكر المناسبات والهدايا' }
+    { id:'fashion',     name:'👗 ملابس وأزياء',        tone:'youth',        instructions:'ركز على الأناقة والتناسق، اذكر المقاسات والألوان، أسلوب شبابي' },
+    { id:'electronics', name:'📱 إلكترونيات',           tone:'professional', instructions:'ركز على المواصفات التقنية والأداء، اذكر الضمان، أسلوب احترافي' },
+    { id:'perfume',     name:'🌸 عطور ومستحضرات',       tone:'luxury',       instructions:'ركز على الرائحة والثبات، اجعله فاخراً شاعرياً، اذكر المناسبات' },
+    { id:'food',        name:'🍃 غذاء وصحة',            tone:'friendly',     instructions:'ركز على الفوائد الصحية والمكونات الطبيعية، أسلوب ودي' },
+    { id:'home',        name:'🏠 منزل وديكور',          tone:'professional', instructions:'ركز على الجودة والتصميم، اذكر الأبعاد والمواد' },
+    { id:'jewelry',     name:'💍 مجوهرات',              tone:'luxury',       instructions:'ركز على المواد والتصميم الفريد، اذكر المناسبات والهدايا' }
   ]});
 });
 
-// ===== GENERATE IMAGE =====
+// ─────────────────────────────────────────
+// IMAGE GEN
+// ─────────────────────────────────────────
 app.post('/api/generate-image', async (req, res) => {
   try {
     const { name, prompt, style } = req.body;
-    const fullPrompt = `Professional product photo of ${name}. ${prompt || ''}. ${style}. High quality, commercial photography, sharp details, no text.`;
-    const r = await openai.images.generate({ model: 'dall-e-3', prompt: fullPrompt, n: 1, size: '1024x1024', quality: 'standard' });
+    const r = await openai.images.generate({
+      model: 'dall-e-3',
+      prompt: `Professional product photo of ${name}. ${prompt || ''}. ${style}. High quality, commercial photography, no text.`,
+      n: 1, size: '1024x1024', quality: 'standard'
+    });
     res.json({ imageUrl: r.data[0].url });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ===== EDIT IMAGE =====
+// ─────────────────────────────────────────
+// EDIT IMAGE
+// ─────────────────────────────────────────
 app.post('/api/edit-image', upload.single('image'), async (req, res) => {
   try {
     const { prompt } = req.body;
     const base64 = req.file.buffer.toString('base64');
-    const mime = req.file.mimetype;
-
+    const mime   = req.file.mimetype;
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 500,
+      model: 'claude-sonnet-4-20250514', max_tokens: 500,
       messages: [{
         role: 'user',
         content: [
           { type: 'image', source: { type: 'base64', media_type: mime, data: base64 } },
-          { type: 'text', text: `خبير تحرير صور. المطلوب: "${prompt}". أنشئ prompt إنجليزي احترافي لـ DALL-E لإنشاء صورة مشابهة مع التعديل. أعطني الـ prompt فقط.` }
+          { type: 'text', text: `خبير تحرير صور. المطلوب: "${prompt}". أنشئ DALL-E prompt إنجليزي احترافي. الـ prompt فقط.` }
         ]
       }]
     });
-
-    const editPrompt = msg.content[0].text.slice(0, 900);
-    const r = await openai.images.generate({ model: 'dall-e-3', prompt: editPrompt, n: 1, size: '1024x1024', quality: 'standard' });
+    const r = await openai.images.generate({ model: 'dall-e-3', prompt: msg.content[0].text.slice(0,900), n:1, size:'1024x1024', quality:'standard' });
     res.json({ imageUrl: r.data[0].url });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ===== TRANSLATE =====
+// ─────────────────────────────────────────
+// TRANSLATE
+// ─────────────────────────────────────────
 app.post('/api/translate', async (req, res) => {
   try {
     const { text, language } = req.body;
     const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 500,
-      messages: [{
-        role: 'user',
-        content: `ترجم هذا النص إلى ${language} بشكل احترافي مناسب للتجارة الإلكترونية. الترجمة فقط بدون شرح:\n\n${text}`
-      }]
+      model: 'claude-sonnet-4-20250514', max_tokens: 500,
+      messages: [{ role:'user', content:`ترجم إلى ${language} بشكل احترافي للتجارة الإلكترونية. الترجمة فقط:\n\n${text}` }]
     });
     res.json({ translation: msg.content[0].text });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ===== WEBHOOK =====
+// ─────────────────────────────────────────
+// WEBHOOK
+// ─────────────────────────────────────────
 app.post('/webhook/salla', (req, res) => {
   console.log('Webhook:', req.body?.event);
   res.json({ success: true });
