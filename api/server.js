@@ -6,49 +6,93 @@ const fs = require('fs');
 const OpenAI = require('openai');
 const Anthropic = require('@anthropic-ai/sdk');
 const axios = require('axios');
- 
+
 const app = express();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
- 
+
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
- 
+
 const publicPath = path.join(__dirname, '../public');
 app.use(express.static(publicPath));
 app.get('/', (req, res) => {
   const f = path.join(publicPath, 'index.html');
   fs.existsSync(f) ? res.sendFile(f) : res.send('<h1>ذكاء المتجر</h1>');
 });
- 
+
+// لوحة الإدارة
+app.get('/admin', (req, res) => {
+  const f = path.join(publicPath, 'admin.html');
+  fs.existsSync(f) ? res.sendFile(f) : res.status(404).send('Admin page not found');
+});
+
 const openai  = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const REDIRECT_URI = 'https://salla-ai-app-indol.vercel.app/auth/callback';
- 
+
+// ─────────────────────────────────────────
+// SUPABASE — قاعدة بيانات العملاء
+// ─────────────────────────────────────────
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://neepfsawxdcdmfnbilft.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_KEY || 'sb_publishable_jl6GnYYSuhlUjb8Ww6DTzA_Ek3_Ald6';
+
+async function dbQuery(method, table, body, params) {
+  params = params || '';
+  const url = SUPABASE_URL + '/rest/v1/' + table + params;
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': method === 'POST' ? 'resolution=merge-duplicates,return=representation' : 'return=representation'
+  };
+  const r = await axios({ method: method, url: url, headers: headers, data: body });
+  return r.data;
+}
+
+async function saveCustomer(token, store) {
+  try {
+    await dbQuery('POST', 'customers', {
+      salla_token: token,
+      store_id: (store.id || '').toString(),
+      store_name: store.name || '',
+      email: store.email || (store.merchant && store.merchant.email) || '',
+      avatar: store.avatar || '',
+      plan: store.plan || 'free',
+      products_count: store.products_count || 0,
+      last_login: new Date().toISOString(),
+      created_at: new Date().toISOString()
+    });
+    console.log('Customer saved:', store.name);
+  } catch(e) {
+    console.error('saveCustomer error:', e.message);
+  }
+}
+
 // Single source of truth for model name
 const AI_MODEL = 'claude-haiku-4-5-20251001';
 console.log('=== SERVER START ===', 'model:', AI_MODEL, 'anthropic_key:', !!process.env.ANTHROPIC_API_KEY);
- 
+
 // ─────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────
 function getToken(req) {
   return req.headers.authorization?.replace('Bearer ', '') || req.body?.token || '';
 }
- 
+
 async function sallaGet(endpoint, token) {
   const r = await axios.get(`https://api.salla.dev/admin/v2/${endpoint}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
   return r.data;
 }
- 
+
 async function sallaUpdate(productId, data, token) {
   const r = await axios.put(`https://api.salla.dev/admin/v2/products/${productId}`, data, {
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
   });
   return r.data;
 }
- 
+
 // ─────────────────────────────────────────
 // EXTRACT HELPER  — robust triple-strategy
 // ─────────────────────────────────────────
@@ -56,16 +100,16 @@ function extractSection(text, key) {
   // Strategy 1: ###KEY### delimiter
   let m = text.match(new RegExp(`###${key}###\\s*\\n([\\s\\S]+?)(?=\\n###[A-Z0-9_]+###|$)`));
   if (m && m[1].trim()) return m[1].trim();
- 
+
   // Strategy 2: KEY:\n multi-line
   m = text.match(new RegExp(`(?:^|\\n)${key}:\\s*\\n([\\s\\S]+?)(?=\\n[A-Z0-9_]+:|$)`, 'm'));
   if (m && m[1].trim()) return m[1].trim();
- 
+
   // Strategy 3: KEY: single line
   m = text.match(new RegExp(`(?:^|\\n)${key}:\\s*([^\\n]+)`, 'm'));
   return m ? m[1].trim() : '';
 }
- 
+
 // ─────────────────────────────────────────
 // CONVERT PLAIN TEXT → RICH HTML
 // ─────────────────────────────────────────
@@ -74,14 +118,14 @@ function descriptionToHtml(text) {
   const lines = text.split('\n');
   let html = '';
   let inList = false;
- 
+
   for (let line of lines) {
     line = line.trim();
     if (!line) {
       if (inList) { html += '</ul>'; inList = false; }
       continue;
     }
- 
+
     // Bullet point
     if (line.startsWith('- ') || line.startsWith('• ')) {
       if (!inList) {
@@ -91,14 +135,14 @@ function descriptionToHtml(text) {
       html += `<li style="margin-bottom:6px;line-height:1.8;color:#444;">${line.replace(/^[-•]\s*/, '')}</li>`;
       continue;
     }
- 
+
     if (inList) { html += '</ul>'; inList = false; }
- 
+
     // Heading: line ends with : or wrapped in ** or is short (< 50 chars, no period)
     const isHeading = (line.endsWith(':') && line.length < 60)
       || /^\*\*(.+)\*\*$/.test(line)
       || (line.length < 55 && !line.endsWith('.') && !line.endsWith('،'));
- 
+
     if (isHeading) {
       const clean = line.replace(/\*\*/g, '').replace(/:$/, '');
       html += `<h3 style="font-size:16px;font-weight:700;color:#222;margin:18px 0 8px;">${clean}</h3>`;
@@ -106,11 +150,11 @@ function descriptionToHtml(text) {
       html += `<p style="font-size:14px;line-height:1.9;color:#444;margin-bottom:12px;">${line.replace(/\*\*/g, '<strong>').replace(/\*\*/g, '</strong>')}</p>`;
     }
   }
- 
+
   if (inList) html += '</ul>';
   return html;
 }
- 
+
 // ─────────────────────────────────────────
 // AUTH
 // ─────────────────────────────────────────
@@ -118,7 +162,7 @@ app.get('/auth/salla', (req, res) => {
   const state = Math.random().toString(36).substring(2, 15);
   res.redirect(`https://accounts.salla.sa/oauth2/auth?client_id=${process.env.SALLA_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=offline_access&state=${state}`);
 });
- 
+
 app.get('/auth/callback', async (req, res) => {
   try {
     const { code } = req.query;
@@ -132,13 +176,21 @@ app.get('/auth/callback', async (req, res) => {
     const r = await axios.post('https://accounts.salla.sa/oauth2/token', params, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
-    res.redirect(`/?token=${r.data.access_token}`);
+    const accessToken = r.data.access_token;
+    // جلب بيانات المتجر وحفظ العميل في قاعدة البيانات
+    try {
+      const storeInfo = await axios.get('https://api.salla.dev/admin/v2/store/info', {
+        headers: { Authorization: 'Bearer ' + accessToken }
+      });
+      await saveCustomer(accessToken, storeInfo.data.data || {});
+    } catch(se) { console.error('store info error:', se.message); }
+    res.redirect('/?token=' + accessToken);
   } catch (e) {
     console.error('Auth error:', e.response?.data || e.message);
     res.redirect('/?error=auth_failed');
   }
 });
- 
+
 // ─────────────────────────────────────────
 // PRODUCTS
 // ─────────────────────────────────────────
@@ -157,7 +209,7 @@ app.get('/api/products', async (req, res) => {
     res.json({ products: [] });
   }
 });
- 
+
 // ─────────────────────────────────────────
 // SEO SCORE
 // ─────────────────────────────────────────
@@ -180,62 +232,62 @@ app.post('/api/seo-score', async (req, res) => {
     res.json({ results: scored });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
- 
+
 // ─────────────────────────────────────────
 // GENERATE DESCRIPTION  ★ MAIN FIX ★
 // ─────────────────────────────────────────
 app.post('/api/generate-description', async (req, res) => {
   try {
     const { name, currentDescription, audience, tone, instructions, mode } = req.body;
- 
+
     const toneMap = { professional:'احترافي ورسمي', youth:'شبابي وعصري', luxury:'فاخر وراقي', friendly:'ودي وقريب' };
     const modeInst = mode === 'improve' ? 'حسّن الوصف الحالي' : 'اكتب وصفاً احترافياً جديداً';
- 
+
     const message = await anthropic.messages.create({
       model: AI_MODEL,
       max_tokens: 2000,
       messages: [{
         role: 'user',
         content: `أنت كاتب محتوى للتجارة الإلكترونية. اكتب بالعربية فقط. لا تستخدم markdown.
- 
+
 المنتج: ${name}
 ${currentDescription ? `الوصف الحالي:\n${currentDescription}\n` : ''}الفئة المستهدفة: ${audience || 'العملاء السعوديين'}
 الأسلوب: ${toneMap[tone] || 'احترافي'}
 التعليمات: ${instructions || modeInst}
- 
+
 اكتب الرد بهذا الشكل بالضبط. لا تضف أي نص خارج هذه الأقسام:
- 
+
 ###SEO_TITLE###
 [عنوان المنتج المحسّن لـ SEO بين 50-60 حرف]
- 
+
 ###SEO_DESC###
 [وصف محركات البحث — جملة واحدة أو جملتان، 140-160 حرف]
- 
+
 ###SHORT_DESC###
 [وصف قصير مقنع — جملتان فقط]
- 
+
 ###LONG_DESC###
 [اكتب وصفاً كاملاً للمنتج بهذا الترتيب:
 - فقرة افتتاحية (3-4 جمل) تصف المنتج وقيمته
 - عنوان فرعي (مثل: تصميم متميز) ثم فقرة تفصيلية
 - عنوان فرعي (مثل: مميزات المنتج) ثم قائمة نقاط بعلامة - 
 - فقرة ختامية تحفز على الشراء]
- 
+
 ###FEATURES###
 [5 مميزات، كل ميزة في سطر يبدأ بـ - ]
- 
+
 ###TIKTOK_CAPTION###
 [كابشن TikTok — جملة جذابة + 5 هاشتاقات]`
       }]
     });
- 
+
     const text = message.content[0].text;
     console.log('=== generate-description RAW (first 600) ===\n', text.substring(0, 600));
- 
+
     const longDesc = extractSection(text, 'LONG_DESC');
     const features = extractSection(text, 'FEATURES')
       .split('\n').filter(f => f.trim().startsWith('-')).map(f => f.replace(/^-\s*/, '').trim());
- 
+
     res.json({
       seoTitle:        extractSection(text, 'SEO_TITLE'),
       seoDescription:  extractSection(text, 'SEO_DESC'),
@@ -251,7 +303,7 @@ ${currentDescription ? `الوصف الحالي:\n${currentDescription}\n` : ''}
     res.status(500).json({ error: e.message });
   }
 });
- 
+
 // ─────────────────────────────────────────
 // IMPROVE DESCRIPTION
 // ─────────────────────────────────────────
@@ -267,13 +319,13 @@ app.post('/api/improve-description', async (req, res) => {
 المنتج: ${name}
 الوصف الحالي: ${currentDescription || 'لا يوجد'}
 تعليمات: ${instructions || 'حسّن الوصف وارفع جودته'}
- 
+
 ###SEO_TITLE###
 [عنوان محسّن]
- 
+
 ###SEO_DESC###
 [وصف SEO 150 حرف]
- 
+
 ###LONG_DESC###
 [وصف محسّن كامل مع عناوين فرعية ونقاط]`
       }]
@@ -289,7 +341,7 @@ app.post('/api/improve-description', async (req, res) => {
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
- 
+
 // ─────────────────────────────────────────
 // GENERATE SEO
 // ─────────────────────────────────────────
@@ -305,13 +357,13 @@ app.post('/api/generate-seo', async (req, res) => {
 المنتج: ${name}
 الوصف: ${description || name}
 كلمات إضافية: ${keywords || ''}
- 
+
 ###SEO_TITLE###
 [عنوان SEO 50-60 حرف]
- 
+
 ###SEO_DESC###
 [وصف SEO 150-160 حرف]
- 
+
 ###SEO_KEYWORDS###
 [15 كلمة مفتاحية مفصولة بفاصلة]`
       }]
@@ -324,7 +376,7 @@ app.post('/api/generate-seo', async (req, res) => {
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
- 
+
 // ─────────────────────────────────────────
 // GENERATE TAGS
 // ─────────────────────────────────────────
@@ -344,7 +396,7 @@ app.post('/api/generate-tags', async (req, res) => {
     res.json({ tags });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
- 
+
 // ─────────────────────────────────────────
 // OPTIMIZE TITLE
 // ─────────────────────────────────────────
@@ -359,13 +411,13 @@ app.post('/api/optimize-title', async (req, res) => {
 الفئة: ${category || 'عام'}
 الوصف: ${description || ''}
 اكتب 3 عناوين محسّنة بالعربية، لا تتجاوز 70 حرفاً.
- 
+
 ###TITLE1###
 [العنوان الأول]
- 
+
 ###TITLE2###
 [العنوان الثاني]
- 
+
 ###TITLE3###
 [العنوان الثالث]` }]
     });
@@ -378,7 +430,7 @@ app.post('/api/optimize-title', async (req, res) => {
     });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
- 
+
 // ─────────────────────────────────────────
 // GENERATE SOCIAL
 // ─────────────────────────────────────────
@@ -391,16 +443,16 @@ app.post('/api/generate-social', async (req, res) => {
       messages: [{
         role: 'user',
         content: `محتوى سوشال ميديا للمنتج: ${name}. الوصف: ${description || ''}
- 
+
 ###INSTAGRAM###
 [كابشن انستغرام + هاشتاقات]
- 
+
 ###TIKTOK###
 [سكريبت TikTok 15-30 ثانية]
- 
+
 ###TWITTER###
 [تغريدة 280 حرف]
- 
+
 ###HASHTAGS###
 [20 هاشتاق]`
       }]
@@ -414,7 +466,7 @@ app.post('/api/generate-social', async (req, res) => {
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
- 
+
 // ─────────────────────────────────────────
 // GENERATE BLOG
 // ─────────────────────────────────────────
@@ -428,19 +480,19 @@ app.post('/api/generate-blog', async (req, res) => {
       messages: [{
         role: 'user',
         content: `مقالة SEO لمتجر "${storeName}". الموضوع: ${topic}. المنتجات: ${productNames}
- 
+
 ###BLOG_TITLE###
 [عنوان المقالة]
- 
+
 ###BLOG_INTRO###
 [مقدمة — فقرتان]
- 
+
 ###BLOG_BODY###
 [جسم المقالة — 4-5 فقرات]
- 
+
 ###BLOG_CONCLUSION###
 [خاتمة تحفز على الشراء]
- 
+
 ###BLOG_META###
 [وصف SEO للمقالة 150 حرف]`
       }]
@@ -455,7 +507,7 @@ app.post('/api/generate-blog', async (req, res) => {
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
- 
+
 // ─────────────────────────────────────────
 // UPDATE PRODUCT
 // ─────────────────────────────────────────
@@ -477,7 +529,7 @@ app.post('/api/update-product', async (req, res) => {
     res.status(500).json({ error: e.response?.data?.message || e.message });
   }
 });
- 
+
 // ─────────────────────────────────────────
 // ADD TAGS
 // ─────────────────────────────────────────
@@ -512,7 +564,7 @@ app.post('/api/add-tags', async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
- 
+
 // ─────────────────────────────────────────
 // ALT TEXT
 // ─────────────────────────────────────────
@@ -530,7 +582,7 @@ app.post('/api/generate-alt', async (req, res) => {
     res.json({ altTexts });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
- 
+
 // ─────────────────────────────────────────
 // SEO PAGES
 // ─────────────────────────────────────────
@@ -541,35 +593,35 @@ app.post('/api/seo-pages', async (req, res) => {
       model: AI_MODEL, max_tokens: 800,
       messages: [{ role: 'user', content: `منتجات: ${products.map(p=>p.name).join('، ')} — متجر: ${storeName||'المتجر'}
 اقترح 5 صفحات SEO.
- 
+
 ###PAGE1_TITLE###
 [عنوان]
 ###PAGE1_URL###
 [slug]
 ###PAGE1_DESC###
 [وصف]
- 
+
 ###PAGE2_TITLE###
 [عنوان]
 ###PAGE2_URL###
 [slug]
 ###PAGE2_DESC###
 [وصف]
- 
+
 ###PAGE3_TITLE###
 [عنوان]
 ###PAGE3_URL###
 [slug]
 ###PAGE3_DESC###
 [وصف]
- 
+
 ###PAGE4_TITLE###
 [عنوان]
 ###PAGE4_URL###
 [slug]
 ###PAGE4_DESC###
 [وصف]
- 
+
 ###PAGE5_TITLE###
 [عنوان]
 ###PAGE5_URL###
@@ -588,7 +640,7 @@ app.post('/api/seo-pages', async (req, res) => {
     res.json({ pages });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
- 
+
 // ─────────────────────────────────────────
 // TEMPLATES
 // ─────────────────────────────────────────
@@ -602,7 +654,7 @@ app.get('/api/templates', (req, res) => {
     { id:'jewelry',     name:'💍 مجوهرات',              tone:'luxury',       instructions:'ركز على المواد والتصميم الفريد، اذكر المناسبات والهدايا' }
   ]});
 });
- 
+
 // ─────────────────────────────────────────
 // IMAGE GEN
 // ─────────────────────────────────────────
@@ -617,7 +669,7 @@ app.post('/api/generate-image', async (req, res) => {
     res.json({ imageUrl: r.data[0].url });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
- 
+
 // ─────────────────────────────────────────
 // EDIT IMAGE
 // ─────────────────────────────────────────
@@ -640,7 +692,7 @@ app.post('/api/edit-image', upload.single('image'), async (req, res) => {
     res.json({ imageUrl: r.data[0].url });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
- 
+
 // ─────────────────────────────────────────
 // TRANSLATE
 // ─────────────────────────────────────────
@@ -654,7 +706,7 @@ app.post('/api/translate', async (req, res) => {
     res.json({ translation: msg.content[0].text });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
- 
+
 // ─────────────────────────────────────────
 // WEBHOOK
 // ─────────────────────────────────────────
@@ -662,10 +714,10 @@ app.post('/webhook/salla', (req, res) => {
   console.log('Webhook:', req.body?.event);
   res.json({ success: true });
 });
- 
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server on port ${PORT}`));
- 
+
 // DEBUG endpoint
 app.get('/api/debug', async (req, res) => {
   const result = {
@@ -687,4 +739,61 @@ app.get('/api/debug', async (req, res) => {
     result.anthropic_test = 'FAILED: ' + e.message;
   }
   res.json(result);
+});
+
+// ─────────────────────────────────────────
+// ADMIN — لوحة إدارة العملاء
+// ─────────────────────────────────────────
+const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'admin2025';
+
+function checkAdmin(req, res) {
+  const pass = req.headers['x-admin-key'] || req.query.key;
+  if (pass !== ADMIN_PASS) { res.status(401).json({ error: 'غير مصرح' }); return false; }
+  return true;
+}
+
+// جلب كل العملاء
+app.get('/api/admin/customers', async (req, res) => {
+  if (!checkAdmin(req, res)) return;
+  try {
+    const data = await dbQuery('GET', 'customers', null, '?order=created_at.desc');
+    res.json({ customers: data, total: data.length });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// تعديل بيانات عميل
+app.put('/api/admin/customers/:id', async (req, res) => {
+  if (!checkAdmin(req, res)) return;
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    const data = await dbQuery('PATCH', 'customers', updates, `?id=eq.${id}`);
+    res.json({ success: true, customer: data });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// حذف عميل
+app.delete('/api/admin/customers/:id', async (req, res) => {
+  if (!checkAdmin(req, res)) return;
+  try {
+    await dbQuery('DELETE', 'customers', null, `?id=eq.${req.params.id}`);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// إحصائيات سريعة
+app.get('/api/admin/stats', async (req, res) => {
+  if (!checkAdmin(req, res)) return;
+  try {
+    const customers = await dbQuery('GET', 'customers', null, '');
+    const today = new Date().toISOString().split('T')[0];
+    const todayNew = customers.filter(c => c.created_at?.startsWith(today)).length;
+    const thisMonth = customers.filter(c => c.created_at?.startsWith(new Date().toISOString().substring(0,7))).length;
+    res.json({
+      total: customers.length,
+      today: todayNew,
+      this_month: thisMonth,
+      latest: customers.slice(0, 5)
+    });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
