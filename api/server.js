@@ -555,7 +555,7 @@ app.post('/api/add-tags', async (req, res) => {
     } catch(e) {}
 
     // 3) لكل وسم: إما موجود أو أنشئه
-    for (const tagName of tags.slice(0, 10)) {
+    for (const tagName of tags.slice(0, 5)) {
       try {
         // ابحث في الوسوم الموجودة أولاً
         const existing = allStoreTags.find(t =>
@@ -575,13 +575,15 @@ app.post('/api/add-tags', async (req, res) => {
           tagIds.push(newId);
           allStoreTags.push({ id: newId, name: tagName }); // أضفه للكاش
         }
-        await new Promise(r => setTimeout(r, 200)); // delay بسيط بين الطلبات
+        await new Promise(r => setTimeout(r, 900)); // delay كافي لتجنب rate limit سلة
       } catch(e) {
         console.warn(`Tag "${tagName}" failed:`, e.message);
       }
     }
 
-    // 4) حدّث المنتج بالوسوم
+    // 4) delay قبل تحديث المنتج
+    await new Promise(r => setTimeout(r, 500));
+    // 5) حدّث المنتج بالوسوم
     if (tagIds.length > 0) await sallaUpdate(productId, { tags: tagIds }, token);
     res.json({ success: true, added: tagIds.length, tagIds });
   } catch (e) {
