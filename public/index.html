@@ -8,18 +8,23 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#05070a;--s1:#0a0e17;--s2:#0f1524;--s3:#161e31;
-  --ac:#c5a059;--ac2:#e2c275;--ac3:#b08e4f;
+  --bg:#020617; 
+  --s1:rgba(15, 23, 42, 0.6); 
+  --s2:rgba(30, 41, 59, 0.5); 
+  --s3:rgba(255, 255, 255, 0.05);
+  --ac:#6366f1; 
+  --ac2:#8b5cf6;
+  --gold:#c5a059; 
   --gr:#10b981;--rd:#ef4444;--yw:#f59e0b;
-  --tx:#f1f5f9;--t2:#94a3b8;--t3:#334155;
+  --tx:#f8fafc;--t2:#94a3b8;--t3:#475569;
   --sb:260px
 }
 body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(99,102,241,.05) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(139,92,246,.04) 0%,transparent 50%);pointer-events:none;z-index:0}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 10% 40%, rgba(99,102,241,0.15) 0%, transparent 40%), radial-gradient(circle at 90% 60%, rgba(197,160,89,0.1) 0%, transparent 40%);pointer-events:none;z-index:0}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
 
 /* SIDEBAR */
-.sb{width:var(--sb);background:rgba(8,12,20,.97);border-left:1px solid rgba(99,102,241,.1);position:fixed;right:0;top:0;bottom:0;z-index:70;display:flex;flex-direction:column;backdrop-filter:blur(20px);transition:transform .3s}
+.sb{width:var(--sb);background:rgba(2,6,23,0.7);backdrop-filter:blur(20px);border-left:1px solid rgba(99,102,241,.1);position:fixed;right:0;top:0;bottom:0;z-index:70;display:flex;flex-direction:column;backdrop-filter:blur(20px);transition:transform .3s}
 .sb-head{padding:18px 16px;border-bottom:1px solid rgba(99,102,241,.1);display:flex;align-items:center;gap:11px}
 .logo{width:36px;height:36px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;box-shadow:0 0 20px rgba(99,102,241,.4)}
 .brand{font-size:12px;font-weight:800;letter-spacing:-.3px;line-height:1.3}
@@ -56,7 +61,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .main{margin-right:var(--sb);display:flex;flex-direction:column;min-height:100vh;position:relative;z-index:1}
 
 /* TOPBAR */
-.topbar{background:rgba(3,5,8,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(99,102,241,.1);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;gap:10px}
+.topbar{background:rgba(2,6,23,0.6);backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid rgba(99,102,241,.1);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;gap:10px}
 .menu-btn{display:none;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:8px;color:var(--t2);cursor:pointer;padding:6px 10px;font-size:16px;flex-shrink:0;font-family:inherit}
 .pg-title{font-size:14px;font-weight:700;letter-spacing:-.3px}
 .pg-tag{font-size:10px;color:var(--ac);background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:100px;padding:2px 9px;font-weight:600}
@@ -218,14 +223,16 @@ textarea{min-height:90px;resize:vertical;line-height:1.6}
 </head>
 <body>
 
-<div id="m-lock" style="position:fixed;inset:0;background:#05070a;z-index:20000;display:flex;align-items:center;justify-content:center;color:white;flex-direction:column;text-align:center;">
-    <h2 style="color:#c5a059;margin-bottom:20px;">نمو المتاجر الإلكترونية</h2>
-    <p style="color:#a0aec0;margin-bottom:10px;">التحكم بالمنتجات يتطلب اشتراكاً مفعلاً</p>
-    <input type="password" id="c-input" style="padding:12px;margin:15px;border-radius:8px;text-align:center;border:1px solid #c5a059;background:#0a0e17;color:#fff;width:250px;" placeholder="أدخل كود التفعيل">
-    <button onclick="if(document.getElementById('c-input').value==='mm1'){document.getElementById('m-lock').style.display='none';localStorage.setItem('auth_v3','ok')}else{alert('الكود غير صحيح')}" style="padding:12px 30px;background:linear-gradient(135deg, #c5a059, #e2c275);border:none;border-radius:8px;cursor:pointer;font-weight:bold;color:#000;width:250px;">تفعيل الوصول</button>
-    <a href="https://wa.me/966500000000" style="margin-top:20px;color:#a0aec0;font-size:12px;text-decoration:none;">تواصل عبر الواتساب للاشتراك</a>
+<div id="m-lock" style="position:fixed;inset:0;background:rgba(2,6,23,0.95);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);">
+  <div style="background:rgba(15, 23, 42, 0.6);border:1px solid rgba(197,160,89,0.3);border-radius:20px;padding:40px;text-align:center;max-width:400px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.5);">
+    <h2 style="color:#c5a059;margin-bottom:10px;">نمو المتاجر الإلكترونية</h2>
+    <p style="color:#94a3b8;">الرجاء إدخال كود التفعيل للوصول للوحة التحكم</p>
+    <input type="password" id="sys-code" style="width:100%;padding:14px;margin:20px 0;background:rgba(0,0,0,0.3);border:1px solid rgba(255, 255, 255, 0.05);color:white;border-radius:10px;text-align:center;font-size:16px;outline:none;" placeholder="أدخل الكود هنا">
+    <button onclick="if(document.getElementById('sys-code').value==='mm1'){document.getElementById('m-lock').style.display='none';localStorage.setItem('auth_ok_glass','true')}else{alert('الكود غير صحيح!')}" style="padding:12px 18px;border-radius:10px;font-size:13px;font-weight:700;background:linear-gradient(135deg,#c5a059,#e2c275);color:#000;border:none;cursor:pointer;width:100%;box-shadow:0 4px 15px rgba(197,160,89,0.3);">تفعيل الدخول</button>
+    <a href="https://wa.me/966500000000" style="display:block;margin-top:20px;color:#94a3b8;font-size:12px;text-decoration:none;">تواصل عبر الواتساب للاشتراك</a>
+  </div>
 </div>
-<script>if(localStorage.getItem('auth_v3')==='ok')document.getElementById('m-lock').style.display='none';</script>
+<script>if(localStorage.getItem('auth_ok_glass')==='true')document.getElementById('m-lock').style.display='none';</script>
 
 <div style="display:flex;min-height:100vh">
 
@@ -682,7 +689,7 @@ async function run(){
           name:p.name,
           currentDescription:p.description||'',
           tone,audience,
-          instructions:inst||(wantDesc?'':'لا تغير الوصف'),
+          instructions:inst + (wantTags ? '\nملاحظة هامة: قم بتوليد 10 إلى 15 وسماً (Tags) متعلقة بالمنتج.' : ''),
           storeId:p.store_id||''
         })
       });
@@ -795,7 +802,7 @@ async function uploadOne(i){
       await fetch(B+'/api/add-tags',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({productId:r.p.id,tags:d.features.slice(0,10),token:T})
+        body:JSON.stringify({productId:r.p.id,tags:d.features,token:T})
       });
     }
     results[i].uploaded=true;
