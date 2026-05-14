@@ -673,12 +673,27 @@ async function loadLeads(){
     if(cnt)cnt.textContent='('+leads.length+')';
     const tbl=document.getElementById('leads-table');
     if(!tbl)return;
-    if(!leads.length){tbl.innerHTML='<div class="empty-w"><div class="ei">📭</div><p>لا يوجد عملاء بعد</p></div>';return;}
-    tbl.innerHTML='<table><thead><tr><th>البريد الإلكتروني</th><th>المصدر</th><th>تاريخ التسجيل</th></tr></thead><tbody>'+
-      leads.map(l=>'<tr><td dir="ltr" style="font-weight:600;color:var(--tx)">'+l.email+'</td>'+
-        '<td><span class="pill pill-free">'+(l.source==='excel'?'📊 Excel':'🔗 سلة')+'</span></td>'+
-        '<td class="dtime">'+(l.created_at?new Date(l.created_at).toLocaleDateString('ar-SA'):'—')+'</td></tr>').join('')+
-    '</tbody></table>';
+    if(!leads.length){
+      tbl.innerHTML='<div class="empty-w"><div class="ei">📭</div><p>لا يوجد عملاء محتملون بعد<br><span style="font-size:11px">سيظهرون هنا بعد التسجيل من صفحة الهبوط</span></p></div>';
+      return;
+    }
+    // Stats bar
+    const excelCount = leads.filter(l=>l.source==='excel').length;
+    const sallaCount = leads.filter(l=>l.source!=='excel').length;
+    const statsHtml = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 18px;border-bottom:1px solid var(--b1);background:var(--s2)">'
+      +'<div style="text-align:center"><div style="font-size:22px;font-weight:900;color:var(--ac)">'+leads.length+'</div><div style="font-size:10px;color:var(--t2)">إجمالي</div></div>'
+      +'<div style="text-align:center"><div style="font-size:22px;font-weight:900;color:var(--gr)">'+excelCount+'</div><div style="font-size:10px;color:var(--t2)">عبر Excel</div></div>'
+      +'<div style="text-align:center"><div style="font-size:22px;font-weight:900;color:var(--yw)">'+sallaCount+'</div><div style="font-size:10px;color:var(--t2)">عبر سلة</div></div>'
+      +'</div>';
+    tbl.innerHTML = statsHtml
+      +'<table><thead><tr><th>#</th><th>البريد الإلكتروني</th><th>المصدر</th><th>تاريخ التسجيل</th></tr></thead><tbody>'
+      +leads.map((l,i)=>'<tr>'
+        +'<td style="color:var(--t3);font-size:11px">'+(i+1)+'</td>'
+        +'<td dir="ltr" style="font-weight:600;color:var(--tx);font-size:13px">'+l.email+'</td>'
+        +'<td><span class="pill '+(l.source==='excel'?'pill-pro':'pill-enterprise')+'">'+(l.source==='excel'?'📊 Excel':'🔗 سلة')+'</span></td>'
+        +'<td class="dtime">'+(l.created_at?new Date(l.created_at).toLocaleDateString('ar-SA',{year:'numeric',month:'short',day:'numeric'}):'—')+'</td>'
+      +'</tr>').join('')
+      +'</tbody></table>';
   }catch(e){console.error(e);}
 }
 setInterval(loadAll,60000);
