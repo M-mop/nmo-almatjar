@@ -85,21 +85,29 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '5mb' }));
 
 const publicPath = path.join(__dirname, '../public');
-app.use(express.static(publicPath));
-// الصفحة الرئيسية = landing
+
+// ─── ROUTES قبل static ────────────────────
 app.get('/', (req, res) => {
   res.sendFile(path.join(publicPath, 'landing.html'));
 });
-
-// التطبيق = /app
 app.get('/app', (req, res) => {
   res.sendFile(path.join(publicPath, 'index.html'));
 });
-
-// Admin
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(publicPath, 'admin.html'));
 });
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(publicPath, 'about.html'));
+});
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(publicPath, 'privacy.html'));
+});
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(publicPath, 'terms.html'));
+});
+
+// ─── STATIC بعد الـ routes ────────────────
+app.use(express.static(publicPath, { index: false }));
 
 const openai  = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -1330,4 +1338,4 @@ app.get('/api/admin/stats', requireAdmin, async (req, res) => {
       latest: customers.slice(0, 5)
     });
   } catch(e) { res.status(500).json({ error: e.message }); }
-}); 
+});
