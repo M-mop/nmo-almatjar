@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>نمو المتاجر الإلكترونية — منصة تحسين المنتجات بالذكاء الاصطناعي</title>
+<title>نمو المتاجر الإلكترونية</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -12,288 +12,205 @@
   --ac:#6366f1;--ac2:#8b5cf6;--ac3:#06b6d4;
   --gr:#10b981;--rd:#ef4444;--yw:#f59e0b;
   --tx:#f1f5f9;--t2:#94a3b8;--t3:#334155;
-  --sb:260px;--r:12px;
-  --glow:0 0 40px rgba(99,102,241,.15)
+  --sb:260px
 }
-html{scroll-behavior:smooth}
 body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;overflow-x:hidden}
-
-/* ANIMATED BG */
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(99,102,241,.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(139,92,246,.05) 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(6,182,212,.04) 0%,transparent 50%);pointer-events:none;z-index:0}
-
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(99,102,241,.05) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(139,92,246,.04) 0%,transparent 50%);pointer-events:none;z-index:0}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
 
 /* SIDEBAR */
-.sb{width:var(--sb);background:rgba(8,12,20,.95);border-left:1px solid rgba(99,102,241,.1);position:fixed;right:0;top:0;bottom:0;z-index:70;display:flex;flex-direction:column;backdrop-filter:blur(20px);transition:transform .3s cubic-bezier(.4,0,.2,1)}
-.sb-head{padding:20px 16px;border-bottom:1px solid rgba(99,102,241,.1);display:flex;align-items:center;gap:12px}
-.logo{width:38px;height:38px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 0 20px rgba(99,102,241,.4),0 0 40px rgba(99,102,241,.1)}
-.brand{font-size:13px;font-weight:800;letter-spacing:-.3px;line-height:1.3}
-.brand-sub{font-size:9px;color:var(--t3);margin-top:2px;letter-spacing:.5px;text-transform:uppercase}
-.sb-badge{margin:10px 16px;background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(139,92,246,.08));border:1px solid rgba(99,102,241,.2);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--t2);display:flex;align-items:center;gap:6px}
-.sb-dot{width:6px;height:6px;border-radius:50%;background:var(--gr);box-shadow:0 0 8px var(--gr);animation:pulse 2s ease-in-out infinite;flex-shrink:0}
+.sb{width:var(--sb);background:rgba(8,12,20,.97);border-left:1px solid rgba(99,102,241,.1);position:fixed;right:0;top:0;bottom:0;z-index:70;display:flex;flex-direction:column;backdrop-filter:blur(20px);transition:transform .3s}
+.sb-head{padding:18px 16px;border-bottom:1px solid rgba(99,102,241,.1);display:flex;align-items:center;gap:11px}
+.logo{width:36px;height:36px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;box-shadow:0 0 20px rgba(99,102,241,.4)}
+.brand{font-size:12px;font-weight:800;letter-spacing:-.3px;line-height:1.3}
+.brand-sub{font-size:9px;color:var(--t3);margin-top:1px;letter-spacing:.5px;text-transform:uppercase}
+.store-badge{margin:10px 12px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.15);border-radius:9px;padding:9px 12px;display:flex;align-items:center;gap:8px}
+.store-dot{width:6px;height:6px;border-radius:50%;background:var(--gr);box-shadow:0 0 8px var(--gr);animation:pulse 2s infinite;flex-shrink:0}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.store-nm{font-size:11px;color:var(--t2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sb-nav{flex:1;overflow-y:auto;padding:8px}
 .nav-sec{padding:12px 8px 4px;font-size:9px;font-weight:700;color:var(--t3);letter-spacing:2px;text-transform:uppercase}
-.nit{display:flex;align-items:center;gap:10px;padding:10px 12px;font-size:12px;color:var(--t2);cursor:pointer;border-radius:10px;margin:2px 0;transition:all .15s;font-weight:500;position:relative;user-select:none}
+.nit{display:flex;align-items:center;gap:10px;padding:9px 12px;font-size:12px;color:var(--t2);cursor:pointer;border-radius:9px;margin:1px 0;transition:all .13s;font-weight:500;user-select:none}
 .nit:hover{background:rgba(99,102,241,.08);color:var(--tx)}
-.nit.on{background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.1));color:var(--ac);font-weight:600}
-.nit.on::before{content:'';position:absolute;right:-8px;top:50%;transform:translateY(-50%);width:3px;height:20px;background:linear-gradient(var(--ac),var(--ac2));border-radius:3px;box-shadow:0 0 8px var(--ac)}
-.ni{width:18px;text-align:center;font-size:15px;flex-shrink:0}
+.nit.on{background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.08));color:var(--ac);font-weight:700}
+.nit.on::before{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:linear-gradient(var(--ac),var(--ac2));border-radius:3px;box-shadow:0 0 8px var(--ac)}
+.nit{position:relative}
+.ni{width:18px;text-align:center;font-size:14px;flex-shrink:0}
 .sb-foot{padding:12px;border-top:1px solid rgba(99,102,241,.1)}
-.usage-box{background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);border-radius:10px;padding:12px;margin-bottom:8px}
-.usage-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:7px}
+.usage-box{background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.12);border-radius:9px;padding:11px;margin-bottom:8px}
+.usage-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px}
 .usage-lbl{color:var(--t2);font-weight:500}
 .usage-val{color:var(--ac);font-weight:700}
 .ubar{height:4px;background:rgba(99,102,241,.1);border-radius:4px;overflow:hidden}
-.ufill{height:100%;border-radius:4px;transition:width .6s ease}
+.ufill{height:100%;border-radius:4px;transition:width .5s;background:linear-gradient(90deg,var(--ac),var(--ac2))}
 .uplan{font-size:10px;color:var(--t3);margin-top:5px}
-.sb-link{display:block;text-align:center;padding:9px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);border-radius:9px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;text-decoration:none;margin-bottom:6px}
-.sb-link:hover{border-color:rgba(99,102,241,.4);color:var(--ac);background:rgba(99,102,241,.1)}
+.sb-btn{width:100%;padding:9px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:9px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .13s;margin-bottom:6px;display:block;text-align:center;text-decoration:none}
+.sb-btn:hover{border-color:rgba(99,102,241,.4);color:var(--ac);background:rgba(99,102,241,.12)}
+.sb-btn.salla{background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.1));border-color:rgba(99,102,241,.3);color:var(--ac)}
 
 /* OVERLAY */
 .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:69;backdrop-filter:blur(4px)}
 .ov.on{display:block}
 
 /* MAIN */
-.main{margin-right:var(--sb);flex:1;display:flex;flex-direction:column;min-height:100vh;position:relative;z-index:1}
+.main{margin-right:var(--sb);display:flex;flex-direction:column;min-height:100vh;position:relative;z-index:1}
 
 /* TOPBAR */
-.topbar{background:rgba(3,5,8,.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(99,102,241,.1);padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;gap:10px}
-.tb-l{display:flex;align-items:center;gap:10px;min-width:0}
-.menu-btn{display:none;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:8px;color:var(--t2);cursor:pointer;padding:6px 10px;font-size:16px;flex-shrink:0;transition:all .15s;line-height:1}
-.menu-btn:hover{background:rgba(99,102,241,.2);color:var(--tx)}
-.pg-title{font-size:15px;font-weight:700;white-space:nowrap;letter-spacing:-.3px}
-.pg-tag{font-size:10px;color:var(--ac);background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:100px;padding:2px 10px;font-weight:600}
-.tb-r{font-size:11px;color:var(--t3);white-space:nowrap}
+.topbar{background:rgba(3,5,8,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(99,102,241,.1);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;gap:10px}
+.menu-btn{display:none;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:8px;color:var(--t2);cursor:pointer;padding:6px 10px;font-size:16px;flex-shrink:0;font-family:inherit}
+.pg-title{font-size:14px;font-weight:700;letter-spacing:-.3px}
+.pg-tag{font-size:10px;color:var(--ac);background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:100px;padding:2px 9px;font-weight:600}
+.tb-r{font-size:11px;color:var(--t3)}
 
 /* CONTENT */
-.content{padding:20px;max-width:1000px}
-.page{display:none;animation:pgIn .2s ease}
+.content{padding:18px;max-width:980px}
+.page{display:none;animation:pgIn .18s ease}
 .page.on{display:block}
-@keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes pgIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
-/* CARD */
-.card{background:var(--s1);border:1px solid rgba(99,102,241,.1);border-radius:var(--r);margin-bottom:12px;overflow:hidden;transition:border-color .2s;box-shadow:0 4px 24px rgba(0,0,0,.3)}
-.card:hover{border-color:rgba(99,102,241,.25)}
-.chd{padding:14px 18px;border-bottom:1px solid rgba(99,102,241,.08);display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(99,102,241,.03)}
-.ctitle{font-size:13px;font-weight:700;letter-spacing:-.2px}
+/* CARDS */
+.card{background:var(--s1);border:1px solid rgba(99,102,241,.1);border-radius:12px;margin-bottom:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.chd{padding:13px 16px;border-bottom:1px solid rgba(99,102,241,.08);display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(99,102,241,.02)}
+.ctitle{font-size:13px;font-weight:700}
 .csub{font-size:11px;color:var(--t2);margin-top:2px}
-.cbody{padding:16px 18px}
-.tip{background:rgba(6,182,212,.05);border-bottom:1px solid rgba(6,182,212,.1);padding:12px 18px;font-size:12px;color:#67e8f9;line-height:1.65;display:flex;gap:8px}
-
-/* STEPS */
-.steps{display:flex;align-items:center;margin-bottom:20px;overflow-x:auto;padding-bottom:2px}
-.stp{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.stp:not(:last-child)::after{content:'';width:28px;height:1px;background:rgba(99,102,241,.2);margin:0 4px}
-.stp-n{width:26px;height:26px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--t3);transition:all .2s;border:1px solid transparent}
-.stp-l{font-size:11px;color:var(--t3);white-space:nowrap;font-weight:500;transition:color .2s}
-.stp.on .stp-n{background:var(--ac);color:#fff;box-shadow:0 0 0 3px rgba(99,102,241,.2),0 0 12px rgba(99,102,241,.4)}
-.stp.on .stp-l{color:var(--ac);font-weight:700}
-.stp.dn .stp-n{background:var(--gr);color:#fff;box-shadow:0 0 8px rgba(16,185,129,.3)}
-.stp.dn .stp-l{color:var(--gr)}
-
-/* TABS */
-.tabs{display:flex;gap:8px;margin-bottom:16px}
-.tab-btn{padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;border:1px solid rgba(99,102,241,.2);background:transparent;color:var(--t2);transition:all .2s}
-.tab-btn.on{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(99,102,241,.3)}
-.tab-btn:hover:not(.on){border-color:rgba(99,102,241,.4);color:var(--tx);background:rgba(99,102,241,.08)}
-
-/* DROPZONE */
-.dropzone{border:2px dashed rgba(99,102,241,.25);border-radius:12px;padding:36px 20px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(99,102,241,.03)}
-.dropzone:hover,.dropzone.drag{border-color:var(--ac);background:rgba(99,102,241,.08)}
-.dz-icon{font-size:44px;margin-bottom:12px}
-.dz-title{font-size:15px;font-weight:700;margin-bottom:5px}
-.dz-sub{font-size:12px;color:var(--t3)}
-.dz-file{margin-top:10px;font-size:12px;color:var(--gr);font-weight:600;display:none}
-
-/* FORM */
-.fg{margin-bottom:14px}
-.lbl{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:5px;display:block;letter-spacing:.5px;text-transform:uppercase}
-input,textarea,select{width:100%;background:var(--s2);border:1px solid rgba(99,102,241,.15);border-radius:9px;padding:10px 13px;color:var(--tx);font-family:inherit;font-size:13px;outline:none;transition:all .15s}
-input:focus,textarea:focus,select:focus{border-color:var(--ac);background:rgba(99,102,241,.05);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
-select option{background:var(--s2);color:var(--tx)}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
-/* TOGGLES */
-.trow{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid rgba(99,102,241,.06)}
-.trow:last-child{border:none}
-.tinfo .tl{font-size:13px;color:var(--t2);font-weight:500}
-.tinfo .th{font-size:11px;color:var(--t3);margin-top:2px;line-height:1.5}
-.tog{position:relative;width:38px;height:21px;flex-shrink:0;margin-top:2px}
-.tog input{opacity:0;width:0;height:0;position:absolute}
-.ts{position:absolute;inset:0;background:var(--s3);border-radius:21px;cursor:pointer;transition:.15s}
-.ts::before{content:'';position:absolute;height:15px;width:15px;left:3px;bottom:3px;background:var(--t3);border-radius:50%;transition:.15s}
-.tog input:checked+.ts{background:linear-gradient(135deg,var(--ac),var(--ac2));box-shadow:0 0 12px rgba(99,102,241,.4)}
-.tog input:checked+.ts::before{transform:translateX(17px);background:#fff}
-.sec-lbl{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;padding:10px 0 6px;border-bottom:1px solid rgba(99,102,241,.08);margin-bottom:4px}
-
-/* BUTTONS */
-.btn{padding:10px 18px;border-radius:10px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;letter-spacing:-.1px;user-select:none}
-.btn:active{transform:scale(.97)}
-.bp{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 4px 16px rgba(99,102,241,.35)}
-.bp:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 24px rgba(99,102,241,.45)}
-.bp:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
-.bs{background:rgba(99,102,241,.08);color:var(--t2);border:1px solid rgba(99,102,241,.2)}
-.bs:hover{color:var(--tx);border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.12)}
-.bg{background:linear-gradient(135deg,var(--gr),#059669);color:#fff;box-shadow:0 4px 16px rgba(16,185,129,.3)}
-.bg:hover{opacity:.9;transform:translateY(-1px)}
-.bg:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
-.brow{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;align-items:center}
-
-/* PROGRESS */
-.prog{display:none;background:rgba(99,102,241,.05);border:1px solid rgba(99,102,241,.15);border-radius:12px;padding:16px;margin-top:12px}
-.prog.on{display:block}
-.prog-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(99,102,241,.2);border-top-color:var(--ac);border-radius:50%;animation:sp .65s linear infinite;flex-shrink:0}
-@keyframes sp{to{transform:rotate(360deg)}}
-.prog-txt{font-size:12px;color:#a5b4fc;font-weight:500;flex:1}
-.prog-bar-wrap{height:5px;background:rgba(99,102,241,.1);border-radius:5px;overflow:hidden}
-.prog-bar{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2),var(--ac3));border-radius:5px;transition:width .4s ease;width:0%;box-shadow:0 0 8px rgba(99,102,241,.5)}
-
-/* UPLOAD BAR */
-.upbar{background:var(--s1);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;box-shadow:0 0 20px rgba(16,185,129,.05)}
-.up-info{font-size:13px;color:var(--gr);font-weight:600}
-.up-acts{display:flex;gap:7px;flex-wrap:wrap}
-
-/* RESULTS */
-.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.pcard{background:var(--s1);border:1px solid rgba(99,102,241,.1);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s;box-shadow:0 4px 20px rgba(0,0,0,.3)}
-.pcard:hover{border-color:rgba(99,102,241,.3);box-shadow:0 8px 32px rgba(99,102,241,.1)}
-.pc-hd{padding:12px 14px;border-bottom:1px solid rgba(99,102,241,.08);display:flex;align-items:center;gap:10px;background:rgba(99,102,241,.03)}
-.pc-img{width:42px;height:42px;border-radius:8px;object-fit:cover;background:var(--s2);flex-shrink:0;border:1px solid rgba(99,102,241,.1)}
-.pc-info{flex:1;min-width:0}
-.pc-nm{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pc-pr{font-size:10px;color:var(--t3);margin-top:2px}
-.pc-badge{font-size:10px;padding:3px 8px;border-radius:100px;font-weight:600;flex-shrink:0}
-.b-ok{background:rgba(16,185,129,.1);color:var(--gr);border:1px solid rgba(16,185,129,.2)}
-.b-err{background:rgba(239,68,68,.1);color:var(--rd)}
-.b-ld{background:rgba(99,102,241,.1);color:var(--ac)}
-.pc-body{padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:9px}
-.pc-ft{padding:10px 14px;border-top:1px solid rgba(99,102,241,.08);display:flex;align-items:center;gap:7px;background:rgba(0,0,0,.2)}
-.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.sdot.pending{background:var(--yw)}.sdot.uploading{background:var(--ac)}.sdot.uploaded{background:var(--gr);box-shadow:0 0 8px var(--gr)}.sdot.err{background:var(--rd)}
-.slbl{font-size:10px;color:var(--t3);flex:1}
-
-/* BLOCKS */
-.blk{background:var(--s2);border:1px solid rgba(99,102,241,.1);border-radius:10px;overflow:hidden}
-.blk-lbl{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;padding:8px 11px;border-bottom:1px solid rgba(99,102,241,.08);display:flex;justify-content:space-between;align-items:center}
-.seo-prev{background:rgba(99,102,241,.05);border:1px solid rgba(99,102,241,.15);border-radius:9px;padding:11px}
-.seo-ttl{font-size:13px;color:#818cf8;font-weight:700;margin-bottom:3px;line-height:1.4}
-.seo-url{font-size:10px;color:var(--gr);margin-bottom:5px}
-.seo-dsc{font-size:11px;color:var(--t2);line-height:1.6}
-.t-opt{padding:9px 11px;border-radius:8px;border:1px solid rgba(99,102,241,.15);margin-bottom:5px;cursor:pointer;font-size:12px;transition:all .15s;display:flex;justify-content:space-between;align-items:center;gap:6px;color:var(--t2)}
-.t-opt:last-child{margin:0}
-.t-opt:hover,.t-opt.sel{border-color:var(--ac);background:rgba(99,102,241,.1);color:var(--tx)}
-.t-len{font-size:10px;color:var(--t3);flex-shrink:0}
-.desc-body{padding:10px 11px;font-size:12px;color:var(--t2);line-height:1.85;max-height:180px;overflow-y:auto}
-.desc-body.exp{max-height:none}
-.desc-body h3{font-size:12px;font-weight:700;color:var(--tx);margin:10px 0 5px}
-.desc-body p{margin-bottom:8px}.desc-body ul{padding-right:18px;margin-bottom:9px}.desc-body li{margin-bottom:5px;line-height:1.7}
-.tags-wrap{display:flex;flex-wrap:wrap;gap:5px;padding:10px 11px}
-.tag{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:100px;padding:4px 10px;font-size:10px;color:var(--t2)}
-.short-d{padding:9px 11px;font-size:12px;color:var(--t2);font-style:italic;line-height:1.65;border-right:3px solid var(--ac);background:rgba(99,102,241,.04)}
+.cbody{padding:14px 16px}
 
 /* PRODUCT LIST */
-.plist{max-height:380px;overflow-y:auto;border-radius:10px;border:1px solid rgba(99,102,241,.1)}
-.pi{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;transition:background .13s;border-bottom:1px solid rgba(99,102,241,.06)}
+.plist{max-height:400px;overflow-y:auto;border:1px solid rgba(99,102,241,.1);border-radius:10px}
+.pi{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;transition:background .12s;border-bottom:1px solid rgba(99,102,241,.06)}
 .pi:last-child{border:none}
 .pi:hover{background:rgba(99,102,241,.05)}
 .pi.sel{background:rgba(99,102,241,.08)}
 .pcb{width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0}
-.pimg{width:40px;height:40px;border-radius:7px;object-fit:cover;background:var(--s2);flex-shrink:0;border:1px solid rgba(99,102,241,.1)}
+.pimg{width:40px;height:40px;border-radius:7px;object-fit:cover;background:var(--s2);flex-shrink:0;border:1px solid rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;font-size:16px}
 .pinfo{flex:1;min-width:0}
 .pnm{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ppr{font-size:10px;color:var(--t3);margin-top:2px}
 .pbadge{font-size:9px;padding:2px 7px;border-radius:100px;font-weight:700;flex-shrink:0}
 .pb-ok{background:rgba(16,185,129,.1);color:var(--gr)}
 .pb-no{background:rgba(245,158,11,.1);color:var(--yw)}
+
+/* FILTER BAR */
 .sbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .scnt{font-size:11px;color:var(--t3)}
-.fbtns{display:flex;gap:4px;margin-right:auto}
-.fb{font-size:11px;padding:5px 11px;border-radius:8px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);color:var(--t2);cursor:pointer;font-family:inherit;transition:all .14s;font-weight:500}
-.fb:hover{color:var(--tx);border-color:rgba(99,102,241,.3)}
-.fb.on{background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.4);color:var(--ac);font-weight:600}
+.fbtns{display:flex;gap:4px}
+.fb{font-size:11px;padding:5px 11px;border-radius:7px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.12);color:var(--t2);cursor:pointer;font-family:inherit;transition:all .12s;font-weight:500}
+.fb.on{background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.35);color:var(--ac)}
 
-/* HISTORY */
-.h-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.hstat{background:var(--s1);border:1px solid rgba(99,102,241,.1);border-radius:var(--r);padding:16px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.3)}
-.hval{font-size:24px;font-weight:900;margin-bottom:4px;letter-spacing:-.5px}
-.hlbl{font-size:11px;color:var(--t3)}
-.h-item{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid rgba(99,102,241,.06);transition:background .13s}
-.h-item:last-child{border:none}.h-item:hover{background:rgba(99,102,241,.04)}
-.h-dot{width:7px;height:7px;border-radius:50%;background:var(--gr);box-shadow:0 0 6px var(--gr);flex-shrink:0}
-.h-nm{font-size:12px;font-weight:600;flex:1}.h-time{font-size:10px;color:var(--t3)}
+/* STEPS */
+.steps{display:flex;align-items:center;gap:4px;margin-bottom:18px;overflow-x:auto;padding-bottom:2px}
+.stp{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.stp:not(:last-child)::after{content:'←';color:var(--t3);font-size:11px;margin:0 4px}
+.stp-n{width:24px;height:24px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--t3);border:1px solid transparent;transition:all .2s}
+.stp-l{font-size:11px;color:var(--t3);font-weight:500;transition:color .2s}
+.stp.on .stp-n{background:var(--ac);color:#fff;box-shadow:0 0 0 3px rgba(99,102,241,.2)}
+.stp.on .stp-l{color:var(--ac);font-weight:700}
+.stp.dn .stp-n{background:var(--gr);color:#fff}
+.stp.dn .stp-l{color:var(--gr)}
 
-/* QUALITY */
-.qdash{background:var(--s1);border:1px solid rgba(99,102,241,.1);border-radius:var(--r);padding:20px;margin-bottom:14px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
-.qscore-wrap{display:flex;align-items:center;gap:16px;margin-bottom:16px}
-.qcirc{width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0}
-.qcirc-inner{width:56px;height:56px;border-radius:50%;background:var(--s1);display:flex;flex-direction:column;align-items:center;justify-content:center;position:absolute}
-.qnum{font-size:16px;font-weight:900;color:var(--ac)}
-.qlbl{font-size:9px;color:var(--t3)}
-.qtask{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(99,102,241,.05);border:1px solid rgba(99,102,241,.12);border-radius:10px;cursor:pointer;transition:all .15s;margin-bottom:8px}
-.qtask:hover{border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.08)}
-.qtask-l{display:flex;align-items:center;gap:9px}
-.qtask-title{font-size:12px;font-weight:600}
-.qtask-count{font-size:10px;color:var(--t3)}
-.qtask-btn{font-size:11px;padding:5px 12px;border-radius:7px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border:none;font-family:inherit;font-weight:700;cursor:pointer}
+/* FORM */
+.fg{margin-bottom:14px}
+.lbl{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:5px;display:block;letter-spacing:.5px;text-transform:uppercase}
+input,textarea,select{width:100%;background:var(--s2);border:1px solid rgba(99,102,241,.12);border-radius:9px;padding:10px 12px;color:var(--tx);font-family:inherit;font-size:13px;outline:none;transition:all .14s}
+input:focus,textarea:focus,select:focus{border-color:var(--ac);background:rgba(99,102,241,.04);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+select option{background:var(--s2)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+textarea{min-height:90px;resize:vertical;line-height:1.6}
 
-/* EXCEL RESULTS */
-.excel-results-wrap{background:var(--s1);border:1px solid rgba(16,185,129,.2);border-radius:12px;overflow:hidden;margin-top:14px;box-shadow:0 0 20px rgba(16,185,129,.05)}
-.excel-stats{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid rgba(99,102,241,.08)}
-.excel-stat{padding:14px;text-align:center;border-left:1px solid rgba(99,102,241,.08)}
-.excel-stat:last-child{border:none}
-.excel-stat-n{font-size:22px;font-weight:900;margin-bottom:2px}
-.excel-stat-l{font-size:10px;color:var(--t3)}
-.excel-table-wrap{max-height:400px;overflow-y:auto}
-.excel-table{width:100%;border-collapse:collapse}
-.excel-table th{padding:10px 14px;font-size:10px;font-weight:700;color:var(--t3);text-align:right;border-bottom:1px solid rgba(99,102,241,.1);background:rgba(99,102,241,.03);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
-.excel-table td{padding:10px 14px;font-size:12px;border-bottom:1px solid rgba(99,102,241,.06);vertical-align:top}
-.excel-table tr:last-child td{border:none}
-.excel-table tr:hover td{background:rgba(99,102,241,.03)}
-.etag-ok{display:inline-flex;align-items:center;gap:4px;background:rgba(16,185,129,.1);color:var(--gr);font-size:10px;padding:2px 8px;border-radius:100px;font-weight:600}
-.etag-err{background:rgba(239,68,68,.1);color:var(--rd);font-size:10px;padding:2px 8px;border-radius:100px;font-weight:600}
-.excel-dl-bar{padding:14px 18px;border-top:1px solid rgba(16,185,129,.15);display:flex;align-items:center;justify-content:space-between;background:rgba(16,185,129,.04)}
+/* TOGGLES */
+.trow{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid rgba(99,102,241,.06)}
+.trow:last-child{border:none}
+.tinfo .tl{font-size:12px;color:var(--t2);font-weight:500}
+.tinfo .th{font-size:11px;color:var(--t3);margin-top:2px;line-height:1.5}
+.tog{position:relative;width:36px;height:20px;flex-shrink:0;margin-top:2px}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.ts{position:absolute;inset:0;background:var(--s3);border-radius:20px;cursor:pointer;transition:.14s}
+.ts::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:var(--t3);border-radius:50%;transition:.14s}
+.tog input:checked+.ts{background:linear-gradient(135deg,var(--ac),var(--ac2));box-shadow:0 0 10px rgba(99,102,241,.4)}
+.tog input:checked+.ts::before{transform:translateX(16px);background:#fff}
 
-/* ALERTS */
-.al{padding:10px 14px;border-radius:10px;font-size:12px;margin-bottom:10px;line-height:1.6;display:flex;gap:8px}
-.al-i{background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.15);color:#67e8f9}
-.al-r{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);color:var(--rd)}
-.al-g{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);color:var(--gr)}
+/* RESULT DISPLAY */
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.pcard{background:var(--s1);border:1px solid rgba(99,102,241,.1);border-radius:12px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.3);transition:border-color .2s}
+.pcard:hover{border-color:rgba(99,102,241,.25)}
+.pc-hd{padding:11px 14px;border-bottom:1px solid rgba(99,102,241,.08);display:flex;align-items:center;gap:9px;background:rgba(99,102,241,.02)}
+.pc-img{width:40px;height:40px;border-radius:7px;object-fit:cover;background:var(--s2);flex-shrink:0;border:1px solid rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;font-size:16px}
+.pc-info{flex:1;min-width:0}
+.pc-nm{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-pr{font-size:10px;color:var(--t3);margin-top:2px}
+.pc-badge{font-size:9px;padding:2px 8px;border-radius:100px;font-weight:700;flex-shrink:0}
+.b-ok{background:rgba(16,185,129,.1);color:var(--gr);border:1px solid rgba(16,185,129,.15)}
+.b-ld{background:rgba(99,102,241,.1);color:var(--ac)}
+.b-err{background:rgba(239,68,68,.1);color:var(--rd)}
+.pc-body{padding:12px 14px;display:flex;flex-direction:column;gap:9px}
+.pc-ft{padding:9px 14px;border-top:1px solid rgba(99,102,241,.08);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.blk{background:var(--s2);border:1px solid rgba(99,102,241,.1);border-radius:9px;overflow:hidden}
+.blk-lbl{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:.5px;padding:7px 10px;border-bottom:1px solid rgba(99,102,241,.08);display:flex;justify-content:space-between;align-items:center}
+.t-opt{padding:8px 10px;border-radius:7px;border:1px solid rgba(99,102,241,.12);margin-bottom:4px;cursor:pointer;font-size:12px;transition:all .12s;display:flex;justify-content:space-between;align-items:center;color:var(--t2)}
+.t-opt:hover,.t-opt.sel{border-color:var(--ac);background:rgba(99,102,241,.1);color:var(--tx)}
+.t-len{font-size:10px;color:var(--t3)}
+.desc-body{padding:9px 10px;font-size:12px;color:var(--t2);line-height:1.85;max-height:160px;overflow-y:auto}
+.desc-body h3{font-size:12px;font-weight:700;color:var(--tx);margin:9px 0 4px}
+.desc-body p{margin-bottom:7px}.desc-body ul{padding-right:16px;margin-bottom:8px}.desc-body li{margin-bottom:4px;line-height:1.7}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:5px;padding:9px 10px}
+.tag{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);border-radius:100px;padding:3px 9px;font-size:10px;color:var(--t2)}
+.seo-prev{background:rgba(99,102,241,.04);border:1px solid rgba(99,102,241,.12);border-radius:9px;padding:10px}
+.seo-ttl{font-size:13px;color:#818cf8;font-weight:700;margin-bottom:3px}
+.seo-url{font-size:10px;color:var(--gr);margin-bottom:5px}
+.seo-dsc{font-size:11px;color:var(--t2);line-height:1.6}
 
-/* WARNING BOX */
-.warn-box{background:rgba(245,158,11,.05);border:1.5px solid rgba(245,158,11,.2);border-radius:12px;padding:14px 16px;margin-bottom:16px}
-.warn-box-title{font-size:13px;font-weight:700;color:#fbbf24;margin-bottom:10px}
-.warn-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.warn-item{background:rgba(245,158,11,.06);border-radius:9px;padding:10px}
-.warn-item-title{font-size:11px;font-weight:700;color:#f59e0b;margin-bottom:6px}
-.warn-item-body{font-size:11px;color:#fde68a;line-height:1.7}
-.warn-note{font-size:11px;color:#f59e0b;margin-top:10px;font-weight:600;background:rgba(245,158,11,.08);border-radius:7px;padding:7px 10px}
+/* BUTTONS */
+.btn{padding:9px 16px;border-radius:9px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .15s;border:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;user-select:none}
+.btn:active{transform:scale(.97)}
+.bp{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 4px 14px rgba(99,102,241,.3)}
+.bp:hover{opacity:.9;transform:translateY(-1px)}
+.bp:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+.bs{background:rgba(99,102,241,.08);color:var(--t2);border:1px solid rgba(99,102,241,.18)}
+.bs:hover{color:var(--tx);border-color:rgba(99,102,241,.35)}
+.bg{background:linear-gradient(135deg,var(--gr),#059669);color:#fff;box-shadow:0 4px 12px rgba(16,185,129,.25)}
+.bg:hover{opacity:.9;transform:translateY(-1px)}
+.bg:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.brow{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
+
+/* STATUS */
+.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sdot.pending{background:var(--yw)}.sdot.uploading{background:var(--ac)}.sdot.uploaded{background:var(--gr);box-shadow:0 0 6px var(--gr)}.sdot.error{background:var(--rd)}
+.slbl{font-size:10px;color:var(--t3);flex:1}
+
+/* SBAR — bulk action bar */
+.upbar{background:var(--s1);border:1px solid rgba(16,185,129,.2);border-radius:11px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;box-shadow:0 0 20px rgba(16,185,129,.05)}
+.up-info{font-size:12px;color:var(--gr);font-weight:600}
+.up-acts{display:flex;gap:7px;flex-wrap:wrap}
+
+/* PROGRESS */
+.prog{display:none;background:rgba(99,102,241,.04);border:1px solid rgba(99,102,241,.12);border-radius:10px;padding:14px;margin-top:12px}
+.prog.on{display:block}
+.prog-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(99,102,241,.2);border-top-color:var(--ac);border-radius:50%;animation:sp .65s linear infinite;flex-shrink:0}
+@keyframes sp{to{transform:rotate(360deg)}}
+.prog-txt{font-size:12px;color:#a5b4fc;font-weight:500;flex:1}
+.prog-bar-wrap{height:4px;background:rgba(99,102,241,.1);border-radius:4px;overflow:hidden}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2),var(--ac3));border-radius:4px;transition:width .4s;box-shadow:0 0 8px rgba(99,102,241,.5)}
 
 /* TOAST */
-.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(14px);border-radius:12px;padding:11px 20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .22s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 28px rgba(0,0,0,.5)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(12px);border-radius:11px;padding:10px 18px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.5)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.success{background:var(--gr);color:#fff}
 .toast.error{background:var(--rd);color:#fff}
 .toast.info{background:var(--ac);color:#fff}
 
-/* LOCK MODAL */
-.lock-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
-.lock-box{background:var(--s1);border:1px solid rgba(99,102,241,.2);border-radius:20px;padding:32px;max-width:420px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(99,102,241,.1)}
+/* LOCK */
+.lock-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)}
+.lock-box{background:var(--s1);border:1px solid rgba(99,102,241,.2);border-radius:18px;padding:30px;max-width:400px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 
 /* MOBILE */
 @media(max-width:768px){
-  .menu-btn{display:flex !important;align-items:center;justify-content:center}
+  .menu-btn{display:flex!important;align-items:center;justify-content:center}
   .sb{transform:translateX(100%)}.sb.open{transform:translateX(0)}
-  .main{margin-right:0}.content{padding:14px}
-  .rgrid{grid-template-columns:1fr}.frow{grid-template-columns:1fr}
-  .h-stats{grid-template-columns:1fr 1fr}
-  .warn-grid{grid-template-columns:1fr}
+  .main{margin-right:0}.content{padding:12px}
+  .rgrid,.frow{grid-template-columns:1fr}
   .upbar{flex-direction:column}
-  .up-acts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .up-acts .btn:first-child{grid-column:1/-1}
 }
-@media(max-width:420px){.stp-l{display:none}.topbar{padding:0 12px}.h-stats{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -308,40 +225,41 @@ select option{background:var(--s2);color:var(--tx)}
       <div class="brand-sub">AI Platform</div>
     </div>
   </div>
-  <div class="sb-badge">
-    <div class="sb-dot"></div>
-    <span id="sn" style="font-size:11px;color:var(--t2)">جاري التحميل...</span>
+  <div class="store-badge">
+    <div class="store-dot"></div>
+    <span class="store-nm" id="sn">جاري التحميل...</span>
   </div>
   <div class="sb-nav">
-    <div class="nav-sec">تحسين المحتوى</div>
-    <div class="nit on" onclick="gp('excel')" id="nav-excel"><span class="ni">📊</span> تحسين Excel</div>
+    <div class="nav-sec">الأدوات</div>
+    <div class="nit on" onclick="gp('enhance')" id="nav-enhance"><span class="ni">⚡</span> تحسين المنتجات</div>
+    <div class="nit" onclick="gp('score')" id="nav-score"><span class="ni">📊</span> تقييم SEO</div>
     <div class="nav-sec">التتبع</div>
-    <div class="nit" onclick="gp('history')" id="nav-history"><span class="ni">✅</span> المنتجات المحسّنة</div>
+    <div class="nit" onclick="gp('history')" id="nav-history"><span class="ni">✅</span> المحسّنة</div>
     <div class="nit" onclick="gp('quality')" id="nav-quality"><span class="ni">🏆</span> نقاط الجودة</div>
     <div class="nav-sec">معلومات</div>
     <div class="nit" onclick="window.open('/about.html','_blank')"><span class="ni">👤</span> من نحن</div>
     <div class="nit" onclick="window.open('/privacy.html','_blank')"><span class="ni">🔒</span> الخصوصية</div>
-    <div class="nit" onclick="window.open('/terms.html','_blank')"><span class="ni">📋</span> شروط الاستخدام</div>
+    <div class="nit" onclick="window.open('/terms.html','_blank')"><span class="ni">📋</span> الشروط</div>
   </div>
   <div class="sb-foot">
     <div class="usage-box">
-      <div class="usage-row"><span class="usage-lbl">الاستهلاك</span><span class="usage-val" id="uval">0 / ∞</span></div>
+      <div class="usage-row"><span class="usage-lbl">الاستهلاك الشهري</span><span class="usage-val" id="uval">0 / 0</span></div>
       <div class="ubar"><div class="ufill" id="ufill" style="width:0%"></div></div>
       <div class="uplan" id="uplan">جاري التحقق...</div>
     </div>
-    <button class="sb-link" onclick="showPromoModal()">🔑 لديك كود ترقية؟</button>
-    <a href="https://wa.me/905340355912" target="_blank" class="sb-link">📱 تواصل للاشتراك</a>
+    <button class="sb-btn" onclick="showPromo()">🔑 لديك كود ترقية؟</button>
+    <a href="https://wa.me/905340355912?text=أبغى+أشترك+في+نمو+المتاجر" target="_blank" class="sb-btn">📱 تواصل للاشتراك</a>
+    <button class="sb-btn salla" onclick="reconnect()">🔗 إعادة ربط المتجر</button>
   </div>
 </div>
-
 <div class="ov" id="ov" onclick="closeSB()"></div>
 
 <!-- MAIN -->
 <div class="main">
   <div class="topbar">
-    <div class="tb-l">
+    <div style="display:flex;align-items:center;gap:8px">
       <button class="menu-btn" onclick="toggleSB()">☰</button>
-      <div class="pg-title" id="pg-title">📊 تحسين Excel</div>
+      <div class="pg-title" id="pg-title">⚡ تحسين المنتجات</div>
       <span class="pg-tag" id="pg-tag">الأدوات</span>
     </div>
     <div class="tb-r" id="tb-r">نمو المتاجر الإلكترونية</div>
@@ -349,142 +267,139 @@ select option{background:var(--s2);color:var(--tx)}
 
   <div class="content">
 
-    <!-- EXCEL PAGE -->
-    <div class="page on" id="page-excel">
-      <div style="margin-bottom:18px">
-        <div style="font-size:16px;font-weight:800;margin-bottom:4px;letter-spacing:-.3px">📊 تحسين ملفات Excel</div>
-        <div style="font-size:13px;color:var(--t2)">حسّن منتجاتك من أي منصة — سلة، زد، شوبيفاي، ووكومرس وغيرها</div>
+    <!-- ENHANCE PAGE -->
+    <div class="page on" id="page-enhance">
+      <!-- STEPS -->
+      <div class="steps">
+        <div class="stp on" id="st1"><div class="stp-n">1</div><div class="stp-l">اختر المنتجات</div></div>
+        <div class="stp" id="st2"><div class="stp-n">2</div><div class="stp-l">خيارات التحسين</div></div>
+        <div class="stp" id="st3"><div class="stp-n">3</div><div class="stp-l">النتائج والرفع</div></div>
       </div>
 
-      <!-- WARNING BOX -->
-      <div class="warn-box">
-        <div class="warn-box-title">⚠️ كيف تحصل على الملف الصحيح؟</div>
-        <div class="warn-grid">
-          <div class="warn-item">
-            <div class="warn-item-title">📦 ملف المنتجات</div>
-            <div class="warn-item-body">
-              من لوحة تحكم متجرك<br>
-              ← المنتجات ← تصدير<br>
-              ← <b>تصدير المنتجات</b><br>
-              ← حمّل ملف Excel
-            </div>
-          </div>
-          <div class="warn-item">
-            <div class="warn-item-title">🔍 ملف SEO</div>
-            <div class="warn-item-body">
-              من لوحة تحكم سلة<br>
-              ← المنتجات ← تصدير<br>
-              ← <b>تصدير بيانات SEO</b><br>
-              ← حمّل ملف Excel
-            </div>
-          </div>
-        </div>
-        <div class="warn-note">⛔ ارفع فقط ملفات Excel المُصدَّرة من منصتك — لا ترفع أي ملف آخر</div>
-      </div>
-
-      <!-- TABS -->
-      <div class="tabs">
-        <button class="tab-btn on" id="tab-products" onclick="switchExcelTab('products')">📦 ملف المنتجات</button>
-        <button class="tab-btn" id="tab-seo" onclick="switchExcelTab('seo')">🔍 ملف SEO</button>
-      </div>
-
-      <!-- PRODUCTS TAB -->
-      <div id="excel-products-tab">
+      <!-- STEP 1: Product List -->
+      <div id="step1">
         <div class="card">
           <div class="chd">
-            <div><div class="ctitle">📦 تحسين المنتجات</div><div class="csub">يعدّل: الاسم + الوصف فقط — باقي الأعمدة لا تُمس</div></div>
+            <div><div class="ctitle">📦 منتجات متجرك</div><div class="csub" id="prods-sub">جاري التحميل...</div></div>
+            <button class="btn bs" onclick="loadProds()" style="font-size:11px;padding:6px 12px">🔄 تحديث</button>
           </div>
           <div class="cbody">
+            <div class="sbar">
+              <div class="fbtns">
+                <button class="fb on" onclick="filterProds('all',this)">الكل</button>
+                <button class="fb" onclick="filterProds('no-desc',this)">بدون وصف</button>
+                <button class="fb" onclick="filterProds('enhanced',this)">محسّن ✓</button>
+              </div>
+              <span class="scnt" id="sel-cnt">0 محدد</span>
+              <div style="margin-right:auto;display:flex;gap:6px">
+                <button class="btn bs" style="font-size:11px;padding:5px 10px" onclick="selAll()">تحديد الكل</button>
+                <button class="btn bs" style="font-size:11px;padding:5px 10px" onclick="selNone()">إلغاء</button>
+              </div>
+            </div>
+            <div class="plist" id="plist"><div style="padding:30px;text-align:center;color:var(--t3)">جاري تحميل المنتجات...</div></div>
+          </div>
+        </div>
+        <div class="brow">
+          <button class="btn bp" onclick="goStep2()" id="btn-next1">التالي — خيارات التحسين ←</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Options -->
+      <div id="step2" style="display:none">
+        <div id="sel-upbar" class="upbar">
+          <div class="up-info" id="upbar-info">0 منتج محدد</div>
+          <div class="up-acts">
+            <button class="btn bs" style="font-size:11px" onclick="goStep1()">← تغيير التحديد</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="chd"><div class="ctitle">⚙️ خيارات التحسين</div><div class="csub">خصّص طريقة تحسين منتجاتك</div></div>
+          <div class="cbody">
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">أسلوب الكتابة</label>
+                <select id="tone">
+                  <option value="professional">احترافي</option>
+                  <option value="luxury">فاخر وراقي</option>
+                  <option value="youth">شبابي وعصري</option>
+                  <option value="friendly">ودي وقريب</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label class="lbl">الجمهور المستهدف</label>
+                <input id="audience" placeholder="مثال: النساء السعوديات 25-45" value="العملاء السعوديين">
+              </div>
+            </div>
             <div class="fg">
-              <label class="lbl">أسلوب الكتابة</label>
-              <select id="excel-tone-p" style="max-width:240px">
-                <option value="professional">احترافي</option>
-                <option value="luxury">فاخر وراقي</option>
-                <option value="youth">شبابي وعصري</option>
-                <option value="friendly">ودي وقريب</option>
-              </select>
+              <label class="lbl">تعليمات إضافية (اختياري)</label>
+              <input id="extra-inst" placeholder="مثال: ركّز على الجودة والضمان">
             </div>
-            <div class="dropzone" id="drop-p" onclick="document.getElementById('file-p').click()"
-              ondragover="event.preventDefault();this.classList.add('drag')"
-              ondragleave="this.classList.remove('drag')"
-              ondrop="handleDrop(event,'p')">
-              <div class="dz-icon">📊</div>
-              <div class="dz-title">اسحب ملف Excel هنا</div>
-              <div class="dz-sub">أو اضغط للاختيار — .xlsx فقط</div>
-              <div class="dz-file" id="file-p-name"></div>
-            </div>
-            <input type="file" id="file-p" accept=".xlsx" style="display:none" onchange="onFile(this,'p')">
-            <div class="brow">
-              <button class="btn bp" id="btn-p" onclick="runExcel('products')" disabled>🚀 بدء التحسين</button>
-            </div>
-            <div class="prog" id="prog-p">
-              <div class="prog-hd"><span class="spin"></span><div class="prog-txt" id="ptxt-p">جاري التحسين...</div></div>
-              <div class="prog-bar-wrap"><div class="prog-bar" id="pbar-p"></div></div>
-            </div>
-            <div id="res-p"></div>
+            <div class="sec-lbl" style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;padding:10px 0 6px;border-bottom:1px solid rgba(99,102,241,.08);margin-bottom:4px">ماذا تريد تحسينه؟</div>
+            <div class="trow"><div class="tinfo"><div class="tl">📝 وصف المنتج</div><div class="th">كتابة وصف احترافي وجذاب</div></div><label class="tog"><input type="checkbox" id="t-desc" checked><span class="ts"></span></label></div>
+            <div class="trow"><div class="tinfo"><div class="tl">🔍 عنوان SEO</div><div class="th">تحسين العنوان لمحركات البحث</div></div><label class="tog"><input type="checkbox" id="t-seo" checked><span class="ts"></span></label></div>
+            <div class="trow"><div class="tinfo"><div class="tl">🏷️ الوسوم التلقائية</div><div class="th">توليد وسوم ذكية للمنتج</div></div><label class="tog"><input type="checkbox" id="t-tags"><span class="ts"></span></label></div>
+            <div class="trow"><div class="tinfo"><div class="tl">📌 وصف قصير</div><div class="th">وصف مختصر جذاب</div></div><label class="tog"><input type="checkbox" id="t-short"><span class="ts"></span></label></div>
+            <div class="trow"><div class="tinfo"><div class="tl">📱 كابشن TikTok</div><div class="th">محتوى لمنصات التواصل</div></div><label class="tog"><input type="checkbox" id="t-tiktok"><span class="ts"></span></label></div>
           </div>
+        </div>
+        <div class="brow">
+          <button class="btn bp" onclick="run()" id="btn-run">🚀 بدء التحسين الشامل</button>
+          <button class="btn bs" onclick="goStep1()">← رجوع</button>
         </div>
       </div>
 
-      <!-- SEO TAB -->
-      <div id="excel-seo-tab" style="display:none">
-        <div class="card">
-          <div class="chd">
-            <div><div class="ctitle">🔍 تحسين SEO</div><div class="csub">يعدّل: عنوان الصفحة + وصف الصفحة فقط</div></div>
+      <!-- STEP 3: Results -->
+      <div id="step3" style="display:none">
+        <div class="prog" id="prog">
+          <div class="prog-hd">
+            <span class="spin"></span>
+            <div class="prog-txt" id="prog-txt">جاري التحسين...</div>
           </div>
-          <div class="cbody">
-            <div class="dropzone" id="drop-s" onclick="document.getElementById('file-s').click()"
-              ondragover="event.preventDefault();this.classList.add('drag')"
-              ondragleave="this.classList.remove('drag')"
-              ondrop="handleDrop(event,'s')">
-              <div class="dz-icon">🔍</div>
-              <div class="dz-title">اسحب ملف SEO هنا</div>
-              <div class="dz-sub">أو اضغط للاختيار — .xlsx فقط</div>
-              <div class="dz-file" id="file-s-name"></div>
-            </div>
-            <input type="file" id="file-s" accept=".xlsx" style="display:none" onchange="onFile(this,'s')">
-            <div class="brow">
-              <button class="btn bp" id="btn-s" onclick="runExcel('seo')" disabled>🚀 بدء التحسين</button>
-            </div>
-            <div class="prog" id="prog-s">
-              <div class="prog-hd"><span class="spin"></span><div class="prog-txt" id="ptxt-s">جاري التحسين...</div></div>
-              <div class="prog-bar-wrap"><div class="prog-bar" id="pbar-s"></div></div>
-            </div>
-            <div id="res-s"></div>
-          </div>
+          <div class="prog-bar-wrap"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
         </div>
+        <div id="results"></div>
+        <div class="brow" id="step3-btns" style="display:none">
+          <button class="btn bg" onclick="uploadAll()" id="btn-upload">⬆️ رفع جميع التحسينات لسلة</button>
+          <button class="btn bs" onclick="goStep1()">← تحسين منتجات أخرى</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO SCORE PAGE -->
+    <div class="page" id="page-score">
+      <div style="margin-bottom:16px">
+        <div style="font-size:15px;font-weight:800;margin-bottom:3px">📊 تقييم SEO</div>
+        <div style="font-size:12px;color:var(--t2)">تحليل جودة المحتوى لكل منتج</div>
+      </div>
+      <div class="card">
+        <div class="chd"><div class="ctitle">نتائج التقييم</div><button class="btn bs" onclick="runScore()" style="font-size:11px;padding:5px 10px">🔄 تحديث</button></div>
+        <div id="score-list" class="cbody"><div style="text-align:center;color:var(--t3);padding:20px">اضغط تحديث لتحليل المنتجات</div></div>
       </div>
     </div>
 
     <!-- HISTORY PAGE -->
     <div class="page" id="page-history">
-      <div style="margin-bottom:16px">
-        <div style="font-size:16px;font-weight:800;margin-bottom:4px">✅ المنتجات المحسّنة</div>
-        <div style="font-size:13px;color:var(--t2)">تتبع عمليات التحسين السابقة</div>
-      </div>
-      <div class="h-stats">
-        <div class="hstat"><div class="hval" id="htot" style="color:var(--gr)">0</div><div class="hlbl">منتج محسّن</div></div>
-        <div class="hstat"><div class="hval" id="hpct" style="color:var(--ac)">0%</div><div class="hlbl">نسبة التحسين</div></div>
-        <div class="hstat"><div class="hval" id="hlft" style="color:var(--yw)">0</div><div class="hlbl">جلسات</div></div>
+      <div style="margin-bottom:16px"><div style="font-size:15px;font-weight:800;margin-bottom:3px">✅ المنتجات المحسّنة</div></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+        <div class="card" style="padding:14px;text-align:center"><div style="font-size:22px;font-weight:900;color:var(--gr)" id="htot">0</div><div style="font-size:11px;color:var(--t3)">محسّن</div></div>
+        <div class="card" style="padding:14px;text-align:center"><div style="font-size:22px;font-weight:900;color:var(--ac)" id="hpct">0%</div><div style="font-size:11px;color:var(--t3)">نسبة التحسين</div></div>
+        <div class="card" style="padding:14px;text-align:center"><div style="font-size:22px;font-weight:900;color:var(--yw)" id="hlft">0</div><div style="font-size:11px;color:var(--t3)">جلسات</div></div>
       </div>
       <div class="card">
         <div class="chd"><div class="ctitle">سجل العمليات</div><button class="btn bs" style="font-size:11px;padding:5px 10px" onclick="clearH()">🗑️ مسح</button></div>
-        <div id="hlist"><div style="padding:32px;text-align:center;color:var(--t3);font-size:13px">لا يوجد سجل بعد</div></div>
+        <div id="hlist"><div style="padding:28px;text-align:center;color:var(--t3)">لا يوجد سجل بعد</div></div>
       </div>
     </div>
 
     <!-- QUALITY PAGE -->
     <div class="page" id="page-quality">
-      <div style="margin-bottom:16px">
-        <div style="font-size:16px;font-weight:800;margin-bottom:4px">🏆 نقاط الجودة</div>
-        <div style="font-size:13px;color:var(--t2)">تتبع مستوى تحسين متجرك</div>
-      </div>
-      <div class="qdash">
-        <div class="qscore-wrap">
-          <div class="qcirc" id="qcirc" style="background:conic-gradient(var(--ac) 0% 0%, var(--s3) 0% 100%)">
-            <div class="qcirc-inner">
-              <div class="qnum" id="qnum">0%</div>
-              <div class="qlbl">جودة</div>
+      <div style="margin-bottom:16px"><div style="font-size:15px;font-weight:800;margin-bottom:3px">🏆 نقاط الجودة</div></div>
+      <div class="card" style="padding:20px">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+          <div id="qcirc" style="width:70px;height:70px;border-radius:50%;background:conic-gradient(var(--ac) 0%,var(--s3) 0%);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <div style="width:54px;height:54px;border-radius:50%;background:var(--s1);display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-size:16px;font-weight:900;color:var(--ac)" id="qnum">0%</div>
+              <div style="font-size:9px;color:var(--t3)">جودة</div>
             </div>
           </div>
           <div>
@@ -498,13 +413,12 @@ select option{background:var(--s2);color:var(--tx)}
 
   </div>
 
-  <!-- FOOTER -->
-  <div style="text-align:center;padding:14px 20px;border-top:1px solid rgba(99,102,241,.1);font-size:11px;color:var(--t3);margin-top:auto">
+  <div style="text-align:center;padding:14px 20px;border-top:1px solid rgba(99,102,241,.08);font-size:11px;color:var(--t3);margin-top:auto">
     <a href="/about.html" style="color:var(--t3);text-decoration:none;margin:0 8px">من نحن</a>·
     <a href="/privacy.html" style="color:var(--t3);text-decoration:none;margin:0 8px">الخصوصية</a>·
-    <a href="/terms.html" style="color:var(--t3);text-decoration:none;margin:0 8px">شروط الاستخدام</a>·
-    <a href="https://wa.me/905340355912" target="_blank" style="color:var(--t3);text-decoration:none;margin:0 8px">📱 الدعم</a>
-    <div style="margin-top:5px;opacity:.5">© 2025 نمو المتاجر الإلكترونية</div>
+    <a href="/terms.html" style="color:var(--t3);text-decoration:none;margin:0 8px">الشروط</a>·
+    <a href="https://wa.me/905340355912" target="_blank" style="color:var(--t3);text-decoration:none;margin:0 8px">الدعم</a>
+    <div style="margin-top:4px;opacity:.4">© 2025 نمو المتاجر الإلكترونية</div>
   </div>
 </div>
 </div>
@@ -512,15 +426,30 @@ select option{background:var(--s2);color:var(--tx)}
 <div class="toast" id="toast"></div>
 
 <script>
-const B = window.location.origin;
-let eLog = JSON.parse(localStorage.getItem('eL')||'[]');
-let excelFileP = null, excelFileS = null;
+const B=window.location.origin;
+let T='', prods=[], sel={}, eLog=JSON.parse(localStorage.getItem('eL')||'[]');
+let enhanced={};
 
-const PI = {
-  excel:{t:'📊 تحسين Excel',g:'الأدوات'},
+const PI={
+  enhance:{t:'⚡ تحسين المنتجات',g:'الأدوات'},
+  score:{t:'📊 تقييم SEO',g:'الأدوات'},
   history:{t:'✅ المنتجات المحسّنة',g:'التتبع'},
   quality:{t:'🏆 نقاط الجودة',g:'التتبع'}
 };
+
+// ── INIT ─────────────────────────────────
+async function init(){
+  T=new URLSearchParams(location.search).get('token')||localStorage.getItem('sT')||'';
+  if(!T){window.location.href='/';return;}
+  localStorage.setItem('sT',T);
+  // Clean URL
+  if(location.search.includes('token=')){
+    history.replaceState({},'','/app');
+  }
+  const plan=localStorage.getItem('uP')||'free';
+  if(plan==='free') showLock();
+  else{ updU(); loadProds(); }
+}
 
 // ── NAV ───────────────────────────────────
 function gp(id){
@@ -533,345 +462,407 @@ function gp(id){
   document.getElementById('pg-tag').textContent=i.g||'';
   if(id==='history')renderH();
   if(id==='quality')renderQ();
+  if(id==='score')runScore();
   closeSB();
 }
 function toggleSB(){document.getElementById('sb').classList.toggle('open');document.getElementById('ov').classList.toggle('on');}
 function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('on');}
+function reconnect(){window.location.href=B+'/auth/salla';}
 
 // ── USAGE ─────────────────────────────────
 function updU(){
   const p=localStorage.getItem('uP')||'free';
   const u=parseInt(localStorage.getItem('uC')||'0');
-  document.getElementById('uplan').textContent = p==='free'?'⛔ يلزم اشتراك':p==='trial'?'🎯 تجربة مجانية':p==='pro'?'⭐ Pro':'💎 Enterprise';
-  document.getElementById('uval').textContent = p==='free'?'محجوب':(u+' منتج');
+  const lim={free:0,trial:50,pro:200,enterprise:99999}[p]||0;
+  document.getElementById('uplan').textContent=p==='free'?'⛔ يلزم اشتراك':p==='trial'?'🎯 تجربة':p==='pro'?'⭐ Pro':'💎 Enterprise';
+  document.getElementById('uval').textContent=lim?u+' / '+lim:'محجوب';
+  const pct=lim?Math.min(100,Math.round(u/lim*100)):0;
   const fill=document.getElementById('ufill');
-  const limit={trial:50,pro:200,enterprise:99999}[p]||0;
-  if(fill&&limit>0){const pct=Math.min(100,Math.round(u/limit*100));fill.style.width=pct+'%';fill.style.background=pct>80?'linear-gradient(90deg,var(--yw),var(--rd))':'linear-gradient(90deg,var(--ac),var(--ac2))';}
-}
-
-// ── INIT ──────────────────────────────────
-function init(){
-  updU();
-  const plan=localStorage.getItem('uP')||'free';
-  if(plan==='free') showLockModal();
+  if(fill){fill.style.width=pct+'%';fill.style.background=pct>80?'linear-gradient(90deg,var(--yw),var(--rd))':'linear-gradient(90deg,var(--ac),var(--ac2))';}
 }
 
 // ── LOCK MODAL ────────────────────────────
-function showLockModal(){
-  if(document.getElementById('lock-modal')) return;
+function showLock(){
+  if(document.getElementById('lock-modal'))return;
   const m=document.createElement('div');
   m.className='lock-modal';m.id='lock-modal';
   m.innerHTML='<div class="lock-box">'
-    +'<div style="text-align:center;margin-bottom:20px">'
-    +'<div style="font-size:48px;margin-bottom:12px">🔒</div>'
-    +'<div style="font-size:20px;font-weight:900;margin-bottom:6px">الخدمة مدفوعة</div>'
-    +'<div style="font-size:13px;color:var(--t2);line-height:1.6">للوصول لمنصة نمو المتاجر يلزمك الاشتراك</div>'
+    +'<div style="text-align:center;margin-bottom:18px">'
+    +'<div style="font-size:44px;margin-bottom:10px">🔒</div>'
+    +'<div style="font-size:18px;font-weight:900;margin-bottom:6px">الخدمة مدفوعة</div>'
+    +'<div style="font-size:13px;color:var(--t2);line-height:1.6">يلزمك الاشتراك للوصول</div>'
     +'</div>'
-    +'<div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:18px;margin-bottom:18px;text-align:center">'
-    +'<div style="font-size:11px;color:var(--t2);margin-bottom:8px;font-weight:600">خطة Pro</div>'
-    +'<div style="font-size:32px;font-weight:900;color:var(--ac);margin-bottom:4px">99 ر.س <span style="font-size:13px;font-weight:400;color:var(--t3)">/ شهر</span></div>'
-    +'<div style="font-size:11px;color:var(--t3)">200 منتج شهرياً • معالجة متوازية سريعة • جميع المنصات</div>'
+    +'<div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">'
+    +'<div style="font-size:11px;color:var(--t2);margin-bottom:6px">خطة Pro</div>'
+    +'<div style="font-size:30px;font-weight:900;color:var(--ac)">99 ر.س <span style="font-size:13px;font-weight:400;color:var(--t3)">/ شهر</span></div>'
+    +'<div style="font-size:11px;color:var(--t3);margin-top:4px">200 منتج شهرياً</div>'
     +'</div>'
-    +'<div style="margin-bottom:16px">'
-    +'<div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:8px;letter-spacing:.5px">لديك كود ترقية؟</div>'
-    +'<div style="display:flex;gap:8px">'
-    +'<input id="promo-inp" placeholder="أدخل الكود" dir="ltr" style="flex:1;text-align:center;letter-spacing:3px;text-transform:uppercase;font-weight:700" onkeydown="if(event.keyCode==13)applyPromo()">'
+    +'<div style="margin-bottom:14px">'
+    +'<div style="font-size:11px;color:var(--t3);margin-bottom:6px">لديك كود؟</div>'
+    +'<div style="display:flex;gap:7px">'
+    +'<input id="promo-inp" placeholder="أدخل الكود" dir="ltr" style="flex:1;text-align:center;letter-spacing:3px;text-transform:uppercase" onkeydown="if(event.keyCode==13)applyPromo()">'
     +'<button onclick="applyPromo()" class="btn bp" style="white-space:nowrap">تفعيل</button>'
-    +'</div>'
-    +'</div>'
-    +'<a href="https://wa.me/905340355912?text=أبغى+أشترك+في+نمو+المتاجر" target="_blank" class="btn bg" style="width:100%;justify-content:center;margin-bottom:8px;font-size:14px">📱 تواصل للاشتراك عبر واتساب</a>'
+    +'</div></div>'
+    +'<a href="https://wa.me/905340355912?text=أبغى+أشترك" target="_blank" class="btn bg" style="width:100%;justify-content:center;font-size:13px">📱 تواصل للاشتراك</a>'
     +'</div>';
   document.body.appendChild(m);
-  setTimeout(()=>document.getElementById('promo-inp')?.focus(),300);
+  setTimeout(()=>document.getElementById('promo-inp')?.focus(),200);
 }
 
-function closeLockModal(){var m=document.getElementById('lock-modal');if(m)m.remove();}
+function closeLock(){const m=document.getElementById('lock-modal');if(m)m.remove();}
 
 function applyPromo(){
-  const inp=document.getElementById('promo-inp');
-  const code=(inp?.value||'').trim().toUpperCase();
-  if(!code){toast('أدخل الكود أولاً','error');return;}
+  const code=(document.getElementById('promo-inp')?.value||'').trim().toUpperCase();
+  if(!code){toast('أدخل الكود','error');return;}
   if(code==='MM1'){
-    localStorage.setItem('uP','trial');
-    localStorage.setItem('uC','0');
-    updU();
-    closeLockModal();
-    toast('🎉 تم تفعيل التجربة — 50 منتج مجاناً!','success');
-    return;
+    localStorage.setItem('uP','trial');localStorage.setItem('uC','0');
+    updU();closeLock();loadProds();
+    toast('🎉 تم تفعيل التجربة — 50 منتج!','success');return;
   }
   toast('❌ الكود غير صحيح','error');
-  if(inp){inp.style.borderColor='var(--rd)';inp.value='';}
 }
 
-function showPromoModal(){
-  const plan=localStorage.getItem('uP')||'free';
-  if(plan!=='free'){toast('أنت مشترك بالفعل ✅','success');return;}
-  showLockModal();
+function showPromo(){
+  if(localStorage.getItem('uP')!=='free'){toast('أنت مشترك بالفعل ✅','success');return;}
+  showLock();
 }
 
-// ── EXCEL TAB SWITCH ──────────────────────
-function switchExcelTab(tab){
-  const isP = tab==='products';
-  document.getElementById('excel-products-tab').style.display = isP?'block':'none';
-  document.getElementById('excel-seo-tab').style.display = isP?'none':'block';
-  document.getElementById('tab-products').className = 'tab-btn'+(isP?' on':'');
-  document.getElementById('tab-seo').className = 'tab-btn'+(!isP?' on':'');
-}
-
-// ── FILE HANDLING ─────────────────────────
-function onFile(input,type){
-  const file=input.files[0];
-  if(!file)return;
-  if(!file.name.endsWith('.xlsx')){toast('يجب أن يكون الملف .xlsx','error');return;}
-  if(type==='p'){
-    excelFileP=file;
-    const nm=document.getElementById('file-p-name');
-    nm.textContent='✅ '+file.name;nm.style.display='block';
-    document.getElementById('drop-p').style.borderColor='var(--gr)';
-    const btn=document.getElementById('btn-p');
-    btn.disabled=false;
-  } else {
-    excelFileS=file;
-    const nm=document.getElementById('file-s-name');
-    nm.textContent='✅ '+file.name;nm.style.display='block';
-    document.getElementById('drop-s').style.borderColor='var(--gr)';
-    const btn=document.getElementById('btn-s');
-    btn.disabled=false;
-  }
-}
-
-function handleDrop(e,type){
-  e.preventDefault();
-  const file=e.dataTransfer.files[0];
-  if(!file)return;
-  const input=document.getElementById(type==='p'?'file-p':'file-s');
-  const dt=new DataTransfer();dt.items.add(file);input.files=dt.files;
-  onFile(input,type);
-  document.getElementById('drop-'+type).classList.remove('drag');
-}
-
-// ── RUN EXCEL WITH POLLING ────────────────
-let pollingIntervals = {};
-
-async function runExcel(type){
-  const plan=localStorage.getItem('uP')||'free';
-  if(plan==='free'){showLockModal();return;}
-
-  const isP=type==='products';
-  const file=isP?excelFileP:excelFileS;
-  const prog=document.getElementById(isP?'prog-p':'prog-s');
-  const ptxt=document.getElementById(isP?'ptxt-p':'ptxt-s');
-  const pbar=document.getElementById(isP?'pbar-p':'pbar-s');
-  const res=document.getElementById(isP?'res-p':'res-s');
-  const btn=document.getElementById(isP?'btn-p':'btn-s');
-
-  if(!file){toast('اختر ملف أولاً','error');return;}
-
-  btn.disabled=true;
-  prog.classList.add('on');
-  res.innerHTML='';
-  ptxt.textContent='⬆️ جاري رفع الملف...';
-  pbar.style.width='5%';
-
+// ── LOAD PRODUCTS ─────────────────────────
+async function loadProds(){
+  document.getElementById('plist').innerHTML='<div style="padding:28px;text-align:center;color:var(--t3)"><span class="spin" style="display:inline-block"></span> جاري التحميل...</div>';
   try{
-    const form=new FormData();
-    form.append('file',file);
-    if(isP) form.append('tone',document.getElementById('excel-tone-p').value);
-
-    // Upload file — get jobId immediately
-    const r=await fetch(B+(isP?'/api/excel/products':'/api/excel/seo'),{method:'POST',body:form});
-    const data=await r.json();
-
-    if(!r.ok||data.error){
-      prog.classList.remove('on');
-      toast('❌ '+(data.error||'حدث خطأ'),'error');
-      btn.disabled=false;return;
-    }
-
-    const {jobId, total} = data;
-    ptxt.textContent='🚀 بدأت المعالجة — '+total+' منتج...';
-    pbar.style.width='8%';
-
-    // Start polling every 2 seconds
-    const pollKey = type;
-    if(pollingIntervals[pollKey]) clearInterval(pollingIntervals[pollKey]);
-
-    pollingIntervals[pollKey] = setInterval(async ()=>{
-      try{
-        const sr=await fetch(B+'/api/excel/status/'+jobId);
-        const status=await sr.json();
-
-        // Update progress bar
-        const pct=Math.max(8, status.progress);
-        pbar.style.width=pct+'%';
-        ptxt.textContent='⚡ معالجة متوازية — '+status.enhanced+' من '+status.total+' ('+pct+'%)';
-
-        if(status.status==='completed'){
-          clearInterval(pollingIntervals[pollKey]);
-          pbar.style.width='100%';
-          await new Promise(r=>setTimeout(r,300));
-          prog.classList.remove('on');
-
-          // Show results table
-          showExcelResults(status, isP, res);
-
-          // Auto download
-          if(status.file){
-            const blob=b64ToBlob(status.file,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            const url=URL.createObjectURL(blob);
-            const a=document.createElement('a');
-            a.href=url;a.download=status.filename||'nmo-enhanced.xlsx';a.click();
-            URL.revokeObjectURL(url);
-          }
-
-          // Save history
-          const used=parseInt(localStorage.getItem('uC')||'0');
-          localStorage.setItem('uC',used+status.enhanced);
-          eLog.unshift({type:isP?'منتجات':'SEO',count:status.enhanced,total:status.total,date:new Date().toLocaleDateString('ar-SA')});
-          if(eLog.length>50)eLog=eLog.slice(0,50);
-          localStorage.setItem('eL',JSON.stringify(eLog));
-          updU();
-          toast('✅ تم تحسين '+status.enhanced+' منتج!','success');
-          btn.disabled=false;
-
-        } else if(status.status==='failed'){
-          clearInterval(pollingIntervals[pollKey]);
-          prog.classList.remove('on');
-          toast('❌ فشلت المعالجة: '+(status.error||'خطأ غير معروف'),'error');
-          btn.disabled=false;
-        }
-      }catch(pollErr){
-        console.error('polling error:', pollErr);
-      }
-    }, 2000);
-
+    const r=await fetch(B+'/api/products',{headers:{Authorization:'Bearer '+T}});
+    const d=await r.json();
+    prods=d.products||[];
+    document.getElementById('prods-sub').textContent=prods.length+' منتج في متجرك';
+    document.getElementById('sn').textContent=prods.length+' منتج';
+    renderList(prods);
   }catch(e){
-    prog.classList.remove('on');
-    toast('❌ '+e.message,'error');
-    btn.disabled=false;
+    document.getElementById('plist').innerHTML='<div style="padding:28px;text-align:center;color:var(--rd)">❌ فشل تحميل المنتجات — تحقق من الاتصال</div>';
   }
 }
 
-function showExcelResults(data,isP,container){
-  const ok=data.results.filter(r=>r.status==='success');
-  const fail=data.results.filter(r=>r.status==='error');
+let currentFilter='all';
+function filterProds(f,btn){
+  currentFilter=f;
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  let list=prods;
+  if(f==='no-desc')list=prods.filter(p=>!p.description||p.description.length<30);
+  if(f==='enhanced')list=prods.filter(p=>enhanced[p.id]);
+  renderList(list);
+}
 
-  let html='<div class="excel-results-wrap">';
+function renderList(list){
+  if(!list.length){
+    document.getElementById('plist').innerHTML='<div style="padding:28px;text-align:center;color:var(--t3)">لا توجد منتجات في هذا التصنيف</div>';
+    return;
+  }
+  document.getElementById('plist').innerHTML=list.map((p,i)=>
+    '<div class="pi'+(sel[p.id]?' sel':'')+'" onclick="toggleSel('+p.id+')">'
+    +'<input type="checkbox" class="pcb" '+(sel[p.id]?'checked':'')+' onclick="event.stopPropagation();toggleSel('+p.id+')">'
+    +'<div class="pimg">'+(p.images?.length?'<img src="'+p.images[0].url+'" style="width:40px;height:40px;object-fit:cover;border-radius:7px">':'📦')+'</div>'
+    +'<div class="pinfo"><div class="pnm">'+escH(p.name)+'</div><div class="ppr">'+(p.price?.amount||0)+' ر.س</div></div>'
+    +(enhanced[p.id]?'<span class="pbadge pb-ok">✓ محسّن</span>':'<span class="pbadge pb-no">بدون وصف</span>')
+    +'</div>'
+  ).join('');
+  updSelCnt();
+}
 
-  // Stats
-  html+='<div class="excel-stats">'
-    +'<div class="excel-stat"><div class="excel-stat-n" style="color:var(--gr)">'+data.enhanced+'</div><div class="excel-stat-l">تم تحسينه</div></div>'
-    +'<div class="excel-stat"><div class="excel-stat-n" style="color:var(--ac)">'+data.total+'</div><div class="excel-stat-l">إجمالي</div></div>'
-    +'<div class="excel-stat"><div class="excel-stat-n" style="color:'+(fail.length?'var(--rd)':'var(--gr)')+'">'+fail.length+'</div><div class="excel-stat-l">فشل</div></div>'
-    +'</div>';
-
-  // Table
-  html+='<div class="excel-table-wrap"><table class="excel-table"><thead><tr><th>#</th>';
-  if(isP) html+='<th>الاسم الجديد</th><th>الوصف (مقتطف)</th>';
-  else html+='<th>المنتج</th><th>عنوان SEO الجديد</th><th>وصف SEO الجديد</th>';
-  html+='<th>الحالة</th></tr></thead><tbody>';
-
-  data.results.forEach((r,i)=>{
-    html+='<tr><td style="color:var(--t3);font-size:11px">'+(i+1)+'</td>';
-    if(isP){
-      html+='<td style="font-weight:600;color:var(--tx)">'+(r.newName||r.oldName||'—')+'</td>';
-      html+='<td style="color:var(--t2)">'+(r.newDesc?r.newDesc.substring(0,80)+'...':'—')+'</td>';
-    } else {
-      html+='<td style="font-weight:600;color:var(--tx)">'+(r.name||'—')+'</td>';
-      html+='<td style="color:var(--ac);font-size:11px">'+(r.newTitle||'—')+'</td>';
-      html+='<td style="color:var(--t2);font-size:11px">'+(r.newDesc?r.newDesc.substring(0,60)+'...':'—')+'</td>';
+function toggleSel(id){
+  sel[id]=!sel[id];
+  if(!sel[id])delete sel[id];
+  // Update UI
+  const items=document.querySelectorAll('.pi');
+  items.forEach(it=>{
+    const cb=it.querySelector('.pcb');
+    if(cb){
+      const pid=prods.find(p=>p.name===it.querySelector('.pnm')?.textContent)?.id;
     }
-    html+='<td>'+(r.status==='success'?'<span class="etag-ok">✓ تم</span>':'<span class="etag-err">خطأ</span>')+'</td>';
-    html+='</tr>';
   });
+  // Re-render for accuracy
+  let list=prods;
+  if(currentFilter==='no-desc')list=prods.filter(p=>!p.description||p.description.length<30);
+  if(currentFilter==='enhanced')list=prods.filter(p=>enhanced[p.id]);
+  renderList(list);
+}
 
-  html+='</tbody></table></div>';
+function updSelCnt(){
+  const cnt=Object.values(sel).filter(Boolean).length;
+  document.getElementById('sel-cnt').textContent=cnt+' محدد';
+}
 
-  // Download button
-  if(data.file){
-    html+='<div class="excel-dl-bar">'
-      +'<div style="font-size:13px;font-weight:600;color:var(--gr)">✅ '+data.enhanced+' منتج حُسِّن — الملف تم تحميله تلقائياً</div>'
-      +'<button onclick="reDownload()" class="btn bg" style="font-size:12px">📥 تحميل مرة ثانية</button>'
-      +'</div>';
+function selAll(){
+  let list=prods;
+  if(currentFilter==='no-desc')list=prods.filter(p=>!p.description||p.description.length<30);
+  list.forEach(p=>sel[p.id]=true);
+  renderList(list);
+}
+
+function selNone(){sel={};let list=prods;if(currentFilter==='no-desc')list=prods.filter(p=>!p.description||p.description.length<30);renderList(list);}
+
+// ── STEPS ────────────────────────────────
+function goStep1(){
+  document.getElementById('step1').style.display='block';
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step3').style.display='none';
+  setStp(1);
+}
+function goStep2(){
+  const cnt=Object.values(sel).filter(Boolean).length;
+  if(!cnt){toast('اختر منتجاً على الأقل','error');return;}
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+  document.getElementById('step3').style.display='none';
+  document.getElementById('upbar-info').textContent=cnt+' منتج محدد للتحسين';
+  setStp(2);
+}
+function setStp(n){
+  [1,2,3].forEach(i=>{
+    const el=document.getElementById('st'+i);
+    if(!el)return;
+    el.className='stp'+(i<n?' dn':i===n?' on':'');
+  });
+}
+
+// ── RUN ENHANCEMENT ──────────────────────
+let results=[];
+async function run(){
+  const plan=localStorage.getItem('uP')||'free';
+  if(plan==='free'){showLock();return;}
+  const limit={trial:50,pro:200,enterprise:99999}[plan]||0;
+  const used=parseInt(localStorage.getItem('uC')||'0');
+  const selProds=prods.filter(p=>sel[p.id]);
+  if(selProds.length+used>limit){toast('⚠️ ستتجاوز حد خطتك — ترقّ لخطة أعلى','error');return;}
+
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step3').style.display='block';
+  setStp(3);
+  results=[];
+  document.getElementById('results').innerHTML='';
+  document.getElementById('step3-btns').style.display='none';
+  const prog=document.getElementById('prog');
+  const ptxt=document.getElementById('prog-txt');
+  const pbar=document.getElementById('prog-bar');
+  prog.classList.add('on');
+
+  const tone=document.getElementById('tone').value;
+  const audience=document.getElementById('audience').value;
+  const inst=document.getElementById('extra-inst').value;
+  const wantDesc=document.getElementById('t-desc').checked;
+  const wantSeo=document.getElementById('t-seo').checked;
+  const wantTags=document.getElementById('t-tags').checked;
+  const wantShort=document.getElementById('t-short').checked;
+  const wantTiktok=document.getElementById('t-tiktok').checked;
+
+  let done=0;
+  const total=selProds.length;
+
+  for(const p of selProds){
+    ptxt.textContent='جاري تحسين: '+p.name.substring(0,30)+'... ('+done+'/'+total+')';
+    pbar.style.width=(done/total*100)+'%';
+    try{
+      const r=await fetch(B+'/api/generate-description',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          name:p.name,
+          currentDescription:p.description||'',
+          tone,audience,
+          instructions:inst||(wantDesc?'':'لا تغير الوصف'),
+          storeId:p.store_id||''
+        })
+      });
+      const d=await r.json();
+      if(d.error){results.push({p,status:'error',error:d.error});}
+      else{
+        results.push({p,status:'ok',data:d,
+          wantDesc,wantSeo,wantTags,wantShort,wantTiktok,
+          uploaded:false
+        });
+        localStorage.setItem('uC',String(parseInt(localStorage.getItem('uC')||'0')+1));
+        enhanced[p.id]=true;
+      }
+    }catch(e){results.push({p,status:'error',error:e.message});}
+    done++;
   }
 
+  pbar.style.width='100%';
+  ptxt.textContent='✅ اكتمل تحسين '+done+' منتج!';
+  setTimeout(()=>prog.classList.remove('on'),1000);
+  renderResults();
+  document.getElementById('step3-btns').style.display='flex';
+  updU();
+  eLog.unshift({type:'تحسين سلة',count:results.filter(r=>r.status==='ok').length,total,date:new Date().toLocaleDateString('ar-SA')});
+  localStorage.setItem('eL',JSON.stringify(eLog.slice(0,50)));
+  toast('✅ تم تحسين '+results.filter(r=>r.status==='ok').length+' منتج!','success');
+}
+
+// ── RENDER RESULTS ────────────────────────
+function renderResults(){
+  const cont=document.getElementById('results');
+  if(!results.length){cont.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px">لا توجد نتائج</div>';return;}
+  cont.innerHTML='<div class="rgrid">'+results.map((r,i)=>renderCard(r,i)).join('')+'</div>';
+}
+
+function renderCard(r,i){
+  if(r.status==='error'){
+    return '<div class="pcard"><div class="pc-hd"><div class="pc-img">📦</div><div class="pc-info"><div class="pc-nm">'+escH(r.p.name)+'</div></div><span class="pc-badge b-err">خطأ</span></div><div class="pc-body"><div style="font-size:12px;color:var(--rd)">'+escH(r.error||'')+'</div></div></div>';
+  }
+  const d=r.data;
+  const titles=[d.seoTitle,r.p.name].filter(Boolean);
+  let html='<div class="pcard">';
+  html+='<div class="pc-hd"><div class="pc-img">'+(r.p.images?.length?'<img src="'+r.p.images[0].url+'" style="width:40px;height:40px;object-fit:cover;border-radius:7px">':'📦')+'</div>';
+  html+='<div class="pc-info"><div class="pc-nm">'+escH(r.p.name)+'</div><div class="pc-pr">'+(r.p.price?.amount||0)+' ر.س</div></div>';
+  html+='<span class="pc-badge '+(r.uploaded?'b-ok':'b-ld')+'">'+(r.uploaded?'✓ رُفع':'جاهز')+'</span></div>';
+  html+='<div class="pc-body">';
+
+  if(r.wantSeo&&d.seoTitle){
+    html+='<div class="blk"><div class="blk-lbl"><span>🔍 عنوان SEO</span></div>';
+    html+=titles.map((t,ti)=>'<div class="t-opt'+(ti===0?' sel':'')+'" onclick="selTitle('+i+','+ti+',this)">'+escH(t)+'<span class="t-len">'+t.length+' حرف</span></div>').join('');
+    html+='</div>';
+  }
+  if(r.wantSeo&&d.seoDescription){
+    html+='<div class="seo-prev"><div class="seo-ttl">'+escH(d.seoTitle||r.p.name)+'</div><div class="seo-url">'+B.replace('https://','').replace('http://','')+'/product/...</div><div class="seo-dsc">'+escH(d.seoDescription)+'</div></div>';
+  }
+  if(r.wantDesc&&d.descriptionHtml){
+    html+='<div class="blk"><div class="blk-lbl">📝 الوصف الجديد <button onclick="toggleDesc(this)" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:10px">عرض كامل</button></div>';
+    html+='<div class="desc-body" id="desc-'+i+'">'+d.descriptionHtml+'</div></div>';
+  }
+  if(r.wantTags&&d.features?.length){
+    html+='<div class="blk"><div class="blk-lbl">🏷️ الوسوم</div><div class="tags-wrap">'+d.features.map(f=>'<span class="tag">'+escH(f)+'</span>').join('')+'</div></div>';
+  }
+  if(r.wantTiktok&&d.tiktokCaption){
+    html+='<div class="blk"><div class="blk-lbl">📱 TikTok</div><div class="desc-body">'+escH(d.tiktokCaption)+'</div></div>';
+  }
   html+='</div>';
-  container.innerHTML=html;
-  container._lastData=data;
+  html+='<div class="pc-ft">';
+  html+='<span class="sdot '+(r.uploaded?'uploaded':'uploading')+'"></span>';
+  html+='<span class="slbl">'+(r.uploaded?'تم الرفع لسلة':'جاهز للرفع')+'</span>';
+  html+='<button class="btn bp" style="font-size:11px;padding:5px 10px" onclick="uploadOne('+i+')">⬆️ رفع</button>';
+  html+='</div></div>';
+  return html;
 }
 
-let lastData=null;
-function reDownload(){
-  const containers=['res-p','res-s'];
-  for(const id of containers){
-    const el=document.getElementById(id);
-    if(el&&el._lastData&&el._lastData.file){
-      const data=el._lastData;
-      const blob=b64ToBlob(data.file,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url;a.download=data.filename||'nmo-enhanced.xlsx';a.click();
-      URL.revokeObjectURL(url);
-      return;
+function selTitle(ri,ti,el){
+  el.parentElement.querySelectorAll('.t-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  if(results[ri]&&results[ri].data) results[ri].selectedTitle=el.textContent.replace(/\d+ حرف/,'').trim();
+}
+
+function toggleDesc(btn){
+  const body=btn.closest('.blk').querySelector('.desc-body');
+  if(!body)return;
+  body.classList.toggle('exp');
+  btn.textContent=body.classList.contains('exp')?'تصغير':'عرض كامل';
+}
+
+// ── UPLOAD ────────────────────────────────
+async function uploadOne(i){
+  const r=results[i];
+  if(!r||r.status==='error')return;
+  const btn=document.querySelectorAll('.pc-ft .btn')[i];
+  if(btn){btn.disabled=true;btn.textContent='⏳';}
+  try{
+    const d=r.data;
+    const title=r.selectedTitle||d.seoTitle||'';
+    await fetch(B+'/api/update-product',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        productId:r.p.id,token:T,
+        description:r.wantDesc?d.description:'',
+        descriptionHtml:r.wantDesc?d.descriptionHtml:'',
+        seoTitle:r.wantSeo?title:'',
+        seoDescription:r.wantSeo?d.seoDescription:''
+      })
+    });
+    if(r.wantTags&&d.features?.length){
+      await fetch(B+'/api/add-tags',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productId:r.p.id,tags:d.features.slice(0,5),token:T})});
     }
+    results[i].uploaded=true;
+    renderResults();
+    toast('✅ تم رفع '+r.p.name,'success');
+  }catch(e){toast('❌ '+e.message,'error');}
+  if(btn){btn.disabled=false;btn.textContent='⬆️ رفع';}
+}
+
+async function uploadAll(){
+  const toUpload=results.filter(r=>r.status==='ok'&&!r.uploaded);
+  if(!toUpload.length){toast('كل المنتجات مرفوعة بالفعل ✅','info');return;}
+  document.getElementById('btn-upload').disabled=true;
+  document.getElementById('btn-upload').textContent='⏳ جاري الرفع...';
+  for(let i=0;i<results.length;i++){
+    if(results[i].status==='ok'&&!results[i].uploaded) await uploadOne(i);
   }
-  toast('لا يوجد ملف للتحميل','error');
+  document.getElementById('btn-upload').disabled=false;
+  document.getElementById('btn-upload').textContent='⬆️ رفع جميع التحسينات';
+  toast('✅ تم رفع جميع المنتجات!','success');
 }
 
-function b64ToBlob(b64,type){
-  const bin=atob(b64);
-  const arr=new Uint8Array(bin.length);
-  for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
-  return new Blob([arr],{type});
+// ── SEO SCORE ────────────────────────────
+async function runScore(){
+  document.getElementById('score-list').innerHTML='<div style="text-align:center;color:var(--t3);padding:20px"><span class="spin" style="display:inline-block"></span> جاري التحليل...</div>';
+  try{
+    const r=await fetch(B+'/api/seo-score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({products:prods})});
+    const d=await r.json();
+    const gradeColor={A:'var(--gr)',B:'#34d399',C:'var(--yw)',D:'#fb923c',F:'var(--rd)'};
+    document.getElementById('score-list').innerHTML=d.results.map(s=>
+      '<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(99,102,241,.06)">'
+      +'<div style="width:36px;height:36px;border-radius:9px;background:rgba(99,102,241,.08);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:'+(gradeColor[s.grade[0]]||'var(--t2)')+'">'+s.grade+'</div>'
+      +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escH(s.name)+'</div>'
+        +'<div style="font-size:10px;color:var(--t3);margin-top:2px">'+s.issues.join(' · ')+'</div>'
+      +'</div>'
+      +'<div style="font-size:11px;font-weight:700;color:var(--ac);white-space:nowrap">'+s.score+'/100</div>'
+      +'</div>'
+    ).join('');
+  }catch(e){document.getElementById('score-list').innerHTML='<div style="padding:20px;color:var(--rd)">❌ '+e.message+'</div>';}
 }
 
-// ── HISTORY ───────────────────────────────
+// ── HISTORY ──────────────────────────────
 function renderH(){
   const total=eLog.reduce((a,e)=>a+(e.total||0),0);
-  const enhanced=eLog.reduce((a,e)=>a+(e.count||0),0);
-  document.getElementById('htot').textContent=enhanced;
-  document.getElementById('hpct').textContent=total?Math.round(enhanced/total*100)+'%':'0%';
+  const enh=eLog.reduce((a,e)=>a+(e.count||0),0);
+  document.getElementById('htot').textContent=enh;
+  document.getElementById('hpct').textContent=total?Math.round(enh/total*100)+'%':'0%';
   document.getElementById('hlft').textContent=eLog.length;
   document.getElementById('hlist').innerHTML=eLog.length
-    ?eLog.map(h=>'<div class="h-item">'
-      +'<div class="h-dot"></div>'
-      +'<div class="h-nm">'+h.type+' — '+h.count+' من '+h.total+' منتج</div>'
-      +'<div class="h-time">'+h.date+'</div>'
+    ?eLog.map(h=>'<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(99,102,241,.06)">'
+      +'<div style="width:7px;height:7px;border-radius:50%;background:var(--gr);box-shadow:0 0 6px var(--gr);flex-shrink:0"></div>'
+      +'<div style="flex:1;font-size:12px;font-weight:600">'+h.type+' — '+h.count+' من '+h.total+'</div>'
+      +'<div style="font-size:10px;color:var(--t3)">'+h.date+'</div>'
       +'</div>').join('')
-    :'<div style="padding:32px;text-align:center;color:var(--t3);font-size:13px">لا يوجد سجل بعد</div>';
+    :'<div style="padding:28px;text-align:center;color:var(--t3)">لا يوجد سجل بعد</div>';
 }
 function clearH(){if(!confirm('مسح السجل؟'))return;eLog=[];localStorage.removeItem('eL');localStorage.removeItem('uC');renderH();updU();toast('🗑️ تم المسح','success');}
 
-// ── QUALITY ───────────────────────────────
+// ── QUALITY ──────────────────────────────
 function renderQ(){
-  const enhanced=eLog.reduce((a,e)=>a+(e.count||0),0);
+  const enh=eLog.reduce((a,e)=>a+(e.count||0),0);
   const total=eLog.reduce((a,e)=>a+(e.total||0),0);
-  const pct=total?Math.min(100,Math.round(enhanced/total*100)):0;
+  const pct=total?Math.min(100,Math.round(enh/total*100)):0;
   const circ=document.getElementById('qcirc');
   if(circ)circ.style.background='conic-gradient(var(--ac) 0% '+pct+'%, var(--s3) '+pct+'% 100%)';
   document.getElementById('qnum').textContent=pct+'%';
-  const msg=document.getElementById('qmsg');
-  if(msg){
-    if(pct===100)msg.textContent='🎉 ممتاز! استمر في التحسين';
-    else if(pct>75)msg.textContent='رائع! تقدم ممتاز';
-    else if(pct>0)msg.textContent='بداية جيدة — واصل';
-    else msg.textContent='ابدأ رحلة التحسين!';
-  }
-  document.getElementById('qdetail').textContent=enhanced+' منتج محسّن من '+total+' إجمالي';
+  const msg=['ابدأ رحلة التحسين!','بداية جيدة — واصل!','رائع! تقدم ممتاز','🎉 ممتاز!'];
+  document.getElementById('qmsg').textContent=msg[pct>=100?3:pct>75?2:pct>0?1:0];
+  document.getElementById('qdetail').textContent=enh+' منتج محسّن من '+total+' إجمالي';
   const tasks=document.getElementById('qtasks');
-  if(tasks&&enhanced===0){
-    tasks.innerHTML='<div class="qtask" onclick="gp(\'excel\')">'
-      +'<div class="qtask-l"><span style="font-size:18px">📊</span><div><div class="qtask-title">ابدأ تحسين منتجاتك</div><div class="qtask-count">ارفع ملف Excel الآن</div></div></div>'
-      +'<button class="qtask-btn">ابدأ الآن</button></div>';
+  if(tasks&&enh===0){
+    tasks.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:rgba(99,102,241,.05);border:1px solid rgba(99,102,241,.12);border-radius:10px;cursor:pointer" onclick="gp(\'enhance\')">'
+      +'<div style="display:flex;align-items:center;gap:9px"><span style="font-size:18px">⚡</span><div><div style="font-size:12px;font-weight:600">ابدأ تحسين منتجاتك</div><div style="font-size:10px;color:var(--t3)">اختر منتجات وحسّنها الآن</div></div></div>'
+      +'<button class="btn bp" style="font-size:11px">ابدأ</button></div>';
   }
 }
 
-// ── TOAST ─────────────────────────────────
+// ── HELPERS ──────────────────────────────
 function toast(msg,type){
   const t=document.getElementById('toast');
   t.textContent=msg;t.className='toast on '+(type||'info');
   setTimeout(()=>t.classList.remove('on'),3500);
 }
+function escH(t){if(!t)return'';return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 document.addEventListener('DOMContentLoaded',init);
 </script>
