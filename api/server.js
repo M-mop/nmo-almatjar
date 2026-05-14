@@ -753,28 +753,31 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
         tagIds.push(existing.id);
         continue;
       }
-      // Create new tag - send tag_name as query string
       try {
         const r = await axios.post(
           'https://api.salla.dev/admin/v2/products/tags',
           null,
-          {
-            headers: authHeader,
-            params: { tag_name: tagName }
-          }
+          { headers: authHeader, params: { tag_name: tagName } }
         );
         const newId = r.data?.data?.id;
         if (newId) { tagIds.push(newId); storeTags.push({id:newId,name:tagName}); }
-        else console.warn('no id returned for tag:', tagName, r.data);
-      } catch(e) { console.warn('create tag failed:', tagName, e.response?.data || e.message); }
+      } catch(e) { console.warn('create tag:', tagName, e.response?.data?.error?.message || e.message); }
+      await new Promise(r=>setTimeout(r,300));
     }
 
-    console.log('Tag IDs to attach:', tagIds);
+    console.log('Tag IDs:', tagIds);
 
-    // Step 3: Attach tag IDs to product
+    // Step 3: Attach ALL tag IDs to product in one call
     if (tagIds.length > 0) {
-      const updateR = await sallaUpdate(productId, { tags: tagIds }, token);
-      console.log('Attached tags:', JSON.stringify(updateR?.data?.tags||[]).substring(0,100));
+      // Get existing product tags first to merge
+      let existingTagIds = [];
+      try {
+        const prod = await sallaGet(`products/${productId}`, token);
+        existingTagIds = (prod.data?.tags||[]).map(t=>t.id).filter(Boolean);
+      } catch(e) {}
+      const allTagIds = [...new Set([...existingTagIds, ...tagIds])];
+      await sallaUpdate(productId, { tags: allTagIds }, token);
+      console.log('Attached', allTagIds.length, 'tags to product', productId);
     }
 
     res.json({ success: true, added: tagIds.length, tagIds });
