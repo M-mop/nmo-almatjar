@@ -732,6 +732,13 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
   try {
     const { productId, tags, token } = req.body;
     if (!productId || !tags?.length || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
+
+    // Send tags directly as strings
+    const cleanTags = tags.slice(0,10).map(t=>String(t).trim()).filter(Boolean);
+    console.log('Adding tags:', cleanTags, 'to:', productId);
+    const result = await sallaUpdate(productId, { tags: cleanTags }, token);
+    return res.json({ success: true, added: cleanTags.length });
+
     const tagIds = [];
     try {
       const prod = await sallaGet(`products/${productId}`, token);
