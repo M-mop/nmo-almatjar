@@ -887,15 +887,26 @@ async function enhanceExcel(type){
     }
 
     const fileSize = file.size;
-  const estProds = Math.min(Math.round(fileSize / 500), 50);
-  progTxt.textContent = 'جاري التحسين... (~' + estProds + ' منتج، قد يستغرق ' + Math.ceil(estProds * 0.7) + ' ثانية)';
+  const estProds = Math.round(fileSize / 500);
+  const estMins = Math.ceil(estProds * 0.7 / 60);
+  if(estProds > 100){
+    progTxt.textContent = 'الملف كبير (~' + estProds + ' منتج) — سيستغرق حوالي ' + estMins + ' دقيقة، يرجى الانتظار ولا تغلق الصفحة';
+  } else {
+    progTxt.textContent = 'جاري التحسين بالذكاء الاصطناعي... (~' + estProds + ' منتج)';
+  }
     progBar.style.width = '40%';
 
     const endpoint = isProducts ? '/api/excel/products' : '/api/excel/seo';
 
     // Set timeout for large files
+    // Show large file warning
+    const estCount = Math.round(file.size / 500);
+    if(estCount > 150){
+      progTxt.textContent = '⏳ الملف كبير (' + estCount + ' منتج تقريباً) — جاري المعالجة، لا تغلق الصفحة...';
+    }
+
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 300000); // 5 minutes
+    const timeout = setTimeout(() => controller.abort(), 600000); // 10 minutes for large files
 
     let res, data;
     try {
@@ -907,7 +918,7 @@ async function enhanceExcel(type){
       clearTimeout(timeout);
       progBox.style.display = 'none';
       if(fetchErr.name === 'AbortError') {
-        toast('⏱️ انتهى وقت الانتظار — جرّب عدد أقل من المنتجات','error');
+        toast('⏱️ الملف كبير جداً — يرجى تقسيمه لأجزاء أصغر أو التواصل معنا','error');
       } else {
         toast('❌ خطأ في الاتصال: ' + fetchErr.message,'error');
       }
@@ -1154,7 +1165,7 @@ function toS(n){
   if(n===2){
     const c=Object.values(sel).filter(Boolean).length;
     if(!c){toast('اختر منتجاً على الأقل','error');return;}
-    if(c>50){toast('الحد الأقصى 200 منتج دفعة واحدة','error');return;}
+    if(c>50){toast('جاري التحسين دفعة واحدة','error');return;}
   }
   for(let i=1;i<=3;i++){
     document.getElementById('s'+i).style.display=i===n?'block':'none';
