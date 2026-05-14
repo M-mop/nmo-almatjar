@@ -12,7 +12,7 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 
 
 // ─── SECURITY: CORS ───────────────────────
 const allowedOrigins = [
-  'https://salla-ai-app-indol.vercel.app',
+  'https://nmo-almatjar-production.up.railway.app',
   'http://localhost:3000',
   'http://localhost:3001',
 ];
@@ -87,6 +87,11 @@ app.use(express.json({ limit: '5mb' }));
 const publicPath = path.join(__dirname, '../public');
 app.use(express.static(publicPath));
 app.get('/', (req, res) => {
+  const f = path.join(publicPath, 'landing.html');
+  fs.existsSync(f) ? res.sendFile(f) : res.send('<h1>نمو المتجر</h1>');
+});
+
+app.get('/app', (req, res) => {
   const f = path.join(publicPath, 'index.html');
   fs.existsSync(f) ? res.sendFile(f) : res.send('<h1>نمو المتجر</h1>');
 });
@@ -99,7 +104,7 @@ app.get('/admin', (req, res) => {
 
 const openai  = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const REDIRECT_URI = 'https://salla-ai-app-indol.vercel.app/auth/callback';
+const REDIRECT_URI = process.env.APP_URL ? process.env.APP_URL + '/auth/callback' : 'https://nmo-almatjar-production.up.railway.app/auth/callback';
 
 // ─────────────────────────────────────────
 // SUPABASE — قاعدة بيانات العملاء
@@ -479,7 +484,10 @@ app.get('/api/admin/leads', requireAdmin, async (req, res) => {
 
 // Serve landing page
 app.get('/landing', (req, res) => {
-  res.sendFile(require('path').join(__dirname, '..', 'public', 'landing.html'));
+  res.sendFile(path.join(publicPath, 'landing.html'));
+});
+app.get('/landing.html', (req, res) => {
+  res.sendFile(path.join(publicPath, 'landing.html'));
 });
 
 console.log('=== SERVER START ===', 'model:', AI_MODEL, 'anthropic_key:', !!process.env.ANTHROPIC_API_KEY);
