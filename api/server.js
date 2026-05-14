@@ -736,48 +736,44 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
     const cleanTags = tags.slice(0,10).map(t=>String(t).trim()).filter(t=>t.length>0);
     if (!cleanTags.length) return res.json({ success: true, added: 0 });
 
-    // Try method 1: send as array of objects with name
-    try {
-      const r = await axios.put(
-        `https://api.salla.dev/admin/v2/products/${productId}`,
-        { tags: cleanTags.map(name => ({ name })) },
-        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
-      );
-      console.log('Tags method1 result:', r.data?.data?.tags?.length || 0);
-      return res.json({ success: true, added: cleanTags.length });
-    } catch(e1) {
-      console.warn('Tags method1 failed:', e1.response?.data || e1.message);
-    }
-
-    // Try method 2: create tags one by one then attach IDs
+    const authHeader = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
     const tagIds = [];
+
+    // Step 1: Get all existing store tags once
+    let storeTags = [];
+    try {
+      const listR = await axios.get('https://api.salla.dev/admin/v2/products/tags', { headers: authHeader });
+      storeTags = listR.data?.data || [];
+    } catch(e) { console.warn('list tags:', e.message); }
+
+    // Step 2: For each tag - find existing or create new
     for (const tagName of cleanTags) {
-      try {
-        // Create tag
-        const r = await axios.post(
-          `https://api.salla.dev/admin/v2/products/tags`,
-          { tag_name: tagName },
-          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
-        );
-        if (r.data?.data?.id) tagIds.push(r.data.data.id);
-      } catch(e2) {
-        // Tag might already exist, try to find it
-        try {
-          const list = await axios.get('https://api.salla.dev/admin/v2/products/tags', {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          const found = (list.data?.data||[]).find(t=>t.name?.toLowerCase()===tagName.toLowerCase());
-          if (found?.id) tagIds.push(found.id);
-        } catch(e3) {}
+      const existing = storeTags.find(t => t.name?.trim().toLowerCase() === tagName.toLowerCase());
+      if (existing?.id) {
+        tagIds.push(existing.id);
+        continue;
       }
+      // Create new tag using query param (salla docs)
+      try {
+        const r = await axios.post(
+          `https://api.salla.dev/admin/v2/products/tags?tag_name=${encodeURIComponent(tagName)}`,
+          {},
+          { headers: authHeader }
+        );
+        const newId = r.data?.data?.id;
+        if (newId) { tagIds.push(newId); storeTags.push({id:newId,name:tagName}); }
+      } catch(e) { console.warn('create tag failed:', tagName, e.response?.data); }
     }
 
+    console.log('Tag IDs to attach:', tagIds);
+
+    // Step 3: Attach tag IDs to product
     if (tagIds.length > 0) {
-      await sallaUpdate(productId, { tags: tagIds }, token);
-      console.log('Tags method2 added:', tagIds.length);
+      const updateR = await sallaUpdate(productId, { tags: tagIds }, token);
+      console.log('Attached tags:', JSON.stringify(updateR?.data?.tags||[]).substring(0,100));
     }
 
-    res.json({ success: true, added: tagIds.length });
+    res.json({ success: true, added: tagIds.length, tagIds });
   } catch(e) {
     console.error('add-tags error:', e.response?.data || e.message);
     res.status(500).json({ error: e.message });
