@@ -275,7 +275,7 @@ app.post('/api/excel/products', rateLimit(5, 60000), upload.single('file'), asyn
     });
 
     if (!products.length) return res.status(400).json({ error: 'لا توجد منتجات في الملف' });
-    if (products.length > 100) return res.status(400).json({ error: 'الحد الأقصى 100 منتج — قسّم الملف' });
+    if (products.length > 50) return res.status(400).json({ error: 'الحد الأقصى 50 منتج — قسّم الملف لأجزاء' });
 
     const results = [];
     for (const p of products) {
@@ -292,7 +292,7 @@ app.post('/api/excel/products', rateLimit(5, 60000), upload.single('file'), asyn
         }
 
         const msg = await anthropic.messages.create({
-          model: AI_MODEL, max_tokens: 1200,
+          model: AI_MODEL, max_tokens: 800,
           messages: [{ role: 'user', content:
 `كاتب محتوى تجارة إلكترونية. اكتب بالعربية فقط. لا تستخدم ** أو markdown.
 المنتج: ${p.name}
@@ -323,7 +323,7 @@ app.post('/api/excel/products', rateLimit(5, 60000), upload.single('file'), asyn
         row.commit();
 
         results.push({ status:'success', rowNum:p.rowNum, oldName:p.name, newName:nm, newDesc:dc.replace(/<[^>]*>/g,'').substring(0,150) });
-        await new Promise(r => setTimeout(r, 900));
+        await new Promise(r => setTimeout(r, 400));
       } catch(e) {
         results.push({ status:'error', rowNum:p.rowNum, oldName:p.name, error:e.message });
       }
@@ -371,13 +371,13 @@ app.post('/api/excel/seo', rateLimit(5, 60000), upload.single('file'), async (re
     });
 
     if (!products.length) return res.status(400).json({ error: 'لا توجد منتجات في الملف' });
-    if (products.length > 100) return res.status(400).json({ error: 'الحد الأقصى 100 منتج' });
+    if (products.length > 50) return res.status(400).json({ error: 'الحد الأقصى 50 منتج' });
 
     const results = [];
     for (const p of products) {
       try {
         const msg = await anthropic.messages.create({
-          model: AI_MODEL, max_tokens: 400,
+          model: AI_MODEL, max_tokens: 300,
           messages: [{ role: 'user', content:
 `خبير SEO للتجارة الإلكترونية. اكتب بالعربية فقط.
 المنتج: ${p.name}
@@ -400,7 +400,7 @@ app.post('/api/excel/seo', rateLimit(5, 60000), upload.single('file'), async (re
         row.commit();
 
         results.push({ status:'success', name:p.name, newTitle, newDesc });
-        await new Promise(r => setTimeout(r, 700));
+        await new Promise(r => setTimeout(r, 300));
       } catch(e) {
         results.push({ status:'error', name:p.name, error:e.message });
       }
@@ -427,23 +427,35 @@ app.post('/api/leads', async (req, res) => {
   try {
     const { email, source } = req.body;
     if (!email || !email.includes('@')) return res.status(400).json({ error: 'بريد إلكتروني غير صحيح' });
-    await dbQuery('POST', 'leads', {
-      email: email.toLowerCase().trim(),
+    const cleanEmail = email.toLowerCase().trim();
+    const url = SUPABASE_URL + '/rest/v1/leads';
+    const headers = {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=ignore-duplicates,return=representation'
+    };
+    await axios.post(url, {
+      email: cleanEmail,
       source: source || 'excel',
       created_at: new Date().toISOString()
-    });
+    }, { headers });
     res.json({ success: true, message: 'تم التسجيل بنجاح' });
   } catch(e) {
-    if (e.response?.status === 409 || (e.message||'').includes('duplicate')) {
-      return res.json({ success: true, message: 'أنت مسجل مسبقاً' });
+    if (e.response?.status === 409 || (e.response?.data?.code === '23505') || (e.message||'').includes('duplicate')) {
+      return res.json({ success: true, message: 'أنت مسجل مسبقاً ✅' });
     }
-    res.status(500).json({ error: e.message });
+    console.error('leads error:', e.response?.data || e.message);
+    res.status(500).json({ error: 'حدث خطأ في الحفظ' });
   }
 });
 
 app.get('/api/admin/leads', requireAdmin, async (req, res) => {
   try {
-    const data = await dbQuery('GET', 'leads', null, '?order=created_at.desc');
+    const url = SUPABASE_URL + '/rest/v1/leads?order=created_at.desc';
+    const headers = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
+    const r = await axios.get(url, { headers });
+    const data = r.data;
     res.json({ leads: data || [], total: (data||[]).length });
   } catch(e) {
     res.status(500).json({ error: e.message });
@@ -1009,7 +1021,7 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
           tagIds.push(newId);
           allStoreTags.push({ id: newId, name: tagName }); // أضفه للكاش
         }
-        await new Promise(r => setTimeout(r, 900)); // delay كافي لتجنب rate limit سلة
+        await new Promise(r => setTimeout(r, 400)); // delay كافي لتجنب rate limit سلة
       } catch(e) {
         console.warn(`Tag "${tagName}" failed:`, e.message);
       }
