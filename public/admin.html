@@ -219,7 +219,7 @@ textarea.ni-input{resize:vertical;min-height:80px}
 <div id="dashboard">
   <div class="sidebar">
     <div class="sb-brand">
-      <div class="sb-icon">✦</div>
+      <div class="sb-icon"><img src="https://i.ibb.co/SDZKDnMF/logo.png" style="width:20px;height:20px;object-fit:contain"></div>
       <div><div class="sb-title">نمو المتجر</div><div class="sb-sub">Admin Panel</div></div>
     </div>
     <div class="sb-clock" id="sb-clock">⏰ جاري التحميل...</div>
@@ -232,6 +232,7 @@ textarea.ni-input{resize:vertical;min-height:80px}
       <div class="nav-it" onclick="goPage('subscriptions')" id="nav-subscriptions"><span class="ni">💳</span> الاشتراكات</div>
       <div class="nav-it" onclick="goPage('activity')" id="nav-activity"><span class="ni">📋</span> سجل النشاط</div>
       <div class="nav-it" onclick="goPage('notifications')" id="nav-notifications"><span class="ni">🔔</span> الإشعارات</div>
+      <div class="nav-it" onclick="goPage('leads')" id="nav-leads"><span class="ni">📧</span> العملاء المحتملون</div>
     </div>
     <div class="sb-bot">
       <div class="sb-user">
@@ -353,6 +354,17 @@ textarea.ni-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
+      <!-- LEADS PAGE -->
+      <div class="page" id="page-leads">
+        <div class="tcard">
+          <div class="tcard-head">
+            <div class="tcard-title">📧 العملاء المحتملون <span style="font-size:11px;font-weight:400;color:var(--t2)" id="leads-count"></span></div>
+            <button class="btn btn-s" onclick="loadLeads()">🔄 تحديث</button>
+          </div>
+          <div id="leads-table"><div class="empty-w"><span class="spin"></span></div></div>
+        </div>
+      </div>
+
 <!-- EDIT MODAL -->
 <div class="overlay" id="edit-modal">
   <div class="modal">
@@ -409,13 +421,14 @@ function logout(){
 }
 
 // NAV
-const PT={overview:'📊 نظرة عامة',customers:'👥 العملاء',usage:'⚡ الاستهلاك',subscriptions:'💳 الاشتراكات',activity:'📋 سجل النشاط',notifications:'🔔 الإشعارات'};
+const PT={overview:'📊 نظرة عامة',customers:'👥 العملاء',usage:'⚡ الاستهلاك',subscriptions:'💳 الاشتراكات',activity:'📋 سجل النشاط',notifications:'🔔 الإشعارات',leads:'📧 العملاء المحتملون'};
 function goPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nav-it').forEach(n=>n.classList.remove('on'));
   document.getElementById('page-'+id)?.classList.add('on');
   document.getElementById('nav-'+id)?.classList.add('on');
   document.getElementById('tb-title').textContent=PT[id]||id;
+  if(id==='leads')loadLeads();
 }
 
 // LOAD
@@ -651,6 +664,23 @@ function showToast(msg,type='success'){
 }
 
 document.getElementById('edit-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+async function loadLeads(){
+  try{
+    const r=await fetch(B+'/api/admin/leads',{headers:{'x-admin-key':adminKey}});
+    const d=await r.json();
+    const leads=d.leads||[];
+    const cnt=document.getElementById('leads-count');
+    if(cnt)cnt.textContent='('+leads.length+')';
+    const tbl=document.getElementById('leads-table');
+    if(!tbl)return;
+    if(!leads.length){tbl.innerHTML='<div class="empty-w"><div class="ei">📭</div><p>لا يوجد عملاء بعد</p></div>';return;}
+    tbl.innerHTML='<table><thead><tr><th>البريد الإلكتروني</th><th>المصدر</th><th>تاريخ التسجيل</th></tr></thead><tbody>'+
+      leads.map(l=>'<tr><td dir="ltr" style="font-weight:600;color:var(--tx)">'+l.email+'</td>'+
+        '<td><span class="pill pill-free">'+(l.source==='excel'?'📊 Excel':'🔗 سلة')+'</span></td>'+
+        '<td class="dtime">'+(l.created_at?new Date(l.created_at).toLocaleDateString('ar-SA'):'—')+'</td></tr>').join('')+
+    '</tbody></table>';
+  }catch(e){console.error(e);}
+}
 setInterval(loadAll,60000);
 </script>
 </body>
