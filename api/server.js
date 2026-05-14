@@ -18,7 +18,6 @@ const allowedOrigins = [
 ];
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
     if (allowedOrigins.some(o => origin.startsWith(o))) return callback(null, true);
     return callback(new Error('CORS: غير مسموح'), false);
@@ -45,7 +44,6 @@ function rateLimit(maxReqs, windowMs) {
     next();
   };
 }
-// Clean old entries every 5 minutes
 setInterval(() => {
   const now = Date.now();
   for (const [key, val] of rateLimitMap.entries()) {
@@ -86,7 +84,9 @@ app.use(express.json({ limit: '5mb' }));
 
 const publicPath = path.join(__dirname, '../public');
 
-// ─── ROUTES قبل static ────────────────────
+// ════════════════════════════════════════════
+// ✅ FIX: ROUTES قبل static — الترتيب مهم جداً
+// ════════════════════════════════════════════
 app.get('/', (req, res) => {
   res.sendFile(path.join(publicPath, 'landing.html'));
 });
@@ -99,14 +99,31 @@ app.get('/admin', (req, res) => {
 app.get('/about', (req, res) => {
   res.sendFile(path.join(publicPath, 'about.html'));
 });
+app.get('/about.html', (req, res) => {
+  res.sendFile(path.join(publicPath, 'about.html'));
+});
 app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(publicPath, 'privacy.html'));
+});
+app.get('/privacy.html', (req, res) => {
   res.sendFile(path.join(publicPath, 'privacy.html'));
 });
 app.get('/terms', (req, res) => {
   res.sendFile(path.join(publicPath, 'terms.html'));
 });
+app.get('/terms.html', (req, res) => {
+  res.sendFile(path.join(publicPath, 'terms.html'));
+});
+app.get('/landing', (req, res) => {
+  res.sendFile(path.join(publicPath, 'landing.html'));
+});
+app.get('/landing.html', (req, res) => {
+  res.sendFile(path.join(publicPath, 'landing.html'));
+});
 
-// ─── STATIC بعد الـ routes ────────────────
+// ════════════════════════════════════════════
+// ✅ STATIC — index:false يمنع index.html من الظهور تلقائياً
+// ════════════════════════════════════════════
 app.use(express.static(publicPath, { index: false }));
 
 const openai  = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
@@ -114,11 +131,11 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const REDIRECT_URI = process.env.APP_URL ? process.env.APP_URL + '/auth/callback' : 'https://nmo-almatjar-production.up.railway.app/auth/callback';
 
 // ─────────────────────────────────────────
-// SUPABASE — قاعدة بيانات العملاء
+// SUPABASE
 // ─────────────────────────────────────────
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://neepfsawxdcdmfnbilft.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || 'sb_publishable_jl6GnYYSuhlUjb8Ww6DTzA_Ek3_Ald6';
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || SUPABASE_KEY; // service role for writes
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || SUPABASE_KEY;
 
 async function dbQuery(method, table, body, params) {
   params = params || '';
@@ -152,25 +169,18 @@ async function saveCustomer(token, store) {
   }
 }
 
-// Single source of truth for model name
 const AI_MODEL = 'claude-haiku-4-5-20251001';
-// ─────────────────────────────────────────
-// PLANS CONFIG
-// ─────────────────────────────────────────
+
 const PLANS = {
   free:       { limit: 2,      name: 'مجاني',      price: 0,   trialDays: 0  },
   pro:        { limit: 200,    name: 'Pro',         price: 99,  trialDays: 0  },
   enterprise: { limit: 99999,  name: 'Enterprise',  price: 299, trialDays: 0  }
 };
 
-// ─── REFERRAL: توليد كود إحالة ─────────────
 function genReferralCode(storeId) {
   return 'REF' + Buffer.from(String(storeId)).toString('base64').slice(0,6).toUpperCase();
 }
 
-// ─────────────────────────────────────────
-// CHECK USAGE LIMIT
-// ─────────────────────────────────────────
 async function checkLimit(storeId) {
   try {
     const res = await dbQuery(
@@ -195,9 +205,6 @@ async function incUsageCount(storeId) {
   } catch(e) { console.warn('incUsage error:', e.message); }
 }
 
-// ─────────────────────────────────────────
-// GET PLAN INFO
-// ─────────────────────────────────────────
 app.post('/api/plan', async (req, res) => {
   try {
     const token = getToken(req);
@@ -211,32 +218,23 @@ app.post('/api/plan', async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────
-// REFERRAL SYSTEM
-// ─────────────────────────────────────────
 app.post('/api/referral/apply', async (req, res) => {
   try {
     const { referralCode, token } = req.body;
     if (!referralCode || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
     const storeInfo = await sallaGet('store/info', token);
     const storeId = String(storeInfo.data?.id || '');
-    // Find referrer
     const all = await dbQuery('SELECT store_id FROM customers', []);
     const referrer = all.rows.find(r => genReferralCode(r.store_id) === referralCode.toUpperCase());
     if (!referrer) return res.status(404).json({ error: 'كود الإحالة غير صحيح' });
     if (referrer.store_id === storeId) return res.status(400).json({ error: 'لا يمكن استخدام كودك الخاص' });
-    // Give referred user 1 month free trial
     const trialEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
     await dbQuery('UPDATE customers SET plan=$1, trial_end=$2, products_count=0 WHERE store_id=$3', ['trial', trialEnd, storeId]);
-    // Give referrer extra month (extend their current plan)
     await dbQuery('UPDATE customers SET products_count = GREATEST(0, products_count - 50) WHERE store_id=$1', [referrer.store_id]);
     res.json({ success: true, message: 'تم تطبيق كود الإحالة — استمتع بشهر مجاني!' });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─────────────────────────────────────────
-// UPGRADE PLAN (admin only for now)
-// ─────────────────────────────────────────
 app.post('/api/upgrade-plan', async (req, res) => {
   try {
     const { storeId, plan, adminKey } = req.body;
@@ -252,14 +250,6 @@ app.post('/api/upgrade-plan', async (req, res) => {
   }
 });
 
-
-// ─────────────────────────────────────────
-// EXCEL: تحسين ملف Excel من سلة
-// ─────────────────────────────────────────
-
-// ─────────────────────────────────────────
-// EXCEL: تحسين ملف المنتجات
-// ─────────────────────────────────────────
 app.post('/api/excel/products', rateLimit(5, 60000), upload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'لم يتم رفع ملف' });
@@ -271,7 +261,6 @@ app.post('/api/excel/products', rateLimit(5, 60000), upload.single('file'), asyn
     const ws = wb.worksheets[0];
     if (!ws) return res.status(400).json({ error: 'الملف فارغ أو تالف' });
 
-    // Validate: must be products file (col 3 row 2 = أسم المنتج)
     const h = String(ws.getRow(2).getCell(3).value || '');
     if (!h.includes('أسم المنتج')) {
       return res.status(400).json({ error: 'هذا ليس ملف المنتجات الصحيح — صدّر ملف "تصدير وتحديث المنتجات الحالية" من سلة' });
@@ -289,8 +278,6 @@ app.post('/api/excel/products', rateLimit(5, 60000), upload.single('file'), asyn
 
     if (!products.length) return res.status(400).json({ error: 'لا توجد منتجات في الملف' });
 
-
-    // ── PARALLEL: 8 منتجات في نفس الوقت ────
     const BATCH_SIZE = 10;
     const results = new Array(products.length).fill(null);
 
@@ -339,7 +326,6 @@ app.post('/api/excel/products', rateLimit(5, 60000), upload.single('file'), asyn
       }
     }
 
-    // تشغيل متوازي بمجموعات
     for(let i=0; i<products.length; i+=BATCH_SIZE) {
       const batch = products.slice(i, i+BATCH_SIZE);
       await Promise.all(batch.map((p,j) => processProduct(p, i+j)));
@@ -359,9 +345,6 @@ app.post('/api/excel/products', rateLimit(5, 60000), upload.single('file'), asyn
   }
 });
 
-// ─────────────────────────────────────────
-// EXCEL: تحسين ملف SEO
-// ─────────────────────────────────────────
 app.post('/api/excel/seo', rateLimit(5, 60000), upload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'لم يتم رفع ملف' });
@@ -371,7 +354,6 @@ app.post('/api/excel/seo', rateLimit(5, 60000), upload.single('file'), async (re
     const ws = wb.worksheets[0];
     if (!ws) return res.status(400).json({ error: 'الملف فارغ أو تالف' });
 
-    // Validate: must be SEO file (col 4 row 1 contains SEO)
     const h4 = String(ws.getRow(1).getCell(4).value || '');
     if (!h4.includes('SEO')) {
       return res.status(400).json({ error: 'هذا ليس ملف SEO الصحيح — صدّر "تصدير واستيراد بيانات SEO للمنتجات" من سلة' });
@@ -388,8 +370,6 @@ app.post('/api/excel/seo', rateLimit(5, 60000), upload.single('file'), async (re
 
     if (!products.length) return res.status(400).json({ error: 'لا توجد منتجات في الملف' });
 
-
-    // ── PARALLEL: 8 منتجات في نفس الوقت ────
     const BATCH_SEO = 10;
     const results = new Array(products.length).fill(null);
 
@@ -442,9 +422,6 @@ app.post('/api/excel/seo', rateLimit(5, 60000), upload.single('file'), async (re
   }
 });
 
-// ─────────────────────────────────────────
-// LEADS: حفظ الزوار من landing page
-// ─────────────────────────────────────────
 app.post('/api/leads', async (req, res) => {
   try {
     const { email, source } = req.body;
@@ -467,7 +444,6 @@ app.post('/api/leads', async (req, res) => {
         console.log('Lead already exists:', cleanEmail);
       } else {
         console.error('DB error:', dbErr.response?.data);
-        // Still return success to user - dont block registration
       }
     }
     res.json({ success: true, message: 'تم التسجيل بنجاح' });
@@ -487,14 +463,6 @@ app.get('/api/admin/leads', requireAdmin, async (req, res) => {
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
-});
-
-// Serve landing page
-app.get('/landing', (req, res) => {
-  res.sendFile(path.join(publicPath, 'landing.html'));
-});
-app.get('/landing.html', (req, res) => {
-  res.sendFile(path.join(publicPath, 'landing.html'));
 });
 
 // ─────────────────────────────────────────
@@ -518,26 +486,15 @@ async function sallaUpdate(productId, data, token) {
   return r.data;
 }
 
-// ─────────────────────────────────────────
-// EXTRACT HELPER  — robust triple-strategy
-// ─────────────────────────────────────────
 function extractSection(text, key) {
-  // Strategy 1: ###KEY### delimiter
   let m = text.match(new RegExp(`###${key}###\\s*\\n([\\s\\S]+?)(?=\\n###[A-Z0-9_]+###|$)`));
   if (m && m[1].trim()) return m[1].trim();
-
-  // Strategy 2: KEY:\n multi-line
   m = text.match(new RegExp(`(?:^|\\n)${key}:\\s*\\n([\\s\\S]+?)(?=\\n[A-Z0-9_]+:|$)`, 'm'));
   if (m && m[1].trim()) return m[1].trim();
-
-  // Strategy 3: KEY: single line
   m = text.match(new RegExp(`(?:^|\\n)${key}:\\s*([^\\n]+)`, 'm'));
   return m ? m[1].trim() : '';
 }
 
-// ─────────────────────────────────────────
-// CONVERT PLAIN TEXT → RICH HTML
-// ─────────────────────────────────────────
 function descriptionToHtml(text) {
   if (!text) return '';
   const lines = text.split('\n');
@@ -550,8 +507,6 @@ function descriptionToHtml(text) {
       if (inList) { html += '</ul>'; inList = false; }
       continue;
     }
-
-    // Bullet point
     if (line.startsWith('- ') || line.startsWith('• ')) {
       if (!inList) {
         html += '<ul style="padding-right:20px;margin:10px 0;">';
@@ -560,14 +515,10 @@ function descriptionToHtml(text) {
       html += `<li style="margin-bottom:6px;line-height:1.8;color:#444;">${line.replace(/^[-•]\s*/, '')}</li>`;
       continue;
     }
-
     if (inList) { html += '</ul>'; inList = false; }
-
-    // Heading: line ends with : or wrapped in ** or is short (< 50 chars, no period)
     const isHeading = (line.endsWith(':') && line.length < 60)
       || /^\*\*(.+)\*\*$/.test(line)
       || (line.length < 55 && !line.endsWith('.') && !line.endsWith('،'));
-
     if (isHeading) {
       const clean = line.replace(/\*\*/g, '').replace(/:$/, '');
       html += `<h3 style="font-size:16px;font-weight:700;color:#222;margin:18px 0 8px;">${clean}</h3>`;
@@ -575,7 +526,6 @@ function descriptionToHtml(text) {
       html += `<p style="font-size:14px;line-height:1.9;color:#444;margin-bottom:12px;">${line.replace(/\*\*/g, '<strong>').replace(/\*\*/g, '</strong>')}</p>`;
     }
   }
-
   if (inList) html += '</ul>';
   return html;
 }
@@ -602,7 +552,6 @@ app.get('/auth/callback', async (req, res) => {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
     const accessToken = r.data.access_token;
-    // جلب بيانات المتجر وحفظ العميل في قاعدة البيانات
     try {
       const storeInfo = await axios.get('https://api.salla.dev/admin/v2/store/info', {
         headers: { Authorization: 'Bearer ' + accessToken }
@@ -635,9 +584,6 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────
-// SEO SCORE
-// ─────────────────────────────────────────
 app.post('/api/seo-score', rateLimit(10, 60000), async (req, res) => {
   try {
     const { products } = req.body;
@@ -658,13 +604,9 @@ app.post('/api/seo-score', rateLimit(10, 60000), async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─────────────────────────────────────────
-// GENERATE DESCRIPTION  ★ MAIN FIX ★
-// ─────────────────────────────────────────
 app.post('/api/generate-description', rateLimit(10, 60000), async (req, res) => {
   try {
     const { name, currentDescription, audience, tone, instructions, mode, storeId } = req.body;
-    // Check usage limit
     if (storeId) {
       const limit = await checkLimit(storeId);
       if (!limit.allowed) {
@@ -678,7 +620,6 @@ app.post('/api/generate-description', rateLimit(10, 60000), async (req, res) => 
     const toneMap = { professional:'احترافي ورسمي', youth:'شبابي وعصري', luxury:'فاخر وراقي', friendly:'ودي وقريب' };
     const modeInst = mode === 'improve' ? 'حسّن الوصف الحالي' : 'اكتب وصفاً احترافياً جديداً';
 
-    // ── Category Intelligence: auto-detect product category ──
     const catMap = {
       fashion:     { keywords:['فستان','بلوزة','قميص','بنطلون','جاكيت','عباءة','تيشيرت','ملابس','شنطة','حذاء','حقيبة'],    focus:'ركز على: القياسات والمقاسات المتاحة، نوع وجودة القماش، المناسبة المثالية للارتداء، عدد الألوان المتاحة، إمكانية التنسيق مع قطع أخرى' },
       electronics: { keywords:['جوال','موبايل','لابتوب','تابلت','سماعة','شاشة','كاميرا','ساعة ذكية','إلكتروني','جهاز','طابعة'],  focus:'ركز على: المواصفات التقنية الدقيقة، الأداء والسرعة، مدة البطارية، الضمان والخدمة بعد البيع، التوافق مع الأجهزة الأخرى' },
@@ -696,16 +637,10 @@ app.post('/api/generate-description', rateLimit(10, 60000), async (req, res) => 
       }
     }
 
-    // ── Fetch reviews if available (Review-to-Content) ──
     const reviewsText = instructions?.includes('###REVIEWS###')
       ? instructions.split('###REVIEWS###')[1]?.trim() || ''
       : '';
-    const reviewsSection = reviewsText
-      ? `
-تقييمات العملاء الفعلية (استخدمها لتعزيز الوصف):
-${reviewsText}
-`
-      : '';
+    const reviewsSection = reviewsText ? `\nتقييمات العملاء الفعلية (استخدمها لتعزيز الوصف):\n${reviewsText}\n` : '';
 
     const message = await anthropic.messages.create({
       model: AI_MODEL,
@@ -716,9 +651,7 @@ ${reviewsText}
 
 المنتج: ${name}
 الفئة المكتشفة: ${detectedCat}
-${currentDescription ? `الوصف الحالي:
-${currentDescription}
-` : ''}الجمهور المستهدف: ${audience || 'العملاء السعوديين'}
+${currentDescription ? `الوصف الحالي:\n${currentDescription}\n` : ''}الجمهور المستهدف: ${audience || 'العملاء السعوديين'}
 الأسلوب: ${toneMap[tone] || 'احترافي'}
 تعليمات الفئة: ${catFocus}
 تعليمات إضافية: ${instructions?.split('###REVIEWS###')[0]?.trim() || modeInst}
@@ -759,7 +692,6 @@ ${reviewsSection}
     const features = extractSection(text, 'FEATURES')
       .split('\n').filter(f => f.trim().startsWith('-')).map(f => f.replace(/^-\s*/, '').trim());
 
-    // Increment usage
     if (storeId) await incUsageCount(storeId);
     res.json({
       seoTitle:         extractSection(text, 'SEO_TITLE'),
@@ -778,9 +710,6 @@ ${reviewsSection}
   }
 });
 
-// ─────────────────────────────────────────
-// IMPROVE DESCRIPTION
-// ─────────────────────────────────────────
 app.post('/api/improve-description', async (req, res) => {
   try {
     const { name, currentDescription, instructions } = req.body;
@@ -816,9 +745,6 @@ app.post('/api/improve-description', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─────────────────────────────────────────
-// GENERATE SEO
-// ─────────────────────────────────────────
 app.post('/api/generate-seo', async (req, res) => {
   try {
     const { name, description, keywords } = req.body;
@@ -851,9 +777,6 @@ app.post('/api/generate-seo', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─────────────────────────────────────────
-// GENERATE TAGS
-// ─────────────────────────────────────────
 app.post('/api/generate-tags', rateLimit(20, 60000), async (req, res) => {
   try {
     const { name, description } = req.body;
@@ -871,9 +794,6 @@ app.post('/api/generate-tags', rateLimit(20, 60000), async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─────────────────────────────────────────
-// OPTIMIZE TITLE
-// ─────────────────────────────────────────
 app.post('/api/optimize-title', rateLimit(20, 60000), async (req, res) => {
   try {
     const { name, description, category } = req.body;
@@ -905,9 +825,6 @@ app.post('/api/optimize-title', rateLimit(20, 60000), async (req, res) => {
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─────────────────────────────────────────
-// GENERATE SOCIAL
-// ─────────────────────────────────────────
 app.post('/api/generate-social', async (req, res) => {
   try {
     const { name, description } = req.body;
@@ -941,9 +858,6 @@ app.post('/api/generate-social', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─────────────────────────────────────────
-// GENERATE BLOG
-// ─────────────────────────────────────────
 app.post('/api/generate-blog', async (req, res) => {
   try {
     const { storeName, products, topic } = req.body;
@@ -982,15 +896,11 @@ app.post('/api/generate-blog', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─────────────────────────────────────────
-// UPDATE PRODUCT
-// ─────────────────────────────────────────
 app.post('/api/update-product', rateLimit(30, 60000), async (req, res) => {
   try {
     const { productId, description, descriptionHtml, seoTitle, seoDescription, name, token } = req.body;
     if (!productId || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
     const updateData = {};
-    // Prefer pre-built HTML; fall back to converter
     if (descriptionHtml) updateData.description = descriptionHtml;
     else if (description) updateData.description = descriptionToHtml(description);
     if (seoTitle)       updateData.metadata_title       = seoTitle;
@@ -1004,22 +914,15 @@ app.post('/api/update-product', rateLimit(30, 60000), async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────
-// ADD TAGS
-// ─────────────────────────────────────────
 app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
   try {
     const { productId, tags, token } = req.body;
     if (!productId || !tags?.length || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
     const tagIds = [];
-
-    // 1) جلب الوسوم الموجودة على المنتج
     try {
       const prod = await sallaGet(`products/${productId}`, token);
       (prod.data?.tags || []).forEach(t => { if (t.id) tagIds.push(t.id); });
     } catch(e) {}
-
-    // 2) جلب كل الوسوم في المتجر مرة واحدة (لتجنب rate limit)
     let allStoreTags = [];
     try {
       const list = await axios.get('https://api.salla.dev/admin/v2/products/tags', {
@@ -1027,11 +930,8 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
       });
       allStoreTags = list.data?.data || [];
     } catch(e) {}
-
-    // 3) لكل وسم: إما موجود أو أنشئه
     for (const tagName of tags.slice(0, 5)) {
       try {
-        // ابحث في الوسوم الموجودة أولاً
         const existing = allStoreTags.find(t =>
           t.name?.toLowerCase().trim() === tagName.toLowerCase().trim()
         );
@@ -1039,7 +939,6 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
           if (!tagIds.includes(existing.id)) tagIds.push(existing.id);
           continue;
         }
-        // أنشئ وسم جديد
         const r = await axios.post(
           `https://api.salla.dev/admin/v2/products/tags?tag_name=${encodeURIComponent(tagName)}`,
           {}, { headers: { Authorization: `Bearer ${token}` } }
@@ -1047,17 +946,13 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
         const newId = r.data?.data?.id;
         if (newId && !tagIds.includes(newId)) {
           tagIds.push(newId);
-          allStoreTags.push({ id: newId, name: tagName }); // أضفه للكاش
+          allStoreTags.push({ id: newId, name: tagName });
         }
-         // delay كافي لتجنب rate limit سلة
       } catch(e) {
         console.warn(`Tag "${tagName}" failed:`, e.message);
       }
     }
-
-    // 4) delay قبل تحديث المنتج
     await new Promise(r => setTimeout(r, 500));
-    // 5) حدّث المنتج بالوسوم
     if (tagIds.length > 0) await sallaUpdate(productId, { tags: tagIds }, token);
     res.json({ success: true, added: tagIds.length, tagIds });
   } catch (e) {
@@ -1065,9 +960,6 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────
-// PRODUCT REVIEWS (Review-to-Content)
-// ─────────────────────────────────────────
 app.post('/api/get-reviews', async (req, res) => {
   try {
     const { productId, token } = req.body;
@@ -1084,9 +976,6 @@ app.post('/api/get-reviews', async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────
-// ALT TEXT
-// ─────────────────────────────────────────
 app.post('/api/generate-alt', async (req, res) => {
   try {
     const { productName, count } = req.body;
@@ -1102,9 +991,6 @@ app.post('/api/generate-alt', async (req, res) => {
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─────────────────────────────────────────
-// SEO PAGES
-// ─────────────────────────────────────────
 app.post('/api/seo-pages', async (req, res) => {
   try {
     const { products, storeName } = req.body;
@@ -1160,9 +1046,6 @@ app.post('/api/seo-pages', async (req, res) => {
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─────────────────────────────────────────
-// TEMPLATES
-// ─────────────────────────────────────────
 app.get('/api/templates', (req, res) => {
   res.json({ templates: [
     { id:'fashion',     name:'👗 ملابس وأزياء',        tone:'youth',        instructions:'ركز على الأناقة والتناسق، اذكر المقاسات والألوان، أسلوب شبابي' },
@@ -1174,9 +1057,6 @@ app.get('/api/templates', (req, res) => {
   ]});
 });
 
-// ─────────────────────────────────────────
-// IMAGE GEN
-// ─────────────────────────────────────────
 app.post('/api/generate-image', async (req, res) => {
   try {
     const { name, prompt, style } = req.body;
@@ -1190,9 +1070,6 @@ app.post('/api/generate-image', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─────────────────────────────────────────
-// EDIT IMAGE
-// ─────────────────────────────────────────
 app.post('/api/edit-image', upload.single('image'), async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -1213,9 +1090,6 @@ app.post('/api/edit-image', upload.single('image'), async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─────────────────────────────────────────
-// TRANSLATE
-// ─────────────────────────────────────────
 app.post('/api/translate', async (req, res) => {
   try {
     const { text, language } = req.body;
@@ -1227,15 +1101,11 @@ app.post('/api/translate', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ─────────────────────────────────────────
-// WEBHOOK
-// ─────────────────────────────────────────
 app.post('/webhook/salla', (req, res) => {
   console.log('Webhook:', req.body?.event);
   res.json({ success: true });
 });
 
-// DEBUG endpoint
 app.get('/api/debug', async (req, res) => {
   const result = {
     model: AI_MODEL,
@@ -1255,7 +1125,6 @@ app.get('/api/debug', async (req, res) => {
   } catch(e) {
     result.anthropic_test = 'FAILED: ' + e.message;
   }
-  // Test Supabase
   result.supabase_service_key_set = !!process.env.SUPABASE_SERVICE_KEY;
   result.supabase_key_prefix = SUPABASE_SERVICE_KEY.substring(0,20)+'...';
   try {
@@ -1275,6 +1144,19 @@ app.get('/api/debug', async (req, res) => {
   res.json(result);
 });
 
+// ════════════════════════════════════════════
+// ✅ FIX: CATCH-ALL — أي رابط ما عنده route يرجع landing
+// يجب أن يكون في آخر شيء قبل app.listen
+// ════════════════════════════════════════════
+app.get('*', (req, res) => {
+  // إذا الطلب لـ API أو auth أرجع 404
+  if (req.path.startsWith('/api/') || req.path.startsWith('/auth/') || req.path.startsWith('/webhook/')) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  // أي صفحة ثانية غير معروفة ترجع landing
+  res.sendFile(path.join(publicPath, 'landing.html'));
+});
+
 // ─────────────────────────────────────────
 // START SERVER
 // ─────────────────────────────────────────
@@ -1284,7 +1166,7 @@ app.listen(PORT, '0.0.0.0', () => {
 });
 
 // ─────────────────────────────────────────
-// ADMIN — لوحة إدارة العملاء
+// ADMIN
 // ─────────────────────────────────────────
 const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'admin2025';
 
@@ -1294,7 +1176,6 @@ function checkAdmin(req, res) {
   return true;
 }
 
-// جلب كل العملاء
 app.get('/api/admin/customers', requireAdmin, async (req, res) => {
   if (!checkAdmin(req, res)) return;
   try {
@@ -1303,7 +1184,6 @@ app.get('/api/admin/customers', requireAdmin, async (req, res) => {
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-// تعديل بيانات عميل
 app.put('/api/admin/customers/:id', requireAdmin, async (req, res) => {
   if (!checkAdmin(req, res)) return;
   try {
@@ -1314,7 +1194,6 @@ app.put('/api/admin/customers/:id', requireAdmin, async (req, res) => {
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-// حذف عميل
 app.delete('/api/admin/customers/:id', requireAdmin, async (req, res) => {
   if (!checkAdmin(req, res)) return;
   try {
@@ -1323,7 +1202,6 @@ app.delete('/api/admin/customers/:id', requireAdmin, async (req, res) => {
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-// إحصائيات سريعة
 app.get('/api/admin/stats', requireAdmin, async (req, res) => {
   if (!checkAdmin(req, res)) return;
   try {
