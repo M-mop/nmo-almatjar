@@ -1,3 +1,342 @@
+```js
+// ========================================
+// ADD THIS AT THE TOP WITH OTHER REQUIRES
+// ========================================
+
+const ExcelJS = require('exceljs');
+const pLimit = require('p-limit');
+const { v4: uuidv4 } = require('uuid');
+
+
+// ========================================
+// ADD THIS AFTER:
+// const app = express();
+// ========================================
+
+const TEMP_DIR = path.join(__dirname, 'temp');
+
+if (!fs.existsSync(TEMP_DIR)) {
+  fs.mkdirSync(TEMP_DIR);
+}
+
+const jobs = new Map();
+
+
+// ========================================
+// ADD THIS AFTER:
+// app.use(express.static(publicPath, { index: false }));
+// ========================================
+
+app.use('/downloads', express.static(TEMP_DIR));
+
+
+// ========================================
+// DELETE YOUR OLD:
+// /api/excel/products
+// COMPLETELY
+// THEN PASTE THIS
+// ========================================
+
+app.post(
+  '/api/excel/products',
+  rateLimit(5, 60000),
+  upload.single('file'),
+  async (req, res) => {
+
+    try {
+
+      if (!req.file) {
+        return res.status(400).json({
+          error: 'لم يتم رفع ملف'
+        });
+      }
+
+      const jobId = uuidv4();
+
+      jobs.set(jobId, {
+        status: 'queued',
+        progress: 0,
+        total: 0,
+        completed: 0,
+        failed: 0,
+        results: [],
+        downloadUrl: null,
+        createdAt: Date.now()
+      });
+
+      processProductsExcel(
+        jobId,
+        req.file.buffer,
+        req.body
+      );
+
+      res.json({
+        success: true,
+        jobId
+      });
+
+    } catch (e) {
+
+      console.error(e);
+
+      res.status(500).json({
+        error: e.message
+      });
+
+    }
+
+  }
+);
+
+
+// ========================================
+// ADD THIS UNDER THE ENDPOINT
+// ========================================
+
+app.get('/api/job/:id', (req, res) => {
+
+  const job = jobs.get(req.params.id);
+
+  if (!job) {
+    return res.status(404).json({
+      error: 'JOB_NOT_FOUND'
+    });
+  }
+
+  res.json(job);
+
+});
+
+
+// ========================================
+// ADD THIS FUNCTION
+// ========================================
+
+async function processProductsExcel(
+  jobId,
+  fileBuffer,
+  body
+) {
+
+  const job = jobs.get(jobId);
+
+  try {
+
+    job.status = 'processing';
+
+    const tone = body.tone || 'professional';
+
+    const toneMap = {
+      professional:'احترافي',
+      luxury:'فاخر وراقي',
+      youth:'شبابي وعصري',
+      friendly:'ودي وقريب'
+    };
+
+    const wb = new ExcelJS.Workbook();
+
+    await wb.xlsx.load(fileBuffer);
+
+    const ws = wb.worksheets[0];
+
+    if (!ws) {
+      throw new Error('الملف فارغ');
+    }
+
+    const h = String(
+      ws.getRow(2).getCell(3).value || ''
+    );
+
+    if (!h.includes('أسم المنتج')) {
+      throw new Error(
+        'ملف منتجات سلة غير صحيح'
+      );
+    }
+
+    const products = [];
+
+    ws.eachRow((row, rowNum) => {
+
+      if (rowNum < 3) return;
+
+      const id = row.getCell(1).value;
+      const name = row.getCell(3).value;
+
+      if (!id || !name) return;
+
+      const cleanDesc = String(
+        row.getCell(9).value || ''
+      )
+      .replace(/<[^>]*>/g, '')
+      .substring(0, 300);
+
+      products.push({
+        rowNum,
+        id,
+        name: String(name),
+        cleanDesc
+      });
+
+    });
+
+    if (!products.length) {
+      throw new Error('لا توجد منتجات');
+    }
+
+    job.total = products.length;
+
+    const limit = pLimit(25);
+
+    await Promise.all(
+
+      products.map(product =>
+
+        limit(async () => {
+
+          try {
+
+            const prompt = `
+أنت كاتب محتوى احترافي للتجارة الإلكترونية.
+
+اكتب بالعربية فقط.
+
+الأسلوب:
+${toneMap[tone]}
+
+المنتج:
+${product.name}
+
+الوصف الحالي:
+${product.cleanDesc}
+
+أرجع:
+
+###NAME###
+اسم احترافي محسّن
+
+###DESC###
+وصف HTML احترافي
+`;
+
+            const msg =
+              await anthropic.messages.create({
+
+                model: AI_MODEL,
+
+                max_tokens: 700,
+
+                messages: [{
+                  role: 'user',
+                  content: prompt
+                }]
+
+              });
+
+            const text =
+              msg.content[0].text;
+
+            const nameMatch =
+              text.match(
+                /###NAME###([\s\S]*?)###DESC###/
+              );
+
+            const descMatch =
+              text.match(
+                /###DESC###([\s\S]*)/
+              );
+
+            const newName =
+              nameMatch
+              ? nameMatch[1].trim()
+              : product.name;
+
+            const newDesc =
+              descMatch
+              ? descMatch[1].trim()
+              : '';
+
+            const row =
+              ws.getRow(product.rowNum);
+
+            row.getCell(3).value =
+              newName;
+
+            row.getCell(9).value =
+              newDesc;
+
+            row.commit();
+
+            job.results.push({
+
+              row: product.rowNum,
+
+              oldName: product.name,
+
+              newName,
+
+              status: 'success'
+
+            });
+
+            job.completed++;
+
+          } catch (e) {
+
+            job.failed++;
+
+            job.results.push({
+
+              row: product.rowNum,
+
+              oldName: product.name,
+
+              status: 'error',
+
+              error: e.message
+
+            });
+
+          }
+
+          job.progress = Math.floor(
+            (
+              (job.completed + job.failed)
+              / job.total
+            ) * 100
+          );
+
+        })
+
+      )
+
+    );
+
+    const fileName =
+      `products-${jobId}.xlsx`;
+
+    const outputPath =
+      path.join(TEMP_DIR, fileName);
+
+    await wb.xlsx.writeFile(outputPath);
+
+    job.status = 'done';
+
+    job.downloadUrl =
+      `/downloads/${fileName}`;
+
+  } catch (e) {
+
+    console.error(e);
+
+    job.status = 'failed';
+
+    job.error = e.message;
+
+  }
+
+}
+```
+
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
