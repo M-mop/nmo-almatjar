@@ -717,9 +717,9 @@ app.post('/api/update-product', rateLimit(30, 60000), async (req, res) => {
     const updateData = {};
     if (descriptionHtml) updateData.description = descriptionHtml;
     else if (description) updateData.description = descriptionToHtml(description);
-    if (seoTitle)       updateData.metadata_title       = seoTitle;
+    if (seoTitle)       { updateData.metadata_title = seoTitle; updateData.name = seoTitle; }
     if (seoDescription) updateData.metadata_description = seoDescription;
-    if (name)           updateData.name = name;
+    if (name && !seoTitle) updateData.name = name;
     const result = await sallaUpdate(productId, updateData, token);
     res.json({ success: true, product: result.data });
   } catch (e) {
@@ -744,7 +744,7 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
       });
       allStoreTags = list.data?.data || [];
     } catch(e) {}
-    for (const tagName of tags.slice(0, 5)) {
+    for (const tagName of tags.slice(0, 10)) {
       try {
         const existing = allStoreTags.find(t =>
           t.name?.toLowerCase().trim() === tagName.toLowerCase().trim()
