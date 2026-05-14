@@ -630,11 +630,11 @@ function closeSB(){document.getElementById('sb').classList.remove('open');docume
 
 function updU(){
   const u=parseInt(localStorage.getItem('uC')||'0'),p=localStorage.getItem('uP')||'free';
-  const l={free:2,trial:50,pro:200,enterprise:99999}[p]||2,pct=Math.min(100,Math.round(u/l*100));
+  const l={free:0,trial:50,pro:200,enterprise:99999}[p]||0,pct=Math.min(100,Math.round(u/l*100));
   const f=document.getElementById('ufill');
   if(f){f.style.width=pct+'%';f.style.background=pct>80?'linear-gradient(90deg,#d97706,#dc2626)':pct>50?'linear-gradient(90deg,#4361ee,#d97706)':'linear-gradient(90deg,#4361ee,#7c3aed)';}
   const v=document.getElementById('uval');if(v)v.textContent=u+' / '+(l===99999?'∞':l);
-  const pl=document.getElementById('uplan');if(pl)pl.textContent=p==='free'?'خطة مجانية (2 منتج)':p==='trial'?'🎯 تجربة مجانية (7 أيام)':p==='pro'?'⭐ Pro (200 منتج)':'💎 Enterprise';
+  const pl=document.getElementById('uplan');if(pl)pl.textContent=p==='free'?'⛔ بدون اشتراك':p==='trial'?'🎯 تجربة مجانية':p==='pro'?'⭐ Pro (200 منتج)':'💎 Enterprise';
 }
 function incU(){localStorage.setItem('uC',(parseInt(localStorage.getItem('uC')||'0')+1));updU();}
 
@@ -860,6 +860,8 @@ function handleExcelDrop(e, type){
 }
 
 async function enhanceExcel(type){
+  const plan=localStorage.getItem('uP')||'free';
+  if(plan==='free'){showLimitModal({});return;}
   const isProducts = type === 'products';
   const file = isProducts ? excelFileP : excelFileS;
   const progBox = document.getElementById(isProducts?'excel-prog-p':'excel-prog-s');
@@ -1040,29 +1042,56 @@ async function loadPlan(){
     if(typeof d.used==='number') localStorage.setItem('uC',d.used);
     updU();
     // Show limit warning
-    if(d.used>=d.limit){
+    if(d.plan==='free'){
       showLimitModal(d);
     }
   }catch(e){console.warn('plan load:',e.message);}
 }
 
 function showLimitModal(info){
-  const plans={free:'مجاني',pro:'Pro',enterprise:'Enterprise'};
-  const pname=plans[info.plan]||info.plan;
+  if(document.getElementById('limit-modal')) return;
   const wrap=document.createElement('div');
-  wrap.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)';
-  wrap.innerHTML='<div style="background:#fff;border-radius:18px;padding:28px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2)">'
-    +'<div style="font-size:36px;margin-bottom:10px">⚡</div>'
-    +'<div style="font-size:17px;font-weight:800;margin-bottom:6px;color:#0f172a">وصلت للحد الشهري</div>'
-    +'<div style="font-size:13px;color:#64748b;margin-bottom:18px;line-height:1.6">خطتك <b>'+pname+'</b> تسمح بـ '+info.limit+' منتج/شهر. تم استخدام <b>'+info.used+'</b> منتج.</div>'
-    +'<div style="background:#f8f9ff;border:1.5px solid rgba(67,97,238,.2);border-radius:12px;padding:16px;margin-bottom:18px">'
-    +'<div style="font-size:12px;color:#64748b;margin-bottom:8px">الترقية لـ Pro = 200 منتج/شهر</div>'
-    +'<div style="font-size:22px;font-weight:900;color:#4361ee">99 ر.س <span style="font-size:12px;font-weight:400;color:#94a3b8">/ شهر</span></div>'
+  wrap.id='limit-modal';
+  wrap.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.8);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
+  wrap.innerHTML='<div style="background:#fff;border-radius:18px;padding:28px;max-width:400px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.25)">'
+    +'<div style="text-align:center;margin-bottom:18px">'
+    +'<div style="font-size:44px;margin-bottom:10px">🔒</div>'
+    +'<div style="font-size:18px;font-weight:900;color:#0f172a;margin-bottom:6px">الخدمة مدفوعة</div>'
+    +'<div style="font-size:13px;color:#64748b;line-height:1.65">للوصول لخدمات نمو المتجر يلزمك الاشتراك</div>'
     +'</div>'
-    +'<button onclick="closeAnyModal(this)" style="background:linear-gradient(135deg,#4361ee,#7c3aed);color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;width:100%;font-family:inherit;margin-bottom:8px">تواصل للترقية ←</button>'
-    +'<button onclick="closeAnyModal(this)" style="background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:10px;font-size:13px;cursor:pointer;width:100%;font-family:inherit">إغلاق</button>'
+    +'<div style="background:#f5f7ff;border:1.5px solid rgba(67,97,238,.15);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">'
+    +'<div style="font-size:12px;color:#64748b;margin-bottom:6px;font-weight:600">خطة Pro</div>'
+    +'<div style="font-size:30px;font-weight:900;color:#4361ee">99 ر.س <span style="font-size:13px;font-weight:400;color:#94a3b8">/ شهر</span></div>'
+    +'<div style="font-size:11px;color:#64748b;margin-top:5px">200 منتج شهرياً • كل الميزات</div>'
+    +'</div>'
+    +'<div style="margin-bottom:14px">'
+    +'<div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px">عندك كود ترقية؟</div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<input id="promo-inp" placeholder="أدخل الكود" style="flex:1;background:#f8f9ff;border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 12px;font-size:13px;outline:none;font-family:inherit;text-align:center;letter-spacing:2px;text-transform:uppercase" dir="ltr" onkeydown="if(event.keyCode==13)applyPromo()">'
+    +'<button onclick="applyPromo()" style="background:linear-gradient(135deg,#4361ee,#7c3aed);color:#fff;border:none;border-radius:9px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">تفعيل</button>'
+    +'</div>'
+    +'</div>'
+    +'<a href="https://wa.me/905340355912?text=أبغى+أشترك+في+نمو+المتجر" target="_blank" style="display:block;text-align:center;padding:12px;border-radius:10px;background:#25d366;color:#fff;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:8px">📱 تواصل للاشتراك عبر واتساب</a>'
+    +'<button onclick="closeLimitModal()" style="width:100%;background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:10px;font-size:13px;cursor:pointer;font-family:inherit">إغلاق</button>'
     +'</div>';
   document.body.appendChild(wrap);
+}
+
+function closeLimitModal(){var m=document.getElementById('limit-modal');if(m)m.remove();}
+async function applyPromo(){
+  const inp = document.getElementById('promo-inp');
+  const code = inp?.value?.trim().toUpperCase();
+  if(!code){toast('أدخل الكود أولاً','error');return;}
+  if(code==='MM1'){
+    localStorage.setItem('uP','trial');
+    localStorage.setItem('uC','0');
+    updU();
+    document.getElementById('limit-modal')?.remove();
+    toast('🎉 تم تفعيل التجربة — تمتع بـ 50 منتج مجاناً!','success');
+    return;
+  }
+  toast('❌ الكود غير صحيح','error');
+  if(inp){inp.style.borderColor='#dc2626';inp.value='';}
 }
 const DEMO=[{id:1,name:'جاكيت نسائي خفيف',price:{amount:84},description:'جاكيت أنيق'},{id:2,name:'طاولة بلوت فاخرة',price:{amount:349},description:''},{id:3,name:'تيشيرت الهلال 2025',price:{amount:129},description:'تيشيرت رسمي'},{id:4,name:'عطر ورد الطائف',price:{amount:599},description:''}];
 async function loadP(){
@@ -1138,6 +1167,9 @@ function toS(n){
 async function run(){
   const ps=Object.entries(sel).filter(([,v])=>v).map(([i])=>prods[+i]).filter(Boolean);
   if(!ps.length){toS(1);return;}
+  // Check plan before running
+  const plan=localStorage.getItem('uP')||'free';
+  if(plan==='free'){showLimitModal({});return;}
   const d1=document.getElementById('o1').checked;
   const d2=document.getElementById('o2').checked;
   const d3=document.getElementById('o3').checked;
