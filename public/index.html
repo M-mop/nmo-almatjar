@@ -339,7 +339,7 @@ textarea{min-height:90px;resize:vertical;line-height:1.6}
             <div class="trow"><div class="tinfo"><div class="tl">🔍 عنوان SEO</div><div class="th">تحسين العنوان لمحركات البحث</div></div><label class="tog"><input type="checkbox" id="t-seo" checked><span class="ts"></span></label></div>
             <div class="trow"><div class="tinfo"><div class="tl">🏷️ الوسوم التلقائية</div><div class="th">توليد وسوم ذكية للمنتج</div></div><label class="tog"><input type="checkbox" id="t-tags"><span class="ts"></span></label></div>
             <div class="trow"><div class="tinfo"><div class="tl">📌 وصف قصير</div><div class="th">وصف مختصر جذاب</div></div><label class="tog"><input type="checkbox" id="t-short"><span class="ts"></span></label></div>
-            <div class="trow"><div class="tinfo"><div class="tl">📱 كابشن TikTok</div><div class="th">محتوى لمنصات التواصل</div></div><label class="tog"><input type="checkbox" id="t-tiktok"><span class="ts"></span></label></div>
+
           </div>
         </div>
         <div class="brow">
@@ -653,7 +653,7 @@ async function run(){
   const wantSeo=document.getElementById('t-seo').checked;
   const wantTags=document.getElementById('t-tags').checked;
   const wantShort=document.getElementById('t-short').checked;
-  const wantTiktok=document.getElementById('t-tiktok').checked;
+
 
   let done=0;
   const total=selProds.length;
@@ -677,7 +677,7 @@ async function run(){
       if(d.error){results.push({p,status:'error',error:d.error});}
       else{
         results.push({p,status:'ok',data:d,
-          wantDesc,wantSeo,wantTags,wantShort,wantTiktok,
+          wantDesc,wantSeo,wantTags,wantShort,
           uploaded:false
         });
         localStorage.setItem('uC',String(parseInt(localStorage.getItem('uC')||'0')+1));
@@ -732,9 +732,7 @@ function renderCard(r,i){
   if(r.wantTags&&d.features?.length){
     html+='<div class="blk"><div class="blk-lbl">🏷️ الوسوم</div><div class="tags-wrap">'+d.features.map(f=>'<span class="tag">'+escH(f)+'</span>').join('')+'</div></div>';
   }
-  if(r.wantTiktok&&d.tiktokCaption){
-    html+='<div class="blk"><div class="blk-lbl">📱 TikTok</div><div class="desc-body">'+escH(d.tiktokCaption)+'</div></div>';
-  }
+
   html+='</div>';
   html+='<div class="pc-ft">';
   html+='<span class="sdot '+(r.uploaded?'uploaded':'uploading')+'"></span>';
@@ -765,20 +763,27 @@ async function uploadOne(i){
   if(btn){btn.disabled=true;btn.textContent='⏳';}
   try{
     const d=r.data;
-    const title=r.selectedTitle||d.seoTitle||'';
+    const title=r.selectedTitle||d.seoTitle||r.p.name||'';
+    // Update product: description + seo title + seo description + name
     await fetch(B+'/api/update-product',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         productId:r.p.id,token:T,
+        name:r.wantSeo&&title?title:'',
         description:r.wantDesc?d.description:'',
         descriptionHtml:r.wantDesc?d.descriptionHtml:'',
         seoTitle:r.wantSeo?title:'',
         seoDescription:r.wantSeo?d.seoDescription:''
       })
     });
+    // Add tags - send up to 10
     if(r.wantTags&&d.features?.length){
-      await fetch(B+'/api/add-tags',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productId:r.p.id,tags:d.features.slice(0,5),token:T})});
+      await fetch(B+'/api/add-tags',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({productId:r.p.id,tags:d.features.slice(0,10),token:T})
+      });
     }
     results[i].uploaded=true;
     renderResults();
