@@ -8,6 +8,31 @@ const Anthropic = require('@anthropic-ai/sdk');
 const axios = require('axios');
 
 const app = express();
+
+// ─── SECURITY: Rate Limiting ───────────────
+const rateLimitMap = new Map();
+function rateLimit(maxReqs, windowMs) {
+  return (req, res, next) => {
+    const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.ip || 'unknown';
+    const key = ip + req.path;
+    const now = Date.now();
+    const entry = rateLimitMap.get(key) || { count: 0, start: now };
+    if (now - entry.start > windowMs) { entry.count = 0; entry.start = now; }
+    entry.count++;
+    rateLimitMap.set(key, entry);
+    if (entry.count > maxReqs) {
+      return res.status(429).json({ error: 'طلبات كثيرة — انتظر قليلاً' });
+    }
+    next();
+  };
+}
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, val] of rateLimitMap.entries()) {
+    if (now - val.start > 300000) rateLimitMap.delete(key);
+  }
+}, 300000);
+
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 // ─── SECURITY: Token Validation ────────────
