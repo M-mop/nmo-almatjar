@@ -276,80 +276,61 @@ app.post('/api/excel/products', rateLimit(5, 60000), upload.single('file'), asyn
     });
 
     if (!products.length) return res.status(400).json({ error: 'لا توجد منتجات في الملف' });
-    if (products.length > 200) return res.status(400).json({ error: 'الحد الأقصى 200 منتج دفعة — قسّم الملف لأجزاء' });
+    // No limit — process all products
 
-    const results = [];
-    for (const p of products) {
-      try {
-        const catFocusMap = [
-          { kw:['فستان','بلوزة','قميص','بنطلون','جاكيت','ملابس','عباءة'], focus:'القماش والمقاسات والمناسبة المثالية للارتداء' },
-          { kw:['عطر','بخور','دهن','زيت عطري','عود','مسك'],              focus:'العائلة العطرية والنوتات والثبات والمناسبات' },
-          { kw:['جوال','لابتوب','سماعة','شاشة','كاميرا'],                focus:'المواصفات التقنية والأداء والضمان' },
-          { kw:['قهوة','شاي','تمر','عسل','زيت','مكسرات'],               focus:'الفوائد الصحية والمكونات الطبيعية' },
-        ];
-        let catFocus = 'المميزات الرئيسية وقيمة المنتج للعميل';
-        for (const cat of catFocusMap) {
-          if (cat.kw.some(k => p.name.includes(k) || p.cleanDesc.includes(k))) { catFocus = cat.focus; break; }
-        }
+    // ── PARALLEL: 8 منتجات في نفس الوقت ────
+    const BATCH_SIZE = 8;
+    const results = new Array(products.length).fill(null);
 
-        const msg = await anthropic.messages.create({
-          model: AI_MODEL, max_tokens: 800,
-          messages: [{ role: 'user', content:
-`كاتب محتوى تجارة إلكترونية. اكتب بالعربية فقط. لا تستخدم ** أو markdown.
+    const catFocusMap = [
+      { kw:['فستان','بلوزة','قميص','بنطلون','جاكيت','ملابس','عباءة'], focus:'القماش والمقاسات والمناسبة المثالية للارتداء' },
+      { kw:['عطر','بخور','دهن','زيت عطري','عود','مسك'],              focus:'العائلة العطرية والنوتات والثبات والمناسبات' },
+      { kw:['جوال','لابتوب','سماعة','شاشة','كاميرا'],                focus:'المواصفات التقنية والأداء والضمان' },
+      { kw:['قهوة','شاي','تمر','عسل','زيت','مكسرات'],               focus:'الفوائد الصحية والمكونات الطبيعية' },
+    ];
+
+    async function processProduct(p, idx) {
+      let catFocus = 'المميزات الرئيسية وقيمة المنتج للعميل';
+      for (const cat of catFocusMap) {
+        if (cat.kw.some(k => p.name.includes(k) || p.cleanDesc.includes(k))) { catFocus = cat.focus; break; }
+      }
+      for(let attempt = 0; attempt < 3; attempt++) {
+        try {
+          if(attempt > 0) await new Promise(r => setTimeout(r, 1500 * attempt));
+          const msg = await anthropic.messages.create({
+            model: AI_MODEL, max_tokens: 800,
+            messages: [{ role:'user', content:
+`كاتب محتوى. اكتب بالعربية فقط. لا تستخدم ** أو markdown.
 المنتج: ${p.name}
 الوصف الحالي: ${p.cleanDesc || 'لا يوجد'}
 الأسلوب: ${toneMap[tone]}
 تعليمات: ${catFocus}
-
 ###NAME###
-[اسم المنتج المحسّن — أضف كلمات مفتاحية مهمة]
+[اسم محسّن + كلمات مفتاحية]
 ###DESC###
 [وصف HTML: فقرة + <h3>مميزات</h3> + <ul><li> + خاتمة]` }]
-        });
-
-        const text = msg.content[0].text;
-        const nmMatch = text.indexOf('###NAME###');
-        const dcMatch = text.indexOf('###DESC###');
-        const nm = nmMatch>=0 && dcMatch>=0
-          ? text.substring(nmMatch+10, dcMatch).trim().split('\n')[0].trim()
-          : p.name;
-        const dc = dcMatch>=0
-          ? text.substring(dcMatch+10).trim()
-          : '';
-
-        // Update ONLY col C (3) and col I (9)
-        const row = ws.getRow(p.rowNum);
-        if (nm) row.getCell(3).value = nm;
-        if (dc) row.getCell(9).value = dc;
-        row.commit();
-
-        results.push({ status:'success', rowNum:p.rowNum, oldName:p.name, newName:nm, newDesc:dc.replace(/<[^>]*>/g,'').substring(0,150) });
-        await new Promise(r => setTimeout(r, 400));
-      } catch(e) {
-        // Retry once
-        try {
-          await new Promise(r => setTimeout(r, 1000));
-          const msg2 = await anthropic.messages.create({
-            model: AI_MODEL, max_tokens: 800,
-            messages: [{ role:'user', content:`كاتب محتوى. اكتب بالعربية فقط.
-المنتج: ${p.name}
-###NAME###
-[اسم محسّن]
-###DESC###
-[وصف HTML]` }]
           });
-          const t2 = msg2.content[0].text;
-          const nm2 = t2.indexOf('###NAME###')>=0&&t2.indexOf('###DESC###')>=0 ? t2.substring(t2.indexOf('###NAME###')+10,t2.indexOf('###DESC###')).trim().split('\n')[0].trim() : p.name;
-          const dc2 = t2.indexOf('###DESC###')>=0 ? t2.substring(t2.indexOf('###DESC###')+10).trim() : '';
-          const row2 = ws.getRow(p.rowNum);
-          if(nm2) row2.getCell(3).value = nm2;
-          if(dc2) row2.getCell(9).value = dc2;
-          row2.commit();
-          results.push({ status:'success', rowNum:p.rowNum, oldName:p.name, newName:nm2, newDesc:dc2.replace(/<[^>]*>/g,'').substring(0,150), retried:true });
-        } catch(e2) {
-          results.push({ status:'error', rowNum:p.rowNum, oldName:p.name, error:e2.message });
+          const text = msg.content[0].text;
+          const ni = text.indexOf('###NAME###');
+          const di = text.indexOf('###DESC###');
+          const nm = (ni>=0&&di>=0) ? text.substring(ni+10,di).trim().split('\n')[0].trim() : p.name;
+          const dc = (di>=0) ? text.substring(di+10).trim() : '';
+          const row = ws.getRow(p.rowNum);
+          if(nm) row.getCell(3).value = nm;
+          if(dc) row.getCell(9).value = dc;
+          row.commit();
+          results[idx] = { status:'success', rowNum:p.rowNum, oldName:p.name, newName:nm, newDesc:dc.replace(/<[^>]*>/g,'').substring(0,150) };
+          return;
+        } catch(e) {
+          if(attempt===2) results[idx] = { status:'error', rowNum:p.rowNum, oldName:p.name, error:e.message };
         }
       }
+    }
+
+    // تشغيل متوازي بمجموعات
+    for(let i=0; i<products.length; i+=BATCH_SIZE) {
+      const batch = products.slice(i, i+BATCH_SIZE);
+      await Promise.all(batch.map((p,j) => processProduct(p, i+j)));
     }
 
     const buffer = await wb.xlsx.writeBuffer();
@@ -394,95 +375,47 @@ app.post('/api/excel/seo', rateLimit(5, 60000), upload.single('file'), async (re
     });
 
     if (!products.length) return res.status(400).json({ error: 'لا توجد منتجات في الملف' });
-    if (products.length > 200) return res.status(400).json({ error: 'الحد الأقصى 200 منتج' });
+    // No limit — process all products
 
-    const results = [];
-    for (const p of products) {
-      try {
-        const msg = await anthropic.messages.create({
-          model: AI_MODEL, max_tokens: 300,
-          messages: [{ role: 'user', content:
-`خبير SEO للتجارة الإلكترونية. اكتب بالعربية فقط.
-المنتج: ${p.name}
-###TITLE###
-[عنوان SEO: 50-60 حرف — يتضمن الكلمة المفتاحية الرئيسية]
-###DESC###
-[وصف SEO: 140-160 حرف — جملة أو جملتان تحفزان على النقر]` }]
-        });
+    // ── PARALLEL: 8 منتجات في نفس الوقت ────
+    const BATCH_SEO = 8;
+    const results = new Array(products.length).fill(null);
 
-        const text = msg.content[0].text;
-        const ti = text.indexOf('###TITLE###');
-        const di = text.indexOf('###DESC###');
-        const newTitle = (ti >= 0 && di >= 0) ? text.substring(ti+11, di).trim().split('\n')[0].trim() : '';
-        const newDesc  = (di >= 0) ? text.substring(di+10).trim().split('\n')[0].trim() : '';
-
-        // Update ONLY col D (4) and col E (5) — do NOT touch col A, B, C
-        const row = ws.getRow(p.rowNum);
-        if (newTitle) row.getCell(4).value = newTitle;
-        if (newDesc)  row.getCell(5).value = newDesc;
-        row.commit();
-
-        results.push({ status:'success', name:p.name, newTitle, newDesc });
-        await new Promise(r => setTimeout(r, 300));
-      } catch(e) {
-        // Retry once on failure
+    async function processSeo(p, idx) {
+      for(let attempt=0; attempt<3; attempt++) {
         try {
-          await new Promise(r => setTimeout(r, 1000));
-          const msg2 = await anthropic.messages.create({
+          if(attempt>0) await new Promise(r=>setTimeout(r, 1500*attempt));
+          const msg = await anthropic.messages.create({
             model: AI_MODEL, max_tokens: 300,
-            messages: [{ role: 'user', content: `اكتب بالعربية فقط.
+            messages: [{ role:'user', content:
+`خبير SEO. اكتب بالعربية فقط.
 المنتج: ${p.name}
 ###TITLE###
-[عنوان SEO 50-60 حرف]
+[عنوان SEO: 50-60 حرف]
 ###DESC###
-[وصف SEO 140-160 حرف]` }]
+[وصف SEO: 140-160 حرف]` }]
           });
-          const t2 = msg2.content[0].text;
-          const ti2 = t2.indexOf('###TITLE###');
-          const di2 = t2.indexOf('###DESC###');
-          const newTitle2 = (ti2>=0&&di2>=0)?t2.substring(ti2+11,di2).trim().split('\n')[0].trim():'';
-          const newDesc2 = (di2>=0)?t2.substring(di2+10).trim().split('\n')[0].trim():'';
-          const row2 = ws.getRow(p.rowNum);
-          if(newTitle2) row2.getCell(4).value = newTitle2;
-          if(newDesc2) row2.getCell(5).value = newDesc2;
-          row2.commit();
-          results.push({ status:'success', name:p.name, newTitle:newTitle2, newDesc:newDesc2, retried:true });
-        } catch(e2) {
-          results.push({ status:'error', name:p.name, error:e2.message });
+          const text = msg.content[0].text;
+          const ti = text.indexOf('###TITLE###');
+          const di = text.indexOf('###DESC###');
+          const newTitle = (ti>=0&&di>=0) ? text.substring(ti+11,di).trim().split('\n')[0].trim() : '';
+          const newDesc  = (di>=0) ? text.substring(di+10).trim().split('\n')[0].trim() : '';
+          const row = ws.getRow(p.rowNum);
+          if(newTitle) row.getCell(4).value = newTitle;
+          if(newDesc)  row.getCell(5).value = newDesc;
+          row.commit();
+          results[idx] = { status:'success', name:p.name, newTitle, newDesc };
+          return;
+        } catch(e) {
+          if(attempt===2) results[idx] = { status:'error', name:p.name, error:e.message };
         }
       }
     }
 
-    // Second pass: retry all failed
-    const failed = results.filter(r=>r.status==='error');
-    for(const f of failed) {
-      const p = products.find(p=>p.name===f.name);
-      if(!p) continue;
-      try {
-        await new Promise(r => setTimeout(r, 1500));
-        const msg3 = await anthropic.messages.create({
-          model: AI_MODEL, max_tokens: 300,
-          messages: [{ role: 'user', content: `اكتب بالعربية.
-المنتج: ${p.name}
-###TITLE###
-[عنوان SEO]
-###DESC###
-[وصف SEO]` }]
-        });
-        const t3 = msg3.content[0].text;
-        const ti3 = t3.indexOf('###TITLE###');
-        const di3 = t3.indexOf('###DESC###');
-        const nt3 = (ti3>=0&&di3>=0)?t3.substring(ti3+11,di3).trim().split('\n')[0].trim():'';
-        const nd3 = (di3>=0)?t3.substring(di3+10).trim().split('\n')[0].trim():'';
-        const row3 = ws.getRow(p.rowNum);
-        if(nt3) row3.getCell(4).value = nt3;
-        if(nd3) row3.getCell(5).value = nd3;
-        row3.commit();
-        const idx = results.findIndex(r=>r.name===f.name&&r.status==='error');
-        if(idx>=0) results[idx] = { status:'success', name:p.name, newTitle:nt3, newDesc:nd3, retried:true };
-      } catch(e3) { /* keep as error */ }
+    for(let i=0; i<products.length; i+=BATCH_SEO) {
+      const batch = products.slice(i, i+BATCH_SEO);
+      await Promise.all(batch.map((p,j) => processSeo(p, i+j)));
     }
-
     const buffer = await wb.xlsx.writeBuffer();
     res.json({
       success:true, total:products.length,
