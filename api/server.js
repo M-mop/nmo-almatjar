@@ -101,7 +101,7 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(publicPath, 'admin.html'));
 });
 
-const openai  = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai  = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const REDIRECT_URI = process.env.APP_URL ? process.env.APP_URL + '/auth/callback' : 'https://nmo-almatjar-production.up.railway.app/auth/callback';
 
@@ -1172,6 +1172,7 @@ app.get('/api/templates', (req, res) => {
 app.post('/api/generate-image', async (req, res) => {
   try {
     const { name, prompt, style } = req.body;
+    if(!openai) return res.status(503).json({ error: 'خدمة توليد الصور غير متاحة حالياً' });
     const r = await openai.images.generate({
       model: 'dall-e-3',
       prompt: `Professional product photo of ${name}. ${prompt || ''}. ${style}. High quality, commercial photography, no text.`,
@@ -1329,4 +1330,4 @@ app.get('/api/admin/stats', requireAdmin, async (req, res) => {
       latest: customers.slice(0, 5)
     });
   } catch(e) { res.status(500).json({ error: e.message }); }
-});
+}); 
