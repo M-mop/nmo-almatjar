@@ -1125,7 +1125,7 @@ function toS(n){
   if(n===2){
     const c=Object.values(sel).filter(Boolean).length;
     if(!c){toast('اختر منتجاً على الأقل','error');return;}
-    if(c>50){toast('الحد الأقصى 50 منتج دفعة واحدة','error');return;}
+    if(c>50){toast('الحد الأقصى 200 منتج دفعة واحدة','error');return;}
   }
   for(let i=1;i<=3;i++){
     document.getElementById('s'+i).style.display=i===n?'block':'none';
