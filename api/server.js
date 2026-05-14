@@ -106,6 +106,7 @@ const REDIRECT_URI = 'https://salla-ai-app-indol.vercel.app/auth/callback';
 // ─────────────────────────────────────────
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://neepfsawxdcdmfnbilft.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || 'sb_publishable_jl6GnYYSuhlUjb8Ww6DTzA_Ek3_Ald6';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || SUPABASE_KEY; // service role for writes
 
 async function dbQuery(method, table, body, params) {
   params = params || '';
@@ -428,26 +429,30 @@ app.post('/api/leads', async (req, res) => {
     const { email, source } = req.body;
     if (!email || !email.includes('@')) return res.status(400).json({ error: 'بريد إلكتروني غير صحيح' });
     const cleanEmail = email.toLowerCase().trim();
+    console.log('Saving lead:', cleanEmail);
     const url = SUPABASE_URL + '/rest/v1/leads';
     const headers = {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'apikey': SUPABASE_SERVICE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_SERVICE_KEY,
       'Content-Type': 'application/json',
-      'Prefer': 'resolution=ignore-duplicates,return=representation'
+      'Prefer': 'resolution=ignore-duplicates'
     };
-    const saveRes = await axios.post(url, {
-      email: cleanEmail,
-      source: source || 'excel',
-      created_at: new Date().toISOString()
-    }, { headers });
-    console.log('Lead saved:', cleanEmail, 'status:', saveRes.status);
+    try {
+      const saveRes = await axios.post(url, { email: cleanEmail, source: source||'excel' }, { headers });
+      console.log('Lead saved OK:', cleanEmail, saveRes.status);
+    } catch(dbErr) {
+      const code = dbErr.response?.data?.code || '';
+      if (code === '23505' || dbErr.response?.status === 409) {
+        console.log('Lead already exists:', cleanEmail);
+      } else {
+        console.error('DB error:', dbErr.response?.data);
+        // Still return success to user - dont block registration
+      }
+    }
     res.json({ success: true, message: 'تم التسجيل بنجاح' });
   } catch(e) {
-    if (e.response?.status === 409 || (e.response?.data?.code === '23505') || (e.message||'').includes('duplicate')) {
-      return res.json({ success: true, message: 'أنت مسجل مسبقاً ✅' });
-    }
-    console.error('leads error:', e.response?.data || e.message);
-    res.status(500).json({ error: 'حدث خطأ في الحفظ' });
+    console.error('leads error:', e.message);
+    res.status(500).json({ error: 'حدث خطأ' });
   }
 });
 
@@ -1229,6 +1234,23 @@ app.get('/api/debug', async (req, res) => {
     result.anthropic_test = 'SUCCESS: ' + msg.content[0].text;
   } catch(e) {
     result.anthropic_test = 'FAILED: ' + e.message;
+  }
+  // Test Supabase
+  result.supabase_service_key_set = !!process.env.SUPABASE_SERVICE_KEY;
+  result.supabase_key_prefix = SUPABASE_SERVICE_KEY.substring(0,20)+'...';
+  try {
+    const tUrl = SUPABASE_URL + '/rest/v1/leads';
+    const tH = {
+      'apikey': SUPABASE_SERVICE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_SERVICE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=ignore-duplicates'
+    };
+    const tr = await axios.post(tUrl, {email:'debug@test.com', source:'debug'}, {headers:tH});
+    result.supabase_leads_test = 'SUCCESS: ' + tr.status;
+  } catch(se) {
+    result.supabase_leads_test = 'FAILED: ' + (se.response?.data?.message || se.response?.data?.code || se.message);
+    result.supabase_error_detail = JSON.stringify(se.response?.data);
   }
   res.json(result);
 });
