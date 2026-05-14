@@ -8,8 +8,8 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#030508;--s1:#080c14;--s2:#0d1220;--s3:#131928;
-  --ac:#6366f1;--ac2:#8b5cf6;--ac3:#06b6d4;
+  --bg:#05070a;--s1:#0a0e17;--s2:#0f1524;--s3:#161e31;
+  --ac:#c5a059;--ac2:#e2c275;--ac3:#b08e4f;
   --gr:#10b981;--rd:#ef4444;--yw:#f59e0b;
   --tx:#f1f5f9;--t2:#94a3b8;--t3:#334155;
   --sb:260px
@@ -211,9 +211,22 @@ textarea{min-height:90px;resize:vertical;line-height:1.6}
   .rgrid,.frow{grid-template-columns:1fr}
   .upbar{flex-direction:column}
 }
+
+/* إخفاء التقييمات */
+.score-circle, .quality-badge, .seo-status, #seo-score-container, .qnum, #qcirc, #nav-score, #nav-quality, #page-score, #page-quality { display: none !important; }
 </style>
 </head>
 <body>
+
+<div id="m-lock" style="position:fixed;inset:0;background:#05070a;z-index:20000;display:flex;align-items:center;justify-content:center;color:white;flex-direction:column;text-align:center;">
+    <h2 style="color:#c5a059;margin-bottom:20px;">نمو المتاجر الإلكترونية</h2>
+    <p style="color:#a0aec0;margin-bottom:10px;">التحكم بالمنتجات يتطلب اشتراكاً مفعلاً</p>
+    <input type="password" id="c-input" style="padding:12px;margin:15px;border-radius:8px;text-align:center;border:1px solid #c5a059;background:#0a0e17;color:#fff;width:250px;" placeholder="أدخل كود التفعيل">
+    <button onclick="if(document.getElementById('c-input').value==='mm1'){document.getElementById('m-lock').style.display='none';localStorage.setItem('auth_v3','ok')}else{alert('الكود غير صحيح')}" style="padding:12px 30px;background:linear-gradient(135deg, #c5a059, #e2c275);border:none;border-radius:8px;cursor:pointer;font-weight:bold;color:#000;width:250px;">تفعيل الوصول</button>
+    <a href="https://wa.me/966500000000" style="margin-top:20px;color:#a0aec0;font-size:12px;text-decoration:none;">تواصل عبر الواتساب للاشتراك</a>
+</div>
+<script>if(localStorage.getItem('auth_v3')==='ok')document.getElementById('m-lock').style.display='none';</script>
+
 <div style="display:flex;min-height:100vh">
 
 <!-- SIDEBAR -->
