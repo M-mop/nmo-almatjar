@@ -275,7 +275,7 @@ app.post('/api/excel/products', rateLimit(5, 60000), upload.single('file'), asyn
     });
 
     if (!products.length) return res.status(400).json({ error: 'لا توجد منتجات في الملف' });
-    if (products.length > 50) return res.status(400).json({ error: 'الحد الأقصى 50 منتج — قسّم الملف لأجزاء' });
+    if (products.length > 200) return res.status(400).json({ error: 'الحد الأقصى 200 منتج دفعة — قسّم الملف لأجزاء' });
 
     const results = [];
     for (const p of products) {
@@ -371,7 +371,7 @@ app.post('/api/excel/seo', rateLimit(5, 60000), upload.single('file'), async (re
     });
 
     if (!products.length) return res.status(400).json({ error: 'لا توجد منتجات في الملف' });
-    if (products.length > 50) return res.status(400).json({ error: 'الحد الأقصى 50 منتج' });
+    if (products.length > 200) return res.status(400).json({ error: 'الحد الأقصى 200 منتج' });
 
     const results = [];
     for (const p of products) {
@@ -435,11 +435,12 @@ app.post('/api/leads', async (req, res) => {
       'Content-Type': 'application/json',
       'Prefer': 'resolution=ignore-duplicates,return=representation'
     };
-    await axios.post(url, {
+    const saveRes = await axios.post(url, {
       email: cleanEmail,
       source: source || 'excel',
       created_at: new Date().toISOString()
     }, { headers });
+    console.log('Lead saved:', cleanEmail, 'status:', saveRes.status);
     res.json({ success: true, message: 'تم التسجيل بنجاح' });
   } catch(e) {
     if (e.response?.status === 409 || (e.response?.data?.code === '23505') || (e.message||'').includes('duplicate')) {
