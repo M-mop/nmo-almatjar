@@ -3,146 +3,498 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>نمو المتاجر الإلكترونية</title>
+<title>نمو المتاجر — ذكاء اصطناعي لمتجرك</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #020617; /* كحلي داكن جداً */
-  --glass: rgba(15, 23, 42, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --ac: #6366f1; /* نيلي تكنولوجي */
-  --gold: #c5a059; /* ذهبي فاخر */
-  --gold-hover: #e2c275;
-  --tx: #f8fafc;
-  --t2: #94a3b8;
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#020b06;
+  --neon:#00ff88;
+  --neon2:#00e5ff;
+  --neon3:#b8ff00;
+  --purple:#7c3aed;
+  --tx:#f0fff4;
+  --t2:#6ee7b7;
+  --t3:#374151;
+  --border:rgba(0,255,136,0.15);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'IBM Plex Sans Arabic',sans-serif;
+  background:var(--bg);
+  color:var(--tx);
+  overflow-x:hidden;
+  line-height:1.7;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { 
-  font-family: 'IBM Plex Sans Arabic', sans-serif; 
-  background: var(--bg); 
-  color: var(--tx); 
-  overflow-x: hidden; 
-  line-height: 1.7;
+/* ANIMATED GRID BACKGROUND */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+  background-size:60px 60px;
+  z-index:0;pointer-events:none;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 10% 20%, rgba(0,255,136,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 70%, rgba(0,229,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 50% 100%, rgba(124,58,237,0.08) 0%, transparent 60%);
+  z-index:0;pointer-events:none;
 }
 
-/* تأثير الإضاءة في الخلفية */
-body::before {
-  content: ''; position: fixed; inset: 0;
-  background: radial-gradient(circle at 15% 50%, rgba(99,102,241,0.15), transparent 30%), 
-              radial-gradient(circle at 85% 30%, rgba(197,160,89,0.1), transparent 30%);
-  z-index: -1; pointer-events: none;
+/* NAV */
+.nav{
+  position:sticky;top:0;z-index:100;
+  padding:0 40px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(2,11,6,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.logo{
+  font-size:18px;font-weight:900;
+  display:flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.logo-mark{
+  width:34px;height:34px;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:#020b06;font-weight:900;
+  box-shadow:0 0 20px rgba(0,255,136,0.4);
+  flex-shrink:0;
+}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-link{
+  color:var(--t2);text-decoration:none;font-size:14px;font-weight:500;
+  transition:.2s;position:relative;
+}
+.nav-link:hover{color:var(--neon)}
+.nav-cta{
+  padding:10px 22px;border-radius:8px;font-size:14px;font-weight:700;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  color:#020b06;border:none;cursor:pointer;font-family:inherit;
+  transition:.2s;box-shadow:0 0 20px rgba(0,255,136,0.3);
+}
+.nav-cta:hover{box-shadow:0 0 35px rgba(0,255,136,0.5);transform:translateY(-1px)}
+
+/* HERO */
+.hero{
+  position:relative;z-index:1;
+  padding:100px 20px 80px;text-align:center;
+  max-width:880px;margin:0 auto;
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--border);
+  border-radius:100px;padding:6px 18px;
+  font-size:12px;font-weight:600;color:var(--neon);
+  background:rgba(0,255,136,0.05);
+  margin-bottom:32px;letter-spacing:.5px;text-transform:uppercase;
+}
+.hero-tag-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--neon);
+  box-shadow:0 0 8px var(--neon);
+  animation:blink 1.5s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{
+  font-size:58px;font-weight:900;line-height:1.1;
+  margin-bottom:24px;letter-spacing:-1px;
+}
+.grad-text{
+  background:linear-gradient(135deg,var(--neon) 0%,var(--neon2) 40%,var(--neon3) 80%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero p{
+  font-size:18px;color:var(--t2);
+  max-width:600px;margin:0 auto 44px;line-height:1.8;
+}
+.hero-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn-neon{
+  padding:14px 32px;border-radius:10px;font-size:15px;font-weight:800;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  color:#020b06;border:none;cursor:pointer;font-family:inherit;
+  transition:.25s;box-shadow:0 0 30px rgba(0,255,136,0.35);
+  display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+}
+.btn-neon:hover{box-shadow:0 0 50px rgba(0,255,136,0.55);transform:translateY(-2px)}
+.btn-ghost{
+  padding:14px 32px;border-radius:10px;font-size:15px;font-weight:700;
+  background:transparent;color:var(--neon);
+  border:1.5px solid var(--border);cursor:pointer;font-family:inherit;
+  transition:.25s;display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+}
+.btn-ghost:hover{border-color:var(--neon);background:rgba(0,255,136,0.06)}
+
+/* METRICS STRIP */
+.metrics{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  background:rgba(0,255,136,0.03);
+  padding:32px 20px;
+}
+.metrics-inner{
+  max-width:800px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;text-align:center;
+}
+.metric-n{
+  font-size:42px;font-weight:900;letter-spacing:-2px;line-height:1;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.metric-l{font-size:13px;color:var(--t2);margin-top:6px;font-weight:500}
+
+/* HOW */
+.section{position:relative;z-index:1;padding:90px 20px}
+.s-tag{
+  display:inline-block;border:1px solid var(--border);
+  border-radius:100px;padding:5px 16px;
+  font-size:11px;font-weight:700;color:var(--neon);
+  background:rgba(0,255,136,0.05);letter-spacing:1px;
+  text-transform:uppercase;margin-bottom:16px;
+}
+.s-title{font-size:38px;font-weight:900;margin-bottom:10px;letter-spacing:-.5px}
+.s-sub{font-size:16px;color:var(--t2);max-width:520px;margin:0 auto}
+.s-head{text-align:center;margin-bottom:60px}
+.steps{max-width:920px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.step{
+  background:linear-gradient(135deg,rgba(0,255,136,0.04),rgba(0,229,255,0.02));
+  border:1px solid var(--border);border-radius:20px;padding:30px;
+  position:relative;overflow:hidden;transition:.25s;
+}
+.step::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,255,136,0.06),transparent);
+  opacity:0;transition:.25s;
+}
+.step:hover{border-color:rgba(0,255,136,0.4);transform:translateY(-6px)}
+.step:hover::before{opacity:1}
+.step:hover .step-num{box-shadow:0 0 30px rgba(0,255,136,0.5)}
+.step-num{
+  width:48px;height:48px;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:900;color:#020b06;
+  margin-bottom:18px;box-shadow:0 0 18px rgba(0,255,136,0.35);
+  transition:.25s;position:relative;z-index:1;
+}
+.step-title{font-size:18px;font-weight:800;margin-bottom:10px;position:relative;z-index:1}
+.step-desc{font-size:14px;color:var(--t2);line-height:1.75;position:relative;z-index:1}
+
+/* FEATURES */
+.feat-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat{
+  border:1px solid var(--border);border-radius:16px;padding:24px;
+  background:rgba(0,255,136,0.02);transition:.25s;
+}
+.feat:hover{border-color:rgba(0,255,136,0.35);background:rgba(0,255,136,0.05);transform:translateY(-3px)}
+.feat-icon{
+  font-size:28px;width:52px;height:52px;
+  background:linear-gradient(135deg,rgba(0,255,136,0.1),rgba(0,229,255,0.1));
+  border:1px solid rgba(0,255,136,0.2);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+}
+.feat-title{font-size:16px;font-weight:800;margin-bottom:8px}
+.feat-desc{font-size:13px;color:var(--t2);line-height:1.7}
+
+/* PRICING */
+.pricing-grid{max-width:860px;margin:48px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.price-card{
+  border:1px solid var(--border);border-radius:24px;padding:36px;
+  background:rgba(0,255,136,0.02);transition:.25s;
+}
+.price-card:hover{border-color:rgba(0,255,136,0.35);transform:translateY(-6px)}
+.price-card.hot{
+  background:linear-gradient(135deg,rgba(0,255,136,0.06),rgba(0,229,255,0.04));
+  border-color:rgba(0,255,136,0.3);
+  box-shadow:0 0 40px rgba(0,255,136,0.1);
+}
+.hot-badge{
+  display:inline-block;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  color:#020b06;border-radius:100px;padding:4px 14px;
+  font-size:11px;font-weight:800;margin-bottom:16px;letter-spacing:.5px;
+}
+.p-name{font-size:22px;font-weight:800;margin-bottom:10px}
+.p-val{
+  font-size:46px;font-weight:900;letter-spacing:-2px;line-height:1;
+  margin-bottom:6px;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.p-val span{font-size:16px;color:var(--t2);font-weight:400}
+.p-desc{font-size:14px;color:var(--t2);margin-bottom:26px}
+.p-feats{list-style:none;margin-bottom:28px}
+.p-feats li{
+  font-size:14px;color:var(--t2);padding:9px 0;
+  border-bottom:1px solid rgba(0,255,136,0.08);
+  display:flex;align-items:center;gap:10px;
+}
+.p-feats li:last-child{border:none}
+.p-feats li::before{
+  content:'✓';color:var(--neon);font-weight:900;flex-shrink:0;
+  text-shadow:0 0 8px var(--neon);
 }
 
-header { padding: 25px 40px; display: flex; justify-content: space-between; align-items: center; }
-.logo { font-size: 24px; font-weight: 900; color: var(--tx); display: flex; align-items: center; gap: 10px; }
-.logo span { color: var(--gold); }
-
-.btn { 
-  padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 700; 
-  text-decoration: none; display: inline-block; transition: 0.3s; 
-  backdrop-filter: blur(10px);
+/* CTA SECTION */
+.cta-section{
+  position:relative;z-index:1;padding:90px 20px;text-align:center;
+  border-top:1px solid var(--border);
 }
-.btn-gold { 
-  background: linear-gradient(135deg, var(--gold), var(--gold-hover)); 
-  color: #000; box-shadow: 0 8px 20px rgba(197,160,89,0.2); 
+.cta-section h2{font-size:44px;font-weight:900;letter-spacing:-.5px;margin-bottom:14px}
+.cta-section p{font-size:17px;color:var(--t2);max-width:500px;margin:0 auto 36px}
+
+/* FOOTER */
+footer{
+  position:relative;z-index:1;
+  padding:32px 40px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  background:rgba(0,255,136,0.02);
 }
-.btn-gold:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(197,160,89,0.4); }
+.footer-links{display:flex;gap:20px}
+.footer-links a{color:var(--t3);text-decoration:none;font-size:13px;transition:.15s}
+.footer-links a:hover{color:var(--neon)}
 
-.hero { padding: 100px 20px; text-align: center; max-width: 900px; margin: 0 auto; }
-.hero h1 { font-size: 52px; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
-.hero p { font-size: 18px; color: var(--t2); margin-bottom: 40px; max-width: 700px; margin-inline: auto; }
-
-.pricing { padding: 80px 20px; max-width: 1200px; margin: 0 auto; text-align: center; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-top: 50px; }
-.card { 
-  background: var(--glass); border: 1px solid var(--glass-border); 
-  border-radius: 24px; padding: 40px; text-align: center; 
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  transition: 0.3s;
+/* MODAL */
+.modal-bg{
+  display:none;position:fixed;inset:0;z-index:999;
+  align-items:center;justify-content:center;
+  background:rgba(2,11,6,0.92);
+  backdrop-filter:blur(16px);
 }
-.card:hover { border-color: var(--gold); transform: translateY(-10px); }
-.price { font-size: 48px; font-weight: 900; color: var(--gold); margin: 20px 0; }
-.price span { font-size: 16px; color: var(--t2); }
-.card ul { list-style: none; text-align: right; color: var(--t2); margin-bottom: 30px; }
-.card ul li { margin-bottom: 12px; font-size: 15px; }
+.modal-bg.on{display:flex}
+.modal-box{
+  background:linear-gradient(135deg,rgba(0,255,136,0.06),rgba(0,229,255,0.04));
+  border:1px solid rgba(0,255,136,0.25);
+  border-radius:24px;padding:40px;
+  max-width:420px;width:92%;
+  box-shadow:0 0 60px rgba(0,255,136,0.15);
+  text-align:center;position:relative;
+}
+.modal-close{
+  position:absolute;top:14px;left:16px;
+  background:rgba(0,255,136,0.08);border:1px solid var(--border);
+  border-radius:8px;width:30px;height:30px;cursor:pointer;
+  color:var(--t2);font-size:16px;display:flex;
+  align-items:center;justify-content:center;font-family:inherit;
+  transition:.15s;
+}
+.modal-close:hover{border-color:var(--neon);color:var(--neon)}
+.modal-icon{font-size:44px;margin-bottom:14px}
+.modal-title{font-size:22px;font-weight:900;margin-bottom:6px}
+.modal-sub{font-size:14px;color:var(--t2);margin-bottom:24px}
+.modal-inp{
+  width:100%;padding:13px 16px;
+  background:rgba(0,255,136,0.04);
+  border:1.5px solid var(--border);border-radius:12px;
+  color:var(--tx);font-family:inherit;font-size:15px;outline:none;
+  text-align:center;letter-spacing:3px;text-transform:uppercase;
+  transition:.15s;margin-bottom:12px;
+}
+.modal-inp:focus{border-color:var(--neon);box-shadow:0 0 0 3px rgba(0,255,136,0.1)}
+.modal-inp::placeholder{color:var(--t3);letter-spacing:0;text-transform:none}
+.modal-divider{
+  display:flex;align-items:center;gap:12px;
+  color:var(--t3);font-size:12px;margin:16px 0;
+}
+.modal-divider::before,.modal-divider::after{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+.btn-wa{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  padding:13px;border-radius:12px;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:#fff;font-weight:700;font-size:14px;
+  text-decoration:none;transition:.2s;
+  box-shadow:0 4px 16px rgba(34,197,94,0.3);
+}
+.btn-wa:hover{opacity:.92;transform:translateY(-1px)}
 
-footer { padding: 40px; text-align: center; border-top: 1px solid var(--glass-border); color: var(--t2); margin-top: 50px; }
+/* MOBILE */
+@media(max-width:768px){
+  .nav{padding:0 16px}
+  .nav-links .nav-link{display:none}
+  .hero h1{font-size:36px}
+  .hero p{font-size:15px}
+  .steps,.feat-grid,.pricing-grid,.metrics-inner{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+  .footer-links{justify-content:center}
+}
 </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">✦ <span>نمو المتاجر</span> الإلكترونية</div>
-    <button onclick="document.getElementById('login-modal').style.display='flex'" class="btn btn-gold">دخول للنظام / لدي كود</button>
-</header>
+<nav class="nav">
+  <div class="logo">
+    <div class="logo-mark">✦</div>
+    نمو المتاجر
+  </div>
+  <div class="nav-links">
+    <a href="#how" class="nav-link">كيف يعمل</a>
+    <a href="#features" class="nav-link">المميزات</a>
+    <a href="#pricing" class="nav-link">الأسعار</a>
+    <button onclick="openModal()" class="nav-cta">🔗 ابدأ الآن</button>
+  </div>
+</nav>
 
 <section class="hero">
-    <h1>واجهتك الذكية لمضاعفة مبيعاتك 🚀</h1>
-    <p>النظام الأول المعتمد على الذكاء الاصطناعي لتحسين أوصاف منتجاتك، الكلمات المفتاحية (SEO)، وتوليد الوسوم الذكية لمتجرك على منصة سلة.</p>
-    <a href="https://wa.me/905340355912?text=أرغب_في_الاشتراك" class="btn btn-gold">اشترك الآن وابدأ التحسين</a>
+  <div class="hero-tag">
+    <span class="hero-tag-dot"></span>
+    مدعوم بالذكاء الاصطناعي
+  </div>
+  <h1>حسّن متجرك<br>بـ<span class="grad-text"> ذكاء اصطناعي</span><br>متخصص</h1>
+  <p>المنصة الوحيدة التي تحسّن أوصاف منتجاتك وعناوين SEO والوسوم تلقائياً — نتائج حقيقية في دقائق</p>
+  <div class="hero-btns">
+    <button onclick="openModal()" class="btn-neon">🚀 ابدأ تحسين منتجاتك</button>
+    <a href="#how" class="btn-ghost">كيف يعمل ؟</a>
+  </div>
 </section>
 
-<section class="pricing">
-    <h2>باقات الاشتراك الاحترافية</h2>
-    <p style="color:var(--t2); margin-top:10px;">لا توجد تجربة مجانية، جودة مخرجاتنا تتحدث عن نفسها.</p>
-    <div class="grid">
-        <div class="card">
-            <h3 style="color:var(--tx); font-size:24px;">باقة النمو</h3>
-            <div class="price">99 <span>ر.س / شهرياً</span></div>
-            <ul>
-                <li>✓ تحسين 200 منتج شهرياً</li>
-                <li>✓ كتابة أوصاف تسويقية احترافية</li>
-                <li>✓ توليد وسوم (Tags) ذكية</li>
-                <li>✓ تحسين عناوين SEO</li>
-            </ul>
-            <a href="https://wa.me/966500000000?text=أرغب_بالاشتراك_بباقة_النمو" class="btn btn-gold" style="width:100%;">اشترك عبر الواتساب</a>
-        </div>
+<section class="metrics">
+  <div class="metrics-inner">
+    <div><div class="metric-n">+500</div><div class="metric-l">منتج حُسِّن حتى الآن</div></div>
+    <div><div class="metric-n">3×</div><div class="metric-l">زيادة في الظهور بـ Google</div></div>
+    <div><div class="metric-n">دقائق</div><div class="metric-l">وقت تحسين 50 منتج</div></div>
+  </div>
+</section>
 
-        <div class="card" style="border-color: rgba(197,160,89,0.3);">
-            <h3 style="color:var(--gold); font-size:24px;">باقة الشركات</h3>
-            <div class="price">249 <span>ر.س / شهرياً</span></div>
-            <ul>
-                <li>✓ تحسين غير محدود للمنتجات</li>
-                <li>✓ أولوية في سرعة معالجة البيانات</li>
-                <li>✓ استهداف دقيق للجمهور</li>
-                <li>✓ دعم فني مخصص</li>
-            </ul>
-            <a href="https://wa.me/966500000000?text=أرغب_بالاشتراك_بباقة_الشركات" class="btn btn-gold" style="width:100%;">اشترك عبر الواتساب</a>
-        </div>
+<section class="section" id="how">
+  <div class="s-head">
+    <div class="s-tag">كيف يعمل</div>
+    <div class="s-title">ثلاث خطوات فقط</div>
+    <div class="s-sub">من ربط المتجر حتى رفع التحسينات مباشرة</div>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">١</div>
+      <div class="step-title">ربط متجرك</div>
+      <div class="step-desc">سجّل دخولك بحساب سلة في ثوانٍ — لا تحتاج إدخال أي بيانات يدوياً</div>
     </div>
+    <div class="step">
+      <div class="step-num">٢</div>
+      <div class="step-title">اختر المنتجات</div>
+      <div class="step-desc">اختر حتى 50 منتج وفعّل خيارات التحسين — وصف، عنوان، SEO، وسوم</div>
+    </div>
+    <div class="step">
+      <div class="step-num">٣</div>
+      <div class="step-title">ارفع التحسينات</div>
+      <div class="step-desc">راجع ما أنشأه الذكاء الاصطناعي وارفعه لمتجرك مباشرة بضغطة واحدة</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features" style="padding-top:0">
+  <div class="s-head">
+    <div class="s-tag">المميزات</div>
+    <div class="s-title">كل ما تحتاجه</div>
+    <div class="s-sub">أدوات ذكاء اصطناعي متكاملة لتحسين محتوى متجرك</div>
+  </div>
+  <div class="feat-grid">
+    <div class="feat"><div class="feat-icon">📝</div><div class="feat-title">وصف احترافي</div><div class="feat-desc">يكتب وصفاً تسويقياً كاملاً مع عناوين فرعية وقائمة مميزات لكل منتج</div></div>
+    <div class="feat"><div class="feat-icon">🔍</div><div class="feat-title">تحسين SEO</div><div class="feat-desc">يولد عنوان ووصف الصفحة لتحسين ظهورك في نتائج البحث</div></div>
+    <div class="feat"><div class="feat-icon">🏷️</div><div class="feat-title">وسوم ذكية</div><div class="feat-desc">يضيف وسوماً دقيقة تساعد عملاءك في البحث والتصفية داخل متجرك</div></div>
+    <div class="feat"><div class="feat-icon">🔤</div><div class="feat-title">تحسين العنوان</div><div class="feat-desc">يقترح 3 عناوين محسّنة مع عدد الأحرف المثالي لمحركات البحث</div></div>
+    <div class="feat"><div class="feat-icon">📊</div><div class="feat-title">تقييم SEO</div><div class="feat-desc">يحلل كل منتج ويعطيه درجة من A إلى F مع اقتراحات تحسين واضحة</div></div>
+    <div class="feat"><div class="feat-icon">⬆️</div><div class="feat-title">رفع مباشر</div><div class="feat-desc">ارفع كل التحسينات لمتجرك مباشرة بدون تصدير أو استيراد يدوي</div></div>
+  </div>
+</section>
+
+<section class="section" id="pricing" style="padding-top:0">
+  <div class="s-head">
+    <div class="s-tag">الأسعار</div>
+    <div class="s-title">باقات واضحة</div>
+    <div class="s-sub">تواصل معنا عبر واتساب للاشتراك</div>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="p-name">باقة النمو</div>
+      <div class="p-val">99 <span>ر.س / شهر</span></div>
+      <div class="p-desc">مثالية للمتاجر الصغيرة والمتوسطة</div>
+      <ul class="p-feats">
+        <li>200 منتج شهرياً</li>
+        <li>وصف + SEO + وسوم</li>
+        <li>تحسين العناوين</li>
+        <li>رفع مباشر لسلة</li>
+        <li>دعم فني</li>
+      </ul>
+      <a href="https://wa.me/905340355912?text=أبغى+أشترك+باقة+النمو" target="_blank" class="btn-neon" style="width:100%;justify-content:center">اشترك عبر واتساب</a>
+    </div>
+    <div class="price-card hot">
+      <div class="hot-badge">الأكثر طلباً</div>
+      <div class="p-name">باقة الشركات</div>
+      <div class="p-val">249 <span>ر.س / شهر</span></div>
+      <div class="p-desc">للمتاجر الكبيرة بمئات المنتجات</div>
+      <ul class="p-feats">
+        <li>منتجات غير محدودة</li>
+        <li>أولوية في المعالجة</li>
+        <li>استهداف دقيق للجمهور</li>
+        <li>جميع ميزات النمو</li>
+        <li>دعم فني مخصص</li>
+      </ul>
+      <a href="https://wa.me/905340355912?text=أبغى+أشترك+باقة+الشركات" target="_blank" class="btn-neon" style="width:100%;justify-content:center">اشترك عبر واتساب</a>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <h2>ابدأ الآن وحسّن متجرك <span class="grad-text">🚀</span></h2>
+  <p>انضم للتجار الذين يستخدمون الذكاء الاصطناعي لتنمية متاجرهم</p>
+  <button onclick="openModal()" class="btn-neon" style="font-size:16px;padding:16px 38px">🔗 ربط متجرك الآن</button>
 </section>
 
 <footer>
-    <p>© 2026 جميع الحقوق محفوظة لـ نمو المتاجر الإلكترونية</p>
+  <div class="logo" style="font-size:15px">
+    <div class="logo-mark" style="width:28px;height:28px;font-size:13px">✦</div>
+    نمو المتاجر الإلكترونية
+  </div>
+  <div class="footer-links">
+    <a href="/about.html">من نحن</a>
+    <a href="/privacy.html">الخصوصية</a>
+    <a href="/terms.html">الشروط</a>
+    <a href="https://wa.me/905340355912" target="_blank">الدعم</a>
+  </div>
+  <div style="font-size:13px;color:var(--t3)">© 2026 نمو المتاجر الإلكترونية</div>
 </footer>
 
-
-<!-- Login Modal -->
-<div id="login-modal" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,0.95); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
-  <div style="background:rgba(15, 23, 42, 0.6); border:1px solid rgba(197,160,89,0.3); border-radius:20px; padding:40px; text-align:center; max-width:400px; width:90%; box-shadow:0 10px 40px rgba(0,0,0,0.5); position:relative;">
-    <button onclick="document.getElementById('login-modal').style.display='none'" style="position:absolute; top:15px; right:20px; background:none; border:none; color:var(--t2); font-size:20px; cursor:pointer;">&times;</button>
-    <h2 style="color:var(--gold); margin-bottom:10px;">تسجيل الدخول</h2>
-    <p style="color:var(--t2);">الرجاء إدخال كود التفعيل للوصول للوحة التحكم</p>
-    <input type="password" id="landing-code" style="width:100%; padding:14px; margin:20px 0; background:rgba(0,0,0,0.3); border:1px solid rgba(255, 255, 255, 0.05); color:white; border-radius:10px; text-align:center; font-size:16px; outline:none;" placeholder="أدخل الكود">
-    <button onclick="loginWithCode()" class="btn btn-gold" style="width:100%; justify-content:center;">دخول</button>
+<!-- MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-icon">🔗</div>
+    <div class="modal-title">ابدأ الآن</div>
+    <div class="modal-sub">سجّل دخولك بحساب سلة أو أدخل كود التفعيل</div>
+    <button onclick="doSalla()" class="btn-neon" style="width:100%;justify-content:center;font-size:15px;padding:14px">🔗 دخول بحساب سلة</button>
+    <div class="modal-divider">أو لديك كود تفعيل</div>
+    <input type="text" class="modal-inp" id="promo-inp" placeholder="أدخل الكود هنا" onkeydown="if(event.key==='Enter')applyCode()">
+    <button onclick="applyCode()" class="btn-neon" style="width:100%;justify-content:center;margin-bottom:14px">تفعيل الكود</button>
+    <div class="modal-divider">للاشتراك</div>
+    <a href="https://wa.me/905340355912?text=أبغى+أشترك+في+نمو+المتاجر" target="_blank" class="btn-wa">📱 تواصل عبر واتساب</a>
   </div>
 </div>
 
 <script>
-function loginWithCode() {
-  const code = document.getElementById('landing-code').value;
-  if(code === 'mm1') {
-    // Save authentication state
-    localStorage.setItem('auth_ok_glass', 'true');
-    // Redirect to the app page (assuming it's index.html or /app in your setup)
-    // Replace 'index.html' with your actual app URL if different
-    window.location.href = 'index.html'; 
-  } else {
-    alert('كود التفعيل غير صحيح!');
-  }
+function openModal(){document.getElementById('modal').classList.add('on');setTimeout(()=>document.getElementById('promo-inp')?.focus(),200);}
+function closeModal(){document.getElementById('modal').classList.remove('on');}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+function doSalla(){window.location.href=window.location.origin+'/auth/salla';}
+function applyCode(){
+  const code=(document.getElementById('promo-inp').value||'').trim().toUpperCase();
+  if(!code){alert('أدخل الكود أولاً');return;}
+  if(code==='MM1'){localStorage.setItem('uP','trial');localStorage.setItem('uC','0');window.location.href='/app';return;}
+  alert('الكود غير صحيح');
 }
 </script>
-
 </body>
 </html>
