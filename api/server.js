@@ -86,14 +86,19 @@ app.use(express.json({ limit: '5mb' }));
 
 const publicPath = path.join(__dirname, '../public');
 app.use(express.static(publicPath));
+// الصفحة الرئيسية = landing
 app.get('/', (req, res) => {
-  const f = path.join(publicPath, 'landing.html');
-  fs.existsSync(f) ? res.sendFile(f) : res.send('<h1>نمو المتجر</h1>');
+  res.sendFile(path.join(publicPath, 'landing.html'));
 });
 
+// التطبيق = /app
 app.get('/app', (req, res) => {
-  const f = path.join(publicPath, 'index.html');
-  fs.existsSync(f) ? res.sendFile(f) : res.send('<h1>نمو المتجر</h1>');
+  res.sendFile(path.join(publicPath, 'index.html'));
+});
+
+// Admin
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(publicPath, 'admin.html'));
 });
 
 // لوحة الإدارة
@@ -281,10 +286,10 @@ app.post('/api/excel/products', rateLimit(5, 60000), upload.single('file'), asyn
     });
 
     if (!products.length) return res.status(400).json({ error: 'لا توجد منتجات في الملف' });
-    // No limit — process all products
+
 
     // ── PARALLEL: 8 منتجات في نفس الوقت ────
-    const BATCH_SIZE = 8;
+    const BATCH_SIZE = 10;
     const results = new Array(products.length).fill(null);
 
     const catFocusMap = [
@@ -380,10 +385,10 @@ app.post('/api/excel/seo', rateLimit(5, 60000), upload.single('file'), async (re
     });
 
     if (!products.length) return res.status(400).json({ error: 'لا توجد منتجات في الملف' });
-    // No limit — process all products
+
 
     // ── PARALLEL: 8 منتجات في نفس الوقت ────
-    const BATCH_SEO = 8;
+    const BATCH_SEO = 10;
     const results = new Array(products.length).fill(null);
 
     async function processSeo(p, idx) {
@@ -1044,7 +1049,7 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
           tagIds.push(newId);
           allStoreTags.push({ id: newId, name: tagName }); // أضفه للكاش
         }
-        await new Promise(r => setTimeout(r, 400)); // delay كافي لتجنب rate limit سلة
+         // delay كافي لتجنب rate limit سلة
       } catch(e) {
         console.warn(`Tag "${tagName}" failed:`, e.message);
       }
@@ -1229,8 +1234,10 @@ app.post('/webhook/salla', (req, res) => {
   res.json({ success: true });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server on port ${PORT}`));
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`=== SERVER START === port:${PORT}`);
+});
 
 // DEBUG endpoint
 app.get('/api/debug', async (req, res) => {
