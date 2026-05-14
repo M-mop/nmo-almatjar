@@ -2,238 +2,586 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>نمو المتجر — حسّن منتجاتك بالذكاء الاصطناعي</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>نمو — حسّن منتجاتك بالذكاء الاصطناعي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--ac:#4361ee;--ac2:#7c3aed;--gr:#059669;--tx:#0f172a;--t2:#475569;--t3:#94a3b8;--bg:#f8f9ff;--s1:#fff;--b1:rgba(0,0,0,.07)}
+:root{
+  --gold:#B8973A;--gold2:#D4AF5A;--gold3:#F0D080;--gold-light:#FBF6E8;
+  --dark:#0A0A0A;--dark2:#141414;--dark3:#1E1E1E;
+  --tx:#1A1A1A;--t2:#555;--t3:#999;
+  --bg:#FAFAF8;--white:#FFFFFF;
+  --border:#E8E4D8;--border2:#F0EDE4;
+  --r:14px;--r2:22px
+}
 html{scroll-behavior:smooth}
-body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden}
-.btn{padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:7px;text-decoration:none;letter-spacing:-.2px}
-.btn:active{transform:scale(.97)}
-.bp{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 4px 20px rgba(67,97,238,.35)}
-.bp:hover{opacity:.92;transform:translateY(-2px);box-shadow:0 8px 28px rgba(67,97,238,.45)}
-.bs{background:#fff;color:var(--ac);border:2px solid rgba(67,97,238,.25)}
-.bs:hover{border-color:var(--ac);background:rgba(67,97,238,.04)}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden;line-height:1.7}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:4px}
 
 /* NAV */
-nav{background:rgba(255,255,255,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:50;padding:0 5vw;height:60px;display:flex;align-items:center;justify-content:space-between}
-.nav-logo{display:flex;align-items:center;gap:10px}
-.nav-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 4px 12px rgba(67,97,238,.3)}
-.nav-name{font-size:15px;font-weight:800;letter-spacing:-.3px}
-.nav-links{display:flex;align-items:center;gap:8px}
-.nav-link{font-size:13px;color:var(--t2);font-weight:500;cursor:pointer;padding:6px 10px;border-radius:7px;transition:all .15s;text-decoration:none}
-.nav-link:hover{color:var(--tx);background:rgba(0,0,0,.04)}
+nav{
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border2);
+  position:sticky;top:0;z-index:100;
+  padding:0 6vw;height:68px;
+  display:flex;align-items:center;justify-content:space-between
+}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-mark{
+  width:40px;height:40px;border-radius:10px;
+  background:var(--dark);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;color:var(--gold3);font-weight:900;letter-spacing:-1px
+}
+.nav-name{font-size:17px;font-weight:800;color:var(--tx);letter-spacing:-.5px}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-link{font-size:13px;color:var(--t2);font-weight:500;cursor:pointer;padding:7px 12px;border-radius:8px;transition:all .15s;text-decoration:none}
+.nav-link:hover{color:var(--tx);background:#F5F5F0}
+.nav-cta{
+  padding:9px 20px;border-radius:10px;font-size:13px;font-weight:700;
+  font-family:inherit;cursor:pointer;border:none;
+  background:var(--dark);color:var(--gold3);
+  transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px
+}
+.nav-cta:hover{background:var(--dark2);transform:translateY(-1px)}
 
 /* HERO */
-.hero{padding:80px 5vw 60px;text-align:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:800px;height:600px;background:radial-gradient(ellipse,rgba(67,97,238,.08) 0%,transparent 65%);pointer-events:none}
-.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(67,97,238,.08);border:1px solid rgba(67,97,238,.2);border-radius:100px;padding:5px 14px;font-size:12px;color:var(--ac);font-weight:600;margin-bottom:20px}
-.hero-title{font-size:clamp(32px,6vw,60px);font-weight:900;line-height:1.15;letter-spacing:-.5px;margin-bottom:16px}
-.hero-title span{background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero-sub{font-size:clamp(15px,2.5vw,19px);color:var(--t2);max-width:560px;margin:0 auto 32px;line-height:1.65;font-weight:400}
-.hero-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:40px}
-.hero-stats{display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap}
-.hstat{text-align:center}
-.hstat-n{font-size:26px;font-weight:900;color:var(--ac);letter-spacing:-.5px}
-.hstat-l{font-size:12px;color:var(--t3);font-weight:500;margin-top:2px}
+.hero{
+  padding:90px 6vw 70px;
+  text-align:center;
+  position:relative;overflow:hidden
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%,rgba(184,151,58,.06) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 30% at 20% 60%,rgba(184,151,58,.04) 0%,transparent 60%);
+  pointer-events:none
+}
+.hero-lines{
+  position:absolute;inset:0;
+  background-image:linear-gradient(var(--border2) 1px,transparent 1px),linear-gradient(90deg,var(--border2) 1px,transparent 1px);
+  background-size:60px 60px;
+  opacity:.5;pointer-events:none
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--gold-light);
+  border:1px solid rgba(184,151,58,.3);
+  border-radius:100px;padding:6px 16px;
+  font-size:12px;color:var(--gold);font-weight:700;
+  margin-bottom:28px;letter-spacing:.5px
+}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+h1.hero-title{
+  font-size:clamp(36px,6vw,72px);
+  font-weight:900;
+  line-height:1.1;
+  letter-spacing:-1.5px;
+  margin-bottom:20px;
+  color:var(--dark)
+}
+h1.hero-title .gold{
+  background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent
+}
+.hero-sub{
+  font-size:clamp(15px,2vw,19px);
+  color:var(--t2);
+  max-width:560px;margin:0 auto 36px;
+  font-weight:400;line-height:1.8
+}
+.hero-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:56px}
+.btn-primary{
+  padding:14px 28px;border-radius:12px;font-size:15px;font-weight:700;
+  font-family:inherit;cursor:pointer;border:none;
+  background:var(--dark);color:var(--gold3);
+  transition:all .2s;display:inline-flex;align-items:center;gap:7px;
+  text-decoration:none;letter-spacing:-.2px
+}
+.btn-primary:hover{background:#111;transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.btn-secondary{
+  padding:14px 26px;border-radius:12px;font-size:15px;font-weight:600;
+  font-family:inherit;cursor:pointer;
+  background:var(--white);color:var(--tx);
+  border:1.5px solid var(--border);
+  transition:all .2s;display:inline-flex;align-items:center;gap:7px;text-decoration:none
+}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-1px)}
+
+/* STATS BAR */
+.stats-bar{
+  display:flex;align-items:center;justify-content:center;
+  gap:48px;flex-wrap:wrap;
+  padding:28px 6vw;
+  border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);
+  background:var(--white)
+}
+.stat-item{text-align:center}
+.stat-n{font-size:28px;font-weight:900;color:var(--dark);letter-spacing:-1px}
+.stat-n span{color:var(--gold)}
+.stat-l{font-size:12px;color:var(--t3);font-weight:500;margin-top:2px}
+.stat-div{width:1px;height:40px;background:var(--border)}
 
 /* MOCKUP */
-.mockup-wrap{padding:0 5vw 70px;max-width:900px;margin:0 auto}
-.mockup{background:#fff;border:1px solid var(--b1);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.1),0 4px 16px rgba(0,0,0,.06)}
-.mock-bar{background:#f5f6fa;border-bottom:1px solid var(--b1);padding:12px 16px;display:flex;align-items:center;gap:8px}
-.mock-dots{display:flex;gap:5px}.mock-dot{width:10px;height:10px;border-radius:50%}
-.mock-url{flex:1;background:#fff;border:1px solid var(--b1);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--t3);margin:0 8px;text-align:center}
-.mock-body{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.mock-card{background:#f8f9ff;border:1px solid rgba(67,97,238,.1);border-radius:10px;padding:12px}
-.mock-prod{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.mock-img{width:36px;height:36px;border-radius:7px;background:linear-gradient(135deg,#e8ecff,#d4d9ff);flex-shrink:0}
-.mock-pname{font-size:11px;font-weight:700;color:var(--tx)}
-.mock-price{font-size:10px;color:var(--t3)}
-.mock-badge{font-size:9px;padding:2px 7px;border-radius:100px;font-weight:600}
-.mb-gr{background:rgba(5,150,105,.1);color:var(--gr)}.mb-ac{background:rgba(67,97,238,.1);color:var(--ac)}
-.mock-seo{background:rgba(67,97,238,.04);border:1px solid rgba(67,97,238,.12);border-radius:7px;padding:8px;margin-bottom:7px}
-.mock-seo-t{font-size:10px;color:#1a56db;font-weight:700;margin-bottom:2px}
-.mock-seo-d{font-size:9px;color:var(--t3);line-height:1.5}
-.mock-tags{display:flex;flex-wrap:wrap;gap:4px}
-.mock-tag{background:#fff;border:1px solid var(--b1);border-radius:100px;padding:2px 7px;font-size:9px;color:var(--t2)}
-.mock-cat{font-size:9px;color:var(--ac);background:rgba(67,97,238,.08);border-radius:100px;padding:2px 7px;font-weight:600;display:inline-block;margin-bottom:6px}
+.mockup-section{padding:70px 6vw;max-width:1000px;margin:0 auto}
+.section-label{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;color:var(--gold);
+  letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:14px
+}
+.section-label::before,.section-label::after{content:'';flex:1;height:1px;background:rgba(184,151,58,.3)}
+.section-label::before{display:none}
+h2.sec-title{font-size:clamp(22px,3.5vw,38px);font-weight:900;letter-spacing:-.5px;margin-bottom:10px;color:var(--dark)}
+p.sec-sub{font-size:15px;color:var(--t2);max-width:500px;line-height:1.8;margin-bottom:44px}
+
+.app-frame{
+  background:var(--white);
+  border:1.5px solid var(--border);
+  border-radius:20px;overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04)
+}
+.app-titlebar{
+  background:#F7F6F2;border-bottom:1px solid var(--border2);
+  padding:12px 18px;display:flex;align-items:center;gap:10px
+}
+.app-dots{display:flex;gap:5px}
+.app-dot{width:11px;height:11px;border-radius:50%}
+.app-url{
+  flex:1;background:var(--white);border:1px solid var(--border2);
+  border-radius:7px;padding:5px 12px;font-size:11px;color:var(--t3);text-align:center;
+  margin:0 10px
+}
+.app-body{display:grid;grid-template-columns:220px 1fr;min-height:340px}
+.app-sidebar{
+  border-left:1px solid var(--border2);background:#F9F8F5;
+  padding:16px 12px
+}
+.app-sidebar-logo{
+  display:flex;align-items:center;gap:8px;padding:6px 8px 14px;
+  border-bottom:1px solid var(--border2);margin-bottom:12px
+}
+.app-sidebar-mark{
+  width:28px;height:28px;border-radius:7px;background:var(--dark);
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  color:var(--gold3);font-weight:900
+}
+.app-sidebar-name{font-size:12px;font-weight:700;color:var(--tx)}
+.app-nav-item{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;
+  font-size:11px;color:var(--t2);margin-bottom:2px;cursor:default
+}
+.app-nav-item.active{background:var(--dark);color:var(--gold3);font-weight:600}
+.app-nav-item svg{width:14px;height:14px;flex-shrink:0}
+.app-main{padding:20px}
+.app-page-title{font-size:14px;font-weight:800;margin-bottom:4px;color:var(--dark)}
+.app-page-sub{font-size:11px;color:var(--t3);margin-bottom:16px}
+.app-tabs{display:flex;gap:6px;margin-bottom:14px}
+.app-tab{
+  padding:6px 14px;border-radius:8px;font-size:11px;font-weight:600;
+  border:1px solid var(--border2);color:var(--t2);background:transparent
+}
+.app-tab.active{background:var(--dark);color:var(--gold3);border-color:transparent}
+.app-card{
+  background:#F9F8F5;border:1px solid var(--border2);border-radius:12px;padding:14px;
+  margin-bottom:10px
+}
+.app-dropzone{
+  border:2px dashed rgba(184,151,58,.3);border-radius:10px;
+  padding:20px;text-align:center;margin-bottom:12px;
+  background:rgba(184,151,58,.02)
+}
+.app-dz-icon{font-size:28px;margin-bottom:6px}
+.app-dz-text{font-size:11px;font-weight:700;color:var(--tx);margin-bottom:2px}
+.app-dz-sub{font-size:10px;color:var(--t3)}
+.app-btn{
+  padding:8px 16px;border-radius:8px;font-size:11px;font-weight:700;
+  background:var(--dark);color:var(--gold3);border:none;cursor:default;
+  display:inline-flex;align-items:center;gap:5px
+}
+.app-result-row{
+  display:flex;align-items:center;gap:8px;padding:8px 0;
+  border-bottom:1px solid var(--border2);font-size:11px
+}
+.app-result-row:last-child{border:none}
+.app-badge-ok{
+  background:#E8F5E0;color:#2D7A1F;font-size:9px;font-weight:700;
+  padding:2px 7px;border-radius:100px
+}
 
 /* FEATURES */
-.features{padding:70px 5vw;background:#fff}
-.sec-title{text-align:center;font-size:clamp(24px,4vw,36px);font-weight:900;margin-bottom:8px;letter-spacing:-.4px}
-.sec-sub{text-align:center;font-size:15px;color:var(--t2);max-width:500px;margin:0 auto 48px;line-height:1.6}
-.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;max-width:1000px;margin:0 auto}
-.feat-card{background:var(--bg);border:1.5px solid var(--b1);border-radius:14px;padding:24px;transition:all .2s}
-.feat-card:hover{border-color:rgba(67,97,238,.3);transform:translateY(-3px);box-shadow:0 8px 24px rgba(67,97,238,.1)}
-.feat-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px}
-.fi-blue{background:rgba(67,97,238,.1)}.fi-green{background:rgba(5,150,105,.1)}.fi-purple{background:rgba(124,58,237,.1)}.fi-orange{background:rgba(234,88,12,.1)}.fi-pink{background:rgba(219,39,119,.1)}.fi-yellow{background:rgba(217,119,6,.1)}
-.feat-title{font-size:15px;font-weight:800;margin-bottom:6px;letter-spacing:-.2px}
-.feat-desc{font-size:13px;color:var(--t2);line-height:1.65}
+.features{padding:80px 6vw;background:var(--white);border-top:1px solid var(--border2)}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px;max-width:1060px;margin:0 auto}
+.feat-card{
+  background:var(--bg);border:1.5px solid var(--border2);
+  border-radius:var(--r2);padding:26px;
+  transition:all .2s;position:relative;overflow:hidden
+}
+.feat-card:hover{border-color:rgba(184,151,58,.4);transform:translateY(-3px);box-shadow:0 12px 40px rgba(184,151,58,.08)}
+.feat-card::before{
+  content:'';position:absolute;top:0;right:0;
+  width:80px;height:80px;
+  background:radial-gradient(circle at top right,rgba(184,151,58,.07),transparent 70%);
+  pointer-events:none
+}
+.feat-icon{
+  width:46px;height:46px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin-bottom:16px;
+  background:var(--gold-light);border:1px solid rgba(184,151,58,.2)
+}
+.feat-title{font-size:15px;font-weight:800;margin-bottom:8px;letter-spacing:-.2px;color:var(--dark)}
+.feat-desc{font-size:13px;color:var(--t2);line-height:1.75}
 
-/* HOW IT WORKS */
-.how{padding:70px 5vw;background:var(--bg)}
-.steps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;max-width:900px;margin:0 auto}
-.step-card{background:#fff;border:1.5px solid var(--b1);border-radius:14px;padding:22px;text-align:center}
-.step-n{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:15px;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 4px 12px rgba(67,97,238,.3)}
-.step-icon{font-size:26px;margin-bottom:10px}
-.step-title{font-size:14px;font-weight:700;margin-bottom:5px}
-.step-desc{font-size:12px;color:var(--t2);line-height:1.6}
+/* HOW */
+.how{padding:80px 6vw;background:var(--bg)}
+.steps-row{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:0;max-width:920px;margin:0 auto;
+  position:relative
+}
+.steps-row::before{
+  content:'';position:absolute;top:28px;right:10%;left:10%;
+  height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);
+  pointer-events:none
+}
+.step-item{padding:20px;text-align:center;position:relative}
+.step-num{
+  width:56px;height:56px;border-radius:50%;
+  background:var(--white);border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:900;color:var(--dark);
+  margin:0 auto 14px;position:relative;z-index:1;
+  transition:all .2s
+}
+.step-item:hover .step-num{background:var(--dark);color:var(--gold3);border-color:var(--dark)}
+.step-icon{font-size:24px;margin-bottom:8px}
+.step-title{font-size:14px;font-weight:800;margin-bottom:5px;color:var(--dark)}
+.step-desc{font-size:12px;color:var(--t3);line-height:1.7}
 
 /* PRICING */
-.pricing{padding:70px 5vw;background:#fff}
-.plans{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;max-width:900px;margin:0 auto}
-.plan{background:var(--bg);border:2px solid var(--b1);border-radius:16px;padding:28px;transition:all .2s;position:relative}
-.plan.popular{border-color:var(--ac);background:#fff;box-shadow:0 8px 32px rgba(67,97,238,.15)}
-.plan-badge{position:absolute;top:-12px;right:50%;transform:translateX(50%);background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:11px;font-weight:700;padding:4px 14px;border-radius:100px;white-space:nowrap}
-.plan-name{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
-.plan-price{font-size:38px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px}
-.plan-price span{font-size:16px;font-weight:500;color:var(--t2)}
-.plan-period{font-size:12px;color:var(--t3);margin-bottom:20px}
-.plan-features{list-style:none;margin-bottom:24px}
-.plan-features li{font-size:13px;color:var(--t2);padding:6px 0;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:8px}
-.plan-features li:last-child{border:none}
-.plan-features li::before{content:'✓';color:var(--gr);font-weight:700;flex-shrink:0}
-.plan-features li.no{color:var(--t3)}.plan-features li.no::before{content:'✗';color:var(--t3)}
-.plan-btn{width:100%;padding:12px;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;border:none}
-.plan-btn-p{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 4px 14px rgba(67,97,238,.3)}
-.plan-btn-p:hover{opacity:.92;transform:translateY(-1px)}
-.plan-btn-s{background:var(--bg);color:var(--ac);border:2px solid rgba(67,97,238,.25)}
-.plan-btn-s:hover{border-color:var(--ac)}
+.pricing{padding:80px 6vw;background:var(--white);border-top:1px solid var(--border2)}
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:20px;max-width:920px;margin:0 auto}
+.plan-card{
+  background:var(--bg);border:1.5px solid var(--border);
+  border-radius:var(--r2);padding:30px;
+  transition:all .2s;position:relative
+}
+.plan-card.featured{
+  background:var(--dark);border-color:var(--dark);
+  box-shadow:0 20px 60px rgba(0,0,0,.2),0 4px 16px rgba(0,0,0,.1)
+}
+.plan-badge{
+  position:absolute;top:-13px;right:50%;transform:translateX(50%);
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:var(--dark);font-size:11px;font-weight:800;
+  padding:4px 14px;border-radius:100px;white-space:nowrap;
+  letter-spacing:.3px
+}
+.plan-name{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.plan-card.featured .plan-name{color:var(--gold2)}
+.plan-card:not(.featured) .plan-name{color:var(--t3)}
+.plan-price{font-size:42px;font-weight:900;letter-spacing:-2px;margin-bottom:4px;color:var(--dark)}
+.plan-card.featured .plan-price{color:var(--white)}
+.plan-price span{font-size:16px;font-weight:500;color:var(--t3);letter-spacing:0}
+.plan-card.featured .plan-price span{color:rgba(255,255,255,.5)}
+.plan-period{font-size:12px;color:var(--t3);margin-bottom:22px}
+.plan-card.featured .plan-period{color:rgba(255,255,255,.4)}
+.plan-feats{list-style:none;margin-bottom:26px}
+.plan-feats li{
+  font-size:13px;padding:7px 0;
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;gap:8px;
+  color:var(--t2)
+}
+.plan-card.featured .plan-feats li{border-color:rgba(255,255,255,.08);color:rgba(255,255,255,.7)}
+.plan-feats li::before{content:'✓';color:var(--gold);font-weight:700;flex-shrink:0}
+.plan-feats li.no{color:var(--t3)}
+.plan-feats li.no::before{content:'✕';color:var(--border)}
+.plan-feats li:last-child{border:none}
+.plan-btn-primary{
+  width:100%;padding:13px;border-radius:11px;font-size:14px;font-weight:700;
+  font-family:inherit;cursor:pointer;border:none;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:var(--dark);transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:7px
+}
+.plan-btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(184,151,58,.3)}
+.plan-btn-secondary{
+  width:100%;padding:12px;border-radius:11px;font-size:14px;font-weight:600;
+  font-family:inherit;cursor:pointer;
+  background:transparent;color:var(--tx);
+  border:1.5px solid var(--border);transition:all .2s
+}
+.plan-btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+.plan-wa-note{
+  text-align:center;font-size:11px;color:var(--t3);margin-top:10px;
+  display:flex;align-items:center;justify-content:center;gap:4px
+}
 
 /* FAQ */
-.faq{padding:70px 5vw;background:var(--bg);max-width:700px;margin:0 auto}
-.faq-item{background:#fff;border:1.5px solid var(--b1);border-radius:12px;margin-bottom:10px;overflow:hidden}
-.faq-q{padding:16px 18px;font-size:14px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
-.faq-q:hover{background:var(--bg)}
-.faq-arr{transition:transform .2s;font-size:12px;color:var(--t3)}
-.faq-a{padding:0 18px;font-size:13px;color:var(--t2);line-height:1.7;max-height:0;overflow:hidden;transition:all .25s}
-.faq-item.open .faq-arr{transform:rotate(180deg)}
-.faq-item.open .faq-a{max-height:200px;padding:0 18px 14px}
+.faq-section{padding:80px 6vw;max-width:740px;margin:0 auto}
+.faq-item{
+  background:var(--white);border:1.5px solid var(--border2);
+  border-radius:14px;margin-bottom:8px;overflow:hidden
+}
+.faq-q{
+  padding:17px 20px;font-size:14px;font-weight:700;color:var(--dark);
+  cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+  user-select:none;transition:background .15s
+}
+.faq-q:hover{background:#F9F8F5}
+.faq-arr{
+  width:24px;height:24px;border-radius:50%;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--t3);transition:transform .2s;flex-shrink:0
+}
+.faq-item.open .faq-arr{transform:rotate(180deg);background:var(--dark);color:var(--gold3)}
+.faq-a{
+  padding:0 20px;font-size:13px;color:var(--t2);line-height:1.8;
+  max-height:0;overflow:hidden;transition:all .25s
+}
+.faq-item.open .faq-a{max-height:200px;padding:0 20px 16px}
 
-/* CTA */
-.cta{padding:70px 5vw;text-align:center;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff}
-.cta-title{font-size:clamp(24px,4vw,38px);font-weight:900;margin-bottom:10px;letter-spacing:-.4px}
-.cta-sub{font-size:16px;opacity:.85;margin-bottom:28px;line-height:1.6}
-.cta .btn{background:#fff;color:var(--ac);font-size:15px;padding:14px 28px}
-.cta .btn:hover{opacity:.95;transform:translateY(-2px)}
+/* CTA SECTION */
+.cta-section{
+  padding:90px 6vw;text-align:center;
+  background:var(--dark);
+  position:relative;overflow:hidden
+}
+.cta-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(184,151,58,.12) 0%,transparent 70%);
+  pointer-events:none
+}
+.cta-label{
+  font-size:11px;font-weight:700;color:var(--gold);letter-spacing:2.5px;
+  text-transform:uppercase;margin-bottom:18px
+}
+.cta-title{
+  font-size:clamp(26px,4vw,48px);font-weight:900;
+  color:var(--white);letter-spacing:-.5px;margin-bottom:12px;line-height:1.15
+}
+.cta-title span{color:var(--gold3)}
+.cta-sub{font-size:16px;color:rgba(255,255,255,.5);margin-bottom:32px;max-width:480px;margin-left:auto;margin-right:auto}
+.cta-btn{
+  padding:15px 34px;border-radius:12px;font-size:15px;font-weight:800;
+  font-family:inherit;cursor:pointer;border:none;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:var(--dark);display:inline-flex;align-items:center;gap:8px;
+  transition:all .2s;text-decoration:none;letter-spacing:-.2px
+}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(184,151,58,.3)}
 
 /* FOOTER */
-footer{background:var(--tx);color:#94a3b8;text-align:center;padding:24px 5vw;font-size:12px}
-footer a{color:#94a3b8;text-decoration:none}.footer-logo{color:#fff;font-weight:800;font-size:15px;margin-bottom:6px}
+footer{
+  background:var(--dark2);color:rgba(255,255,255,.4);
+  text-align:center;padding:28px 6vw;font-size:12px;
+  border-top:1px solid rgba(255,255,255,.06)
+}
+footer a{color:rgba(255,255,255,.4);text-decoration:none;margin:0 10px}
+footer a:hover{color:var(--gold)}
+.footer-logo{color:var(--gold3);font-weight:800;font-size:15px;margin-bottom:8px}
 
 /* MODAL */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
+.modal-bg{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);z-index:200;
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(8px)
+}
 .modal-bg.on{display:flex}
-.modal{background:#fff;border-radius:18px;padding:32px;width:400px;max-width:92vw;animation:mIn .2s ease}
-@keyframes mIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
-.modal-title{font-size:20px;font-weight:900;margin-bottom:4px;letter-spacing:-.4px}
-.modal-sub{font-size:13px;color:var(--t2);margin-bottom:22px;line-height:1.5}
+.modal{
+  background:var(--white);border-radius:20px;padding:36px;
+  width:420px;max-width:92vw;
+  border:1.5px solid var(--border);
+  box-shadow:0 24px 80px rgba(0,0,0,.15);
+  animation:mIn .2s ease
+}
+@keyframes mIn{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}
+.modal-close{
+  float:left;background:none;border:none;font-size:18px;
+  cursor:pointer;color:var(--t3);width:30px;height:30px;
+  border-radius:7px;display:flex;align-items:center;justify-content:center
+}
+.modal-close:hover{background:#F5F5F0;color:var(--tx)}
+.modal-title{font-size:20px;font-weight:900;margin-bottom:4px;letter-spacing:-.4px;color:var(--dark)}
+.modal-sub{font-size:13px;color:var(--t2);margin-bottom:24px;line-height:1.6}
 .fg{margin-bottom:14px}
 .lbl{font-size:11px;font-weight:700;color:var(--t2);margin-bottom:5px;display:block;letter-spacing:.3px}
-.inp{width:100%;background:#f8f9ff;border:1.5px solid var(--b1);border-radius:9px;padding:10px 13px;color:var(--tx);font-family:inherit;font-size:14px;outline:none;transition:border-color .15s}
-.inp:focus{border-color:var(--ac);background:#fff;box-shadow:0 0 0 3px rgba(67,97,238,.1)}
-.modal-btn{width:100%;padding:13px;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border:none;margin-top:4px;transition:all .2s;box-shadow:0 4px 14px rgba(67,97,238,.3)}
-.modal-btn:hover{opacity:.92;transform:translateY(-1px)}
-.modal-close{position:absolute;top:16px;left:16px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--t3);width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center}
-.modal-close:hover{background:#f1f5f9;color:var(--tx)}
-.modal-wrap{position:relative}
-.divider{text-align:center;font-size:12px;color:var(--t3);margin:14px 0;display:flex;align-items:center;gap:8px}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--b1)}
-.salla-btn{width:100%;padding:12px;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;background:#5b47d5;color:#fff;border:none;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
-.salla-btn:hover{opacity:.92;transform:translateY(-1px)}
-.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--tx);border-radius:10px;padding:11px 20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .22s;pointer-events:none;white-space:nowrap;color:#fff}
+.inp{
+  width:100%;background:var(--bg);border:1.5px solid var(--border);
+  border-radius:10px;padding:11px 14px;color:var(--tx);
+  font-family:inherit;font-size:14px;outline:none;transition:border-color .15s
+}
+.inp:focus{border-color:var(--gold);background:var(--white);box-shadow:0 0 0 3px rgba(184,151,58,.1)}
+.modal-btn{
+  width:100%;padding:13px;border-radius:11px;font-size:14px;font-weight:800;
+  font-family:inherit;cursor:pointer;border:none;
+  background:var(--dark);color:var(--gold3);
+  transition:all .2s;margin-top:4px
+}
+.modal-btn:hover{background:#111;transform:translateY(-1px)}
+.option-card{
+  border:1.5px solid var(--border);border-radius:14px;padding:16px;
+  cursor:pointer;transition:all .15s;margin-bottom:8px;
+  display:flex;align-items:center;gap:14px
+}
+.option-card:hover{border-color:var(--gold);background:var(--gold-light)}
+.option-card.selected{border-color:var(--dark);background:var(--dark)}
+.option-icon{
+  width:46px;height:46px;border-radius:10px;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0
+}
+.option-card.selected .option-icon{background:rgba(255,255,255,.1)}
+.option-title{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:2px}
+.option-card.selected .option-title{color:var(--white)}
+.option-desc{font-size:12px;color:var(--t3)}
+.option-card.selected .option-desc{color:rgba(255,255,255,.5)}
+.option-badge{
+  margin-right:auto;font-size:10px;font-weight:700;padding:3px 9px;
+  border-radius:100px;white-space:nowrap
+}
+.badge-ok{background:#E5F5D8;color:#2A6E14}
+.badge-soon{background:#FFF3CD;color:#8A6000}
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(14px);
+  border-radius:12px;padding:12px 22px;font-size:13px;font-weight:700;
+  z-index:999;opacity:0;transition:all .22s;pointer-events:none;white-space:nowrap;
+  box-shadow:0 8px 32px rgba(0,0,0,.2)
+}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.success{background:var(--gr)}.toast.error{background:#dc2626}
+.toast.success{background:var(--dark);color:var(--gold3)}
+.toast.error{background:#DC2626;color:#fff}
 
-@media(max-width:640px){
-  .hero{padding:50px 5vw 40px}
-  .nav-links .bs{display:none}
-  .mock-body{grid-template-columns:1fr}
-  .hero-stats{gap:20px}
+/* MOBILE */
+@media(max-width:680px){
+  .nav-links .btn-secondary,.nav-links .nav-link{display:none}
+  .stats-bar{gap:24px}.stat-div{display:none}
+  .app-body{grid-template-columns:1fr}
+  .app-sidebar{display:none}
+  .steps-row::before{display:none}
+  h1.hero-title{letter-spacing:-.5px}
 }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
-  <div class="nav-logo">
-    <div class="nav-icon"><img src="https://i.ibb.co/SDZKDnMF/logo.png" style="width:24px;height:24px;object-fit:contain;border-radius:6px"></div>
-    <div class="nav-name">نمو المتجر</div>
-  </div>
+  <a class="nav-logo" href="/">
+    <div class="nav-mark">ن</div>
+    <div class="nav-name">نمو</div>
+  </a>
   <div class="nav-links">
     <a href="#features" class="nav-link">المميزات</a>
     <a href="#pricing" class="nav-link">الأسعار</a>
     <a href="#faq" class="nav-link">الأسئلة</a>
     <a href="/about.html" class="nav-link">من نحن</a>
-    <a href="/privacy.html" class="nav-link">الخصوصية</a>
-    <button class="btn bp" onclick="openModal('start')" style="padding:8px 16px;font-size:13px">ابدأ الآن ←</button>
+    <button class="nav-cta" onclick="openModal()">ابدأ الآن ←</button>
   </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
-  <div class="hero-badge">🤖 مدعوم بـ Claude AI من Anthropic</div>
-  <h1 class="hero-title">حسّن منتجاتك وضاعف<br><span>مبيعاتك بالذكاء الاصطناعي</span></h1>
-  <p class="hero-sub">أداة تحسين المحتوى الأولى المتخصصة لمتاجر سلة — تحسين الوصف والعنوان والـ SEO والوسوم بضغطة زر واحدة.</p>
-  <div class="hero-btns">
-    <button class="btn bp" onclick="openModal('start')" style="font-size:15px;padding:14px 28px">جرّب الآن ←</button>
-    <a href="#features" class="btn bs" style="font-size:14px;padding:13px 24px">شاهد المميزات</a>
-  </div>
-  <div class="hero-stats">
-    <div class="hstat"><div class="hstat-n">50+</div><div class="hstat-l">منتج دفعة واحدة</div></div>
-    <div class="hstat"><div class="hstat-n">5</div><div class="hstat-l">أدوات تحسين</div></div>
-    <div class="hstat"><div class="hstat-n">100%</div><div class="hstat-l">متوافق مع سلة</div></div>
-    <div class="hstat"><div class="hstat-n">3x</div><div class="hstat-l">تحسين الظهور</div></div>
+  <div class="hero-bg"></div>
+  <div class="hero-lines"></div>
+  <div style="position:relative;z-index:1">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      مدعوم بـ Claude AI من Anthropic
+    </div>
+    <h1 class="hero-title">
+      حوّل منتجاتك إلى<br>
+      <span class="gold">مبيعات حقيقية</span>
+    </h1>
+    <p class="hero-sub">أول منصة ذكاء اصطناعي متخصصة لتحسين محتوى متاجر سلة — عنوان، وصف، SEO، ووسوم بلحظات.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="openModal()">جرّب الآن مجاناً ←</button>
+      <a href="#features" class="btn-secondary">اكتشف المميزات</a>
+    </div>
   </div>
 </section>
 
-<!-- MOCKUP -->
-<div class="mockup-wrap">
-  <div class="mockup">
-    <div class="mock-bar">
-      <div class="mock-dots">
-        <div class="mock-dot" style="background:#f87171"></div>
-        <div class="mock-dot" style="background:#fbbf24"></div>
-        <div class="mock-dot" style="background:#34d399"></div>
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-n">200<span>+</span></div><div class="stat-l">منتج في الشهر</div></div>
+  <div class="stat-div"></div>
+  <div class="stat-item"><div class="stat-n">5<span>x</span></div><div class="stat-l">أسرع من يدوي</div></div>
+  <div class="stat-div"></div>
+  <div class="stat-item"><div class="stat-n">100<span>%</span></div><div class="stat-l">متوافق مع سلة</div></div>
+  <div class="stat-div"></div>
+  <div class="stat-item"><div class="stat-n">3<span>x</span></div><div class="stat-l">تحسين الظهور</div></div>
+</div>
+
+<!-- APP MOCKUP -->
+<div class="mockup-section">
+  <div style="text-align:center;margin-bottom:36px">
+    <div class="section-label">المنصة</div>
+    <h2 class="sec-title">واجهة احترافية وبسيطة</h2>
+    <p class="sec-sub">ارفع ملف Excel من سلة، وبضغطة واحدة تحصل على كل منتجاتك محسّنة.</p>
+  </div>
+  <div class="app-frame">
+    <div class="app-titlebar">
+      <div class="app-dots">
+        <div class="app-dot" style="background:#f87171"></div>
+        <div class="app-dot" style="background:#fbbf24"></div>
+        <div class="app-dot" style="background:#34d399"></div>
       </div>
-      <div class="mock-url">app.نمو-المتجر.sa</div>
+      <div class="app-url">app.نمو.sa</div>
     </div>
-    <div class="mock-body">
-      <div class="mock-card">
-        <div class="mock-cat">👗 ملابس وأزياء</div>
-        <div class="mock-prod">
-          <div class="mock-img"></div>
-          <div><div class="mock-pname">فستان سهرة أنيق</div><div class="mock-price">249 ر.س</div></div>
+    <div class="app-body">
+      <div class="app-sidebar">
+        <div class="app-sidebar-logo">
+          <div class="app-sidebar-mark">ن</div>
+          <div class="app-sidebar-name">نمو المتاجر</div>
         </div>
-        <div class="mock-seo">
-          <div class="mock-seo-t">فستان سهرة نسائي أنيق للمناسبات الراقية</div>
-          <div class="mock-seo-d">فستان راقٍ مصمم لإبراز أناقتك في كل مناسبة — قماش فاخر...</div>
+        <div class="app-nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          تحسين Excel
         </div>
-        <div class="mock-tags">
-          <span class="mock-tag">فستان نسائي</span>
-          <span class="mock-tag">سهرة</span>
-          <span class="mock-tag">مناسبات</span>
-          <span class="mock-tag">أناقة</span>
+        <div class="app-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          المنتجات المحسّنة
+        </div>
+        <div class="app-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          نقاط الجودة
         </div>
       </div>
-      <div class="mock-card">
-        <div class="mock-cat">📱 إلكترونيات</div>
-        <div class="mock-prod">
-          <div class="mock-img" style="background:linear-gradient(135deg,#e8f4ff,#d0e8ff)"></div>
-          <div><div class="mock-pname">سماعة لاسلكية Pro</div><div class="mock-price">199 ر.س</div></div>
+      <div class="app-main">
+        <div class="app-page-title">📊 تحسين ملف Excel</div>
+        <div class="app-page-sub">حسّن منتجاتك من أي منصة — سلة، زد، شوبيفاي</div>
+        <div class="app-tabs">
+          <div class="app-tab active">📦 ملف المنتجات</div>
+          <div class="app-tab">🔍 ملف SEO</div>
         </div>
-        <div class="mock-seo">
-          <div class="mock-seo-t">سماعة بلوتوث لاسلكية Pro بجودة صوت فائقة</div>
-          <div class="mock-seo-d">صوت نقي واتصال مستقر، بطارية 30 ساعة، مضادة للماء...</div>
+        <div class="app-card">
+          <div class="app-dropzone">
+            <div class="app-dz-icon">📊</div>
+            <div class="app-dz-text">اسحب ملف Excel هنا</div>
+            <div class="app-dz-sub">أو اضغط للاختيار — .xlsx فقط</div>
+          </div>
+          <div class="app-btn">🚀 بدء التحسين</div>
         </div>
-        <div class="mock-tags">
-          <span class="mock-tag">سماعة</span>
-          <span class="mock-tag">بلوتوث</span>
-          <span class="mock-tag">لاسلكية</span>
-          <span class="mock-tag">Pro</span>
+        <div class="app-result-row">
+          <span style="font-size:10px;color:var(--t3)">1</span>
+          <span style="flex:1;font-weight:600;color:var(--tx)">عطر ورد الطائف الفاخر</span>
+          <span class="app-badge-ok">✓ تم</span>
+        </div>
+        <div class="app-result-row">
+          <span style="font-size:10px;color:var(--t3)">2</span>
+          <span style="flex:1;font-weight:600;color:var(--tx)">سماعة بلوتوث Pro لاسلكية</span>
+          <span class="app-badge-ok">✓ تم</span>
+        </div>
+        <div class="app-result-row">
+          <span style="font-size:10px;color:var(--t3)">3</span>
+          <span style="flex:1;font-weight:600;color:var(--tx)">فستان سهرة نسائي أنيق</span>
+          <span class="app-badge-ok">✓ تم</span>
         </div>
       </div>
     </div>
@@ -242,197 +590,206 @@ footer a{color:#94a3b8;text-decoration:none}.footer-logo{color:#fff;font-weight:
 
 <!-- FEATURES -->
 <section class="features" id="features">
-  <div class="sec-title">كل ما تحتاجه لمتجر متصدر</div>
-  <p class="sec-sub">أدوات ذكاء اصطناعي متخصصة لرفع جودة محتوى متجرك وزيادة مبيعاتك</p>
+  <div style="text-align:center;margin-bottom:44px;max-width:1060px;margin-left:auto;margin-right:auto">
+    <div class="section-label">المميزات</div>
+    <h2 class="sec-title">كل ما يحتاجه متجرك</h2>
+    <p class="sec-sub" style="margin-left:auto;margin-right:auto">أدوات ذكاء اصطناعي متخصصة لرفع جودة محتواك وضاعفة مبيعاتك</p>
+  </div>
   <div class="feat-grid">
     <div class="feat-card">
-      <div class="feat-icon fi-blue">🧠</div>
+      <div class="feat-icon">🧠</div>
       <div class="feat-title">ذكاء الفئات التلقائي</div>
       <div class="feat-desc">يكتشف نوع منتجك تلقائياً ويكتب وصفاً متخصصاً — ملابس يركز على القماش والمقاسات، إلكترونيات يركز على المواصفات والضمان.</div>
     </div>
     <div class="feat-card">
-      <div class="feat-icon fi-green">⭐</div>
-      <div class="feat-title">الرد الذكي على التقييمات</div>
-      <div class="feat-desc">يقرأ تقييمات عملائك ويحوّلها لعبارات بيع قوية داخل الوصف — كلام عملائك الحقيقي أفضل دليل للمشتري الجديد.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon fi-purple">🔍</div>
+      <div class="feat-icon">🔍</div>
       <div class="feat-title">تحسين SEO كامل</div>
-      <div class="feat-desc">عنوان الصفحة ووصفها ووسومها كلها محسّنة لـ Google — منتجاتك تظهر أعلى نتائج البحث وتجذب زوار مجانيين.</div>
+      <div class="feat-desc">عنوان الصفحة ووصفها ووسومها محسّنة لـ Google — منتجاتك تظهر أعلى نتائج البحث وتجذب زوار مجانيين.</div>
     </div>
     <div class="feat-card">
-      <div class="feat-icon fi-orange">🔤</div>
-      <div class="feat-title">اختبار العناوين (A/B)</div>
-      <div class="feat-desc">يقترح 3 عناوين مختلفة لكل منتج — أنت تختار الأقوى وأكثرها جذباً للنقر بناءً على كلماتها المفتاحية.</div>
+      <div class="feat-icon">⚡</div>
+      <div class="feat-title">معالجة متوازية سريعة</div>
+      <div class="feat-desc">تحسين 10 منتجات بنفس الوقت — بدلاً من الانتظار واحداً واحداً، كل الملف ينتهي بأسرع وقت ممكن.</div>
     </div>
     <div class="feat-card">
-      <div class="feat-icon fi-pink">🏆</div>
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">تحسين Excel من سلة</div>
+      <div class="feat-desc">صدّر ملف منتجاتك أو SEO من سلة، ارفعه هنا، وتحصل على نسخة محسّنة كاملة جاهزة للاستيراد مباشرة.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🏆</div>
       <div class="feat-title">نقاط جودة المتجر</div>
       <div class="feat-desc">لوحة تعرض نسبة تحسين متجرك مع مهام واضحة لإصلاح المشاكل — تحدّ نفسك للوصول لـ 100%.</div>
     </div>
     <div class="feat-card">
-      <div class="feat-icon fi-yellow">⚡</div>
-      <div class="feat-title">تحسين 50 منتج دفعة</div>
-      <div class="feat-desc">اختر حتى 50 منتج ومنهم يتحسنون تلقائياً — وصف + عنوان + SEO + وسوم بضغطة زر واحدة.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon fi-purple">🧠</div>
-      <div class="feat-title">أسلوب البيع النفسي</div>
-      <div class="feat-desc">اختر استراتيجية البيع — الندرة، حل المشكلات، أو الرفاهية — والذكاء الاصطناعي يعيد صياغة المحتوى ليحفّز المشتري فوراً.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon fi-green">🔗</div>
-      <div class="feat-title">روابط المنتجات الذكية</div>
-      <div class="feat-desc">يقترح في نهاية كل وصف منتجات مكملة من متجرك تلقائياً — يزيد متوسط قيمة السلة بدون مجهود يدوي.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon fi-orange">🎁</div>
-      <div class="feat-title">نظام الإحالة</div>
-      <div class="feat-desc">شارك كودك مع أصدقائك التجار — كل من يسجل بكودك يحصل على شهر مجاني وأنت أيضاً تكافأ تلقائياً.</div>
+      <div class="feat-icon">🎨</div>
+      <div class="feat-title">أساليب كتابة متعددة</div>
+      <div class="feat-desc">اختر بين الأسلوب الاحترافي، الفاخر، الشبابي، أو الودي — لكل متجر شخصيته الخاصة.</div>
     </div>
   </div>
 </section>
 
 <!-- HOW IT WORKS -->
 <section class="how">
-  <div class="sec-title">كيف يعمل؟</div>
-  <p class="sec-sub">ثلاث خطوات بسيطة لتحسين متجرك كاملاً</p>
-  <div class="steps-grid">
-    <div class="step-card">
-      <div class="step-n">١</div>
-      <div class="step-icon">🔗</div>
-      <div class="step-title">اربط متجرك</div>
-      <div class="step-desc">اربط متجرك على سلة بخطوة واحدة — لا تحتاج أي معرفة تقنية</div>
+  <div style="text-align:center;margin-bottom:44px">
+    <div class="section-label">كيف يعمل</div>
+    <h2 class="sec-title">٣ خطوات فقط</h2>
+    <p class="sec-sub" style="margin-left:auto;margin-right:auto">من ملف Excel إلى منتجات محسّنة في دقائق</p>
+  </div>
+  <div class="steps-row">
+    <div class="step-item">
+      <div class="step-num">١</div>
+      <div class="step-icon">📤</div>
+      <div class="step-title">صدّر من سلة</div>
+      <div class="step-desc">اذهب للمنتجات في سلة واستخرج ملف Excel</div>
     </div>
-    <div class="step-card">
-      <div class="step-n">٢</div>
-      <div class="step-icon">☑️</div>
-      <div class="step-title">اختر المنتجات</div>
-      <div class="step-desc">اختر المنتجات التي تريد تحسينها — ابدأ بالأولى بالأولوية</div>
+    <div class="step-item">
+      <div class="step-num">٢</div>
+      <div class="step-icon">⬆️</div>
+      <div class="step-title">ارفع الملف</div>
+      <div class="step-desc">ارفع الملف في المنصة واختر أسلوب الكتابة</div>
     </div>
-    <div class="step-card">
-      <div class="step-n">٣</div>
-      <div class="step-icon">🚀</div>
-      <div class="step-title">اضغط تحسين</div>
-      <div class="step-desc">الذكاء الاصطناعي يكتب الوصف والعنوان والوسوم في ثوانٍ</div>
+    <div class="step-item">
+      <div class="step-num">٣</div>
+      <div class="step-icon">🤖</div>
+      <div class="step-title">الذكاء يعمل</div>
+      <div class="step-desc">Claude يحسّن كل منتج — اسم ووصف وSEO</div>
     </div>
-    <div class="step-card">
-      <div class="step-n">٤</div>
-      <div class="step-icon">✅</div>
-      <div class="step-title">ارفع للمتجر</div>
-      <div class="step-desc">راجع النتائج وارفعها لمتجرك مباشرة — بدون أي خطوات إضافية</div>
+    <div class="step-item">
+      <div class="step-num">٤</div>
+      <div class="step-icon">📥</div>
+      <div class="step-title">حمّل وارفع</div>
+      <div class="step-desc">حمّل الملف المحسّن واستورده لسلة مباشرة</div>
     </div>
   </div>
 </section>
 
 <!-- PRICING -->
 <section class="pricing" id="pricing">
-  <div class="sec-title">أسعار شفافة وبسيطة</div>
-  <p class="sec-sub">خطط مرنة تبدأ من 99 ر.س/شهر — تواصل معنا للاشتراك</p>
-  <div class="plans">
-    <div class="plan">
+  <div style="text-align:center;margin-bottom:44px">
+    <div class="section-label">الأسعار</div>
+    <h2 class="sec-title">شفاف وبسيط</h2>
+    <p class="sec-sub" style="margin-left:auto;margin-right:auto">الاشتراك عبر واتساب — لا بطاقة ائتمانية، لا تعقيد</p>
+  </div>
+  <div class="plans-grid">
+    <div class="plan-card">
       <div class="plan-name">مجاني</div>
       <div class="plan-price">0 <span>ر.س</span></div>
-      <div class="plan-period">إلى الأبد</div>
-      <ul class="plan-features">
-        <li>تجربة بكود خاص من الفريق</li>
+      <div class="plan-period">بكود خاص من الفريق</div>
+      <ul class="plan-feats">
+        <li>تجربة بكود مخصص</li>
         <li>تحسين الوصف والعنوان</li>
         <li>تحسين SEO أساسي</li>
-        <li>توليد الوسوم</li>
-        <li class="no">ذكاء الفئات المتقدم</li>
-        <li class="no">الرد على التقييمات</li>
         <li class="no">تحسين بالجملة</li>
+        <li class="no">أولوية في المعالجة</li>
       </ul>
-      <div style="background:rgba(67,97,238,.06);border:1px dashed rgba(67,97,238,.2);border-radius:8px;padding:8px;text-align:center;margin-bottom:10px;font-size:11px;color:#4361ee;font-weight:600">🎯 طلب كود تجريبي خاص</div>
-      <button class="plan-btn plan-btn-s" onclick="openModal('start')">ابدأ الآن</button>
+      <button class="plan-btn-secondary" onclick="openModal()">طلب كود تجريبي</button>
+      <div class="plan-wa-note">📱 تواصل معنا للحصول على كود</div>
     </div>
-    <div class="plan popular">
-      <div class="plan-badge">الأكثر شعبية ⭐</div>
+    <div class="plan-card featured">
+      <div class="plan-badge">⭐ الأكثر شعبية</div>
       <div class="plan-name">Pro</div>
-      <div class="plan-price">99 <span>ر.س</span></div>
-      <div class="plan-period">شهرياً</div>
-      <ul class="plan-features">
+      <div class="plan-price">99 <span>ر.س / شهر</span></div>
+      <div class="plan-period">اشتراك شهري قابل للإلغاء</div>
+      <ul class="plan-feats">
         <li>200 منتج في الشهر</li>
         <li>تحسين الوصف والعنوان</li>
         <li>تحسين SEO متقدم</li>
-        <li>توليد الوسوم</li>
-        <li>ذكاء الفئات المتقدم</li>
-        <li>الرد على التقييمات</li>
-        <li>تحسين 50 منتج دفعة</li>
+        <li>تحسين بالجملة</li>
+        <li>أولوية في المعالجة</li>
       </ul>
-      <button class="plan-btn plan-btn-p" onclick="openModal('start')">ابدأ الآن ←</button>
+      <button class="plan-btn-primary" onclick="openWhatsapp('pro')">📱 اشترك عبر واتساب ←</button>
+      <div class="plan-wa-note" style="color:rgba(255,255,255,.3)">الدفع آمن • إلغاء فوري</div>
     </div>
-    <div class="plan">
+    <div class="plan-card">
       <div class="plan-name">Enterprise</div>
       <div class="plan-price">299 <span>ر.س</span></div>
-      <div class="plan-period">شهرياً</div>
-      <ul class="plan-features">
-        <li>غير محدود</li>
+      <div class="plan-period">شهرياً — غير محدود</div>
+      <ul class="plan-feats">
+        <li>منتجات غير محدودة</li>
         <li>كل مميزات Pro</li>
-        <li>أولوية في الدعم</li>
+        <li>أولوية قصوى في الدعم</li>
         <li>تقارير تفصيلية</li>
-        <li>لوحة إدارة متقدمة</li>
-        <li>API مخصص</li>
-        <li>دعم عبر واتساب</li>
+        <li>دعم عبر واتساب مباشر</li>
       </ul>
-      <button class="plan-btn plan-btn-s" onclick="openModal('start')">تواصل معنا</button>
+      <button class="plan-btn-secondary" onclick="openWhatsapp('enterprise')">📱 تواصل معنا</button>
+      <div class="plan-wa-note">مناسب للمتاجر الكبيرة</div>
     </div>
   </div>
 </section>
 
 <!-- FAQ -->
-<section id="faq" style="padding:70px 5vw;background:var(--bg)">
-  <div style="max-width:680px;margin:0 auto">
-    <div class="sec-title" style="margin-bottom:8px">الأسئلة الشائعة</div>
-    <p class="sec-sub">كل ما تحتاج معرفته</p>
-    <div id="faq-list">
-      <div class="faq-item">
-        <div class="faq-q" onclick="togFaq(this)">هل التطبيق متوافق مع سلة؟ <span class="faq-arr">▼</span></div>
-        <div class="faq-a">نعم — التطبيق مبني خصيصاً لمنصة سلة ومتكامل معها بالكامل. يربط متجرك مباشرة ويحدّث المنتجات تلقائياً.</div>
+<section id="faq">
+  <div class="faq-section">
+    <div style="text-align:center;margin-bottom:36px">
+      <div class="section-label">الأسئلة</div>
+      <h2 class="sec-title">أسئلة شائعة</h2>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="togFaq(this)">
+        هل التطبيق متوافق مع سلة؟
+        <div class="faq-arr">▼</div>
       </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="togFaq(this)">كيف يعمل الذكاء الاصطناعي على منتجاتي؟ <span class="faq-arr">▼</span></div>
-        <div class="faq-a">نستخدم نموذج Claude من Anthropic — من أقوى النماذج اللغوية عالمياً. يكتشف نوع منتجك تلقائياً ويكتب محتوى متخصصاً يناسب فئته وجمهوره المستهدف.</div>
+      <div class="faq-a">نعم — مبني خصيصاً لمنصة سلة. يقبل ملفات Excel المُصدَّرة من سلة مباشرة، ويعيدها محسّنة جاهزة للاستيراد.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="togFaq(this)">
+        كيف يعمل الذكاء الاصطناعي على منتجاتي؟
+        <div class="faq-arr">▼</div>
       </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="togFaq(this)">هل يمكنني تعديل النتائج قبل الرفع؟ <span class="faq-arr">▼</span></div>
-        <div class="faq-a">بالطبع — تستطيع مراجعة كل الوصف والعناوين قبل رفعها. تختار العنوان الأفضل من بين 3 خيارات وتوسّع الوصف لتقرأه كاملاً.</div>
+      <div class="faq-a">نستخدم Claude من Anthropic — من أقوى النماذج اللغوية عالمياً. يكتشف فئة منتجك تلقائياً ويكتب محتوى متخصصاً يناسب جمهورك المستهدف.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="togFaq(this)">
+        كيف يتم الاشتراك والدفع؟
+        <div class="faq-arr">▼</div>
       </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="togFaq(this)">هل بياناتي آمنة؟ <span class="faq-arr">▼</span></div>
-        <div class="faq-a">نعم — لا نخزن بيانات منتجاتك. نستخدم التوكن للوصول المؤقت لمتجرك فقط عند الحاجة، ولا نشارك أي بيانات مع أطراف ثالثة.</div>
+      <div class="faq-a">الاشتراك عبر واتساب مباشرة — تتواصل معنا، نفعّل حسابك، وتبدأ فوراً. الدفع بالطريقة المناسبة لك.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="togFaq(this)">
+        هل بياناتي آمنة؟
+        <div class="faq-arr">▼</div>
       </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="togFaq(this)">ماذا لو لم أكن راضياً؟ <span class="faq-arr">▼</span></div>
-        <div class="faq-a">الخطة المجانية متاحة دائماً بدون بطاقة ائتمانية. إذا اشتركت بالـ Pro وأردت الإلغاء، يمكنك ذلك في أي وقت.</div>
+      <div class="faq-a">نعم — لا نخزن ملفاتك. الملف يُعالَج مباشرة ويُحذف فور الانتهاء. بياناتك ملكك فقط.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="togFaq(this)">
+        ماذا لو لم أكن راضياً عن النتائج؟
+        <div class="faq-arr">▼</div>
       </div>
+      <div class="faq-a">تقدر تراجع كل المحتوى قبل الاستيراد. وإذا ما رضيت، نحن نعمل معك حتى تحصل على أفضل نتيجة.</div>
     </div>
   </div>
 </section>
 
 <!-- CTA -->
-<section class="cta">
-  <div class="cta-title">حسّن متجرك وضاعف مبيعاتك</div>
-  <p class="cta-sub">ابدأ تحسين متجرك الآن — خطط مرنة تناسب كل متجر</p>
-  <button class="btn" onclick="openModal('start')" style="background:#fff;color:var(--ac);font-size:15px;padding:14px 28px;font-weight:800;box-shadow:0 4px 20px rgba(0,0,0,.15)">جرّب الآن ← ←</button>
+<section class="cta-section">
+  <div class="cta-bg"></div>
+  <div style="position:relative;z-index:1">
+    <div class="cta-label">ابدأ اليوم</div>
+    <div class="cta-title">متجرك يستحق محتوى<br><span>يبيع فعلاً</span></div>
+    <p class="cta-sub">انضم لأصحاب المتاجر الذين يستخدمون الذكاء الاصطناعي لتنمية مبيعاتهم</p>
+    <button class="cta-btn" onclick="openModal()">ابدأ الآن ←</button>
+  </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
-  <div class="footer-logo">✦ نمو المتجر</div>
-  <div>أداة تحسين المحتوى الأولى لمتاجر سلة</div>
-  <div style="margin-top:8px;opacity:.6">© 2025 نمو المتجر — جميع الحقوق محفوظة</div>
-  <div style="margin-top:8px;opacity:.7">
-    <a href="/about.html">من نحن</a> · 
-    <a href="/privacy.html">سياسة الخصوصية</a> · 
-    <a href="/terms.html">شروط الاستخدام</a>
+  <div class="footer-logo">✦ نمو</div>
+  <div>منصة تحسين محتوى المتاجر الإلكترونية بالذكاء الاصطناعي</div>
+  <div style="margin-top:10px">
+    <a href="/about.html">من نحن</a>
+    <a href="/privacy.html">الخصوصية</a>
+    <a href="/terms.html">الشروط</a>
+    <a href="https://wa.me/905340355912" target="_blank">الدعم</a>
   </div>
+  <div style="margin-top:8px;opacity:.4">© 2025 نمو — جميع الحقوق محفوظة</div>
 </footer>
 
-<!-- REGISTER/LOGIN MODAL -->
-<div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
-  <div class="modal modal-wrap">
-    <button class="modal-close" onclick="document.getElementById('modal-bg').classList.remove('on')">✕</button>
+<!-- MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
     <div id="modal-content"></div>
   </div>
 </div>
@@ -440,172 +797,101 @@ footer a{color:#94a3b8;text-decoration:none}.footer-logo{color:#fff;font-weight:
 <div class="toast" id="toast"></div>
 
 <script>
-const B = window.location.origin;
-
-// ── FAQ ──────────────────────────────────
-function togFaq(el){
-  const item = el.parentElement;
-  item.classList.toggle('open');
-}
-
-// ── MODAL ────────────────────────────────
-function openModal(type){
-  var mc = document.getElementById('modal-content');
+function openModal(){
   document.getElementById('modal-bg').classList.add('on');
-
-  if(type==='start'){
-    mc.innerHTML =
-      '<div style="text-align:center;margin-bottom:18px">' +
-        '<div class="modal-title" style="margin-bottom:4px">كيف تريد البدء؟</div>' +
-        '<div class="modal-sub">اختر الطريقة المناسبة لك</div>' +
-      '</div>' +
-      '<div style="border:1.5px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:10px;opacity:.5;background:#f8fafc">' +
-        '<div style="display:flex;align-items:center;gap:12px">' +
-          '<div style="width:44px;height:44px;background:#e0e7ff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🔗</div>' +
-          '<div style="flex:1">' +
-            '<div style="font-size:14px;font-weight:700;margin-bottom:2px">ربط متجر سلة مباشرة</div>' +
-            '<div style="font-size:12px;color:#64748b">تحسين فوري لمنتجاتك بدون تصدير</div>' +
-          '</div>' +
-          '<span style="background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px">قريباً ⏳</span>' +
-        '</div>' +
-      '</div>' +
-      '<div style="border:2px solid #4361ee;border-radius:12px;padding:16px;cursor:pointer;background:#f5f7ff" onclick="openModal(\'excel\')">' +
-        '<div style="display:flex;align-items:center;gap:12px">' +
-          '<div style="width:44px;height:44px;background:#e0e7ff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📊</div>' +
-          '<div style="flex:1">' +
-            '<div style="font-size:14px;font-weight:700;margin-bottom:2px">تحسين عبر Excel</div>' +
-            '<div style="font-size:12px;color:#64748b">صدّر منتجاتك، حسّنها، استوردها لسلة</div>' +
-          '</div>' +
-          '<span style="background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px">متاح الآن ✅</span>' +
-        '</div>' +
-      '</div>';
-    return;
-  }
-
-  if(type==='excel'){
-    mc.innerHTML =
-      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">' +
-        '<button onclick="openModal(&quot;start&quot;)" style="background:#f1f5f9;border:none;cursor:pointer;color:#64748b;font-size:16px;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center">←</button>' +
-        '<div class="modal-title" style="margin:0">سجّل اهتمامك 📊</div>' +
-      '</div>' +
-      '<div class="modal-sub" style="margin-bottom:16px">أدخل بريدك الإلكتروني للبدء</div>' +
-      '<div class="fg">' +
-        '<label class="lbl">البريد الإلكتروني</label>' +
-        '<input class="inp" id="excel-email" placeholder="example@email.com" type="email" dir="ltr">' +
-      '</div>' +
-      '<button class="modal-btn" onclick="doExcelRegister()">ابدأ الآن ←</button>' +
-      '<div style="margin-top:14px;background:#f8fafc;border-radius:10px;padding:12px;font-size:12px;color:#64748b;line-height:1.8">' +
-        '✅ منتجان مجانيان فوراً<br>' +
-        '📊 تحسين عبر ملفات Excel من سلة<br>' +
-        '🔒 لا نشارك بياناتك مع أحد' +
-      '</div>';
-    setTimeout(function(){ var el=document.getElementById('excel-email'); if(el)el.focus(); }, 100);
-    return;
-  }
-
-  if(type==='login'){
-    mc.innerHTML =
-      '<div class="modal-title">مرحباً بعودتك 👋</div>' +
-      '<div class="modal-sub" style="margin-bottom:16px">سجّل دخولك للوصول للتطبيق</div>' +
-      '<button class="salla-btn" onclick="doSalla()" style="margin-bottom:10px">🔗 دخول بحساب سلة</button>' +
-      '<div class="divider">أو</div>' +
-      '<div class="fg"><label class="lbl">البريد الإلكتروني</label><input class="inp" id="log-email" placeholder="example@email.com" type="email" dir="ltr"></div>' +
-      '<button class="modal-btn" onclick="doLogin()">دخول ←</button>';
-    return;
-  }
+  document.getElementById('modal-content').innerHTML = `
+    <div style="margin-bottom:22px">
+      <div style="font-size:20px;font-weight:900;margin-bottom:4px;color:var(--dark)">ابدأ مع نمو</div>
+      <div style="font-size:13px;color:var(--t2)">اختر الطريقة المناسبة لك</div>
+    </div>
+    <div class="option-card" onclick="showExcelForm(this)">
+      <div class="option-icon">📊</div>
+      <div>
+        <div class="option-title">تحسين عبر Excel</div>
+        <div class="option-desc">صدّر من سلة، حسّن، استورد — متاح الآن</div>
+      </div>
+      <span class="option-badge badge-ok">متاح ✅</span>
+    </div>
+    <div class="option-card" style="opacity:.55;cursor:default">
+      <div class="option-icon">🔗</div>
+      <div>
+        <div class="option-title">ربط مباشر بسلة</div>
+        <div class="option-desc">تحسين فوري بدون تصدير</div>
+      </div>
+      <span class="option-badge badge-soon">قريباً ⏳</span>
+    </div>
+  `;
 }
 
-function closeModal(e){
-  if(e.target===document.getElementById('modal-bg'))
-    document.getElementById('modal-bg').classList.remove('on');
+function showExcelForm(){
+  document.getElementById('modal-content').innerHTML = `
+    <button onclick="openModal()" style="background:#F5F5F0;border:none;cursor:pointer;color:var(--t2);font-size:13px;padding:6px 10px;border-radius:7px;margin-bottom:16px;font-family:inherit">← رجوع</button>
+    <div style="font-size:18px;font-weight:900;margin-bottom:4px;color:var(--dark)">سجّل اهتمامك</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:20px">أدخل بريدك للبدء أو تواصل عبر واتساب</div>
+    <div class="fg">
+      <label class="lbl">البريد الإلكتروني</label>
+      <input class="inp" id="lead-email" type="email" placeholder="example@email.com" dir="ltr" onkeydown="if(event.key==='Enter')submitLead()">
+    </div>
+    <button class="modal-btn" onclick="submitLead()">ابدأ الآن ←</button>
+    <div style="text-align:center;margin:14px 0;font-size:12px;color:var(--t3)">— أو —</div>
+    <a href="https://wa.me/905340355912?text=أريد+الاشتراك+في+نمو" target="_blank" 
+       style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:11px;background:#25D366;color:#fff;font-size:14px;font-weight:700;text-decoration:none;transition:opacity .15s"
+       onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      تواصل واشترك عبر واتساب
+    </a>
+    <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:10px">🔒 بياناتك محمية ولن تُشارَك</div>
+  `;
+  setTimeout(()=>document.getElementById('lead-email')?.focus(),100);
 }
 
-async function doExcelRegister(){
-  const email = document.getElementById('excel-email')?.value?.trim();
+async function submitLead(){
+  const email = document.getElementById('lead-email')?.value?.trim();
   if(!email||!email.includes('@')){
-    document.getElementById('excel-email').style.borderColor='#dc2626';
-    return;
+    document.getElementById('lead-email').style.borderColor='#DC2626';return;
   }
   const btn = document.querySelector('.modal-btn');
-  if(btn){btn.disabled=true;btn.textContent='جاري التسجيل...';}
+  if(btn){btn.disabled=true;btn.textContent='جاري...';}
   try{
-    const r = await fetch(window.location.origin+'/api/leads',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email, source:'excel'})
-    });
-    const d = await r.json();
-    if(d.success){
-      document.getElementById('modal-content').innerHTML =
-        '<div style="text-align:center;padding:10px 0">'+
-        '<div style="font-size:48px;margin-bottom:14px">🎉</div>'+
-        '<div style="font-size:18px;font-weight:900;color:var(--tx);margin-bottom:8px">تم التسجيل!</div>'+
-        '<div style="font-size:13px;color:var(--t2);margin-bottom:20px;line-height:1.6">'+email+'<br>تم حفظ بريدك — يمكنك البدء الآن</div>'+
-        '<button onclick="goToApp()" style="width:100%;padding:13px;border-radius:10px;background:linear-gradient(135deg,#4361ee,#7c3aed);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">🚀 ابدأ التحسين ←</button>'+
-        '</div>';
-    }
-  }catch(e){
-    if(btn){btn.disabled=false;btn.textContent='أرسل طلبي ←';}
-    toast('حدث خطأ — حاول مرة ثانية','error');
-  }
+    await fetch('/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,source:'landing'})});
+  }catch(e){}
+  document.getElementById('modal-content').innerHTML = `
+    <div style="text-align:center;padding:16px 0">
+      <div style="font-size:52px;margin-bottom:14px">✅</div>
+      <div style="font-size:19px;font-weight:900;color:var(--dark);margin-bottom:8px">تم التسجيل!</div>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:22px;line-height:1.6">يمكنك البدء الآن بالنسخة التجريبية</div>
+      <button onclick="goApp()" style="padding:12px 28px;border-radius:11px;background:var(--dark);color:var(--gold3);border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">🚀 ابدأ التحسين ←</button>
+    </div>
+  `;
 }
 
-function goToApp(){ window.location.href='/app'; }
-function doSalla(){
-  window.location.href = '/';
+function goApp(){ window.location.href='/app'; }
+
+function openWhatsapp(plan){
+  const msg = plan==='pro'
+    ? 'أريد الاشتراك في خطة Pro (99 ر.س/شهر) في نمو'
+    : 'أريد الاشتراك في خطة Enterprise في نمو';
+  window.open('https://wa.me/905340355912?text='+encodeURIComponent(msg),'_blank');
 }
 
-async function doRegister(){
-  const name  = document.getElementById('reg-name')?.value?.trim();
-  const email = document.getElementById('reg-email')?.value?.trim();
-  const pass  = document.getElementById('reg-pass')?.value;
-  if(!name||!email||!pass){toast('أكمل جميع الحقول','error');return;}
-  if(pass.length<8){toast('كلمة المرور 8 أحرف على الأقل','error');return;}
-  // Save to localStorage for now (replace with real auth later)
-  localStorage.setItem('user',JSON.stringify({name,email,plan:'free',joined:new Date().toISOString()}));
-  toast('✅ تم إنشاء حسابك! جاري التحويل...','success');
-  setTimeout(()=>{ window.location.href = '/'; }, 1500);
-}
+function closeModal(){ document.getElementById('modal-bg').classList.remove('on'); }
+function closeModalOutside(e){ if(e.target===document.getElementById('modal-bg'))closeModal(); }
+function togFaq(el){ el.parentElement.classList.toggle('open'); }
 
-async function doLogin(){
-  const email = document.getElementById('log-email')?.value?.trim();
-  const pass  = document.getElementById('log-pass')?.value;
-  if(!email||!pass){toast('أدخل البريد وكلمة المرور','error');return;}
-  // Check localStorage (replace with real auth later)
-  const user = JSON.parse(localStorage.getItem('user')||'null');
-  if(user&&user.email===email){
-    toast('✅ مرحباً '+user.name+'! جاري الدخول...','success');
-    setTimeout(()=>{ window.location.href = '/'; }, 1500);
-  } else {
-    // Try salla auth
-    toast('جاري التحقق...','');
-    setTimeout(()=>{ window.location.href = '/'; }, 800);
-  }
-}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape')closeModal(); });
 
-function toast(msg,type){
-  const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className='toast on '+(type||'');
-  setTimeout(()=>t.classList.remove('on'),3000);
-}
-
-// Keyboard support
-document.addEventListener('keydown',function(e){
-  if(e.key==='Escape') document.getElementById('modal-bg').classList.remove('on');
-  if(e.key==='Enter'){
-    if(document.getElementById('reg-pass')===document.activeElement) doRegister();
-    if(document.getElementById('log-pass')===document.activeElement) doLogin();
-  }
-});
-
-// Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',function(e){
     e.preventDefault();
     document.querySelector(this.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});
   });
 });
+
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast on '+(type||'');
+  setTimeout(()=>t.classList.remove('on'),3000);
+}
 </script>
 </body>
 </html>
