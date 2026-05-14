@@ -884,15 +884,37 @@ async function enhanceExcel(type){
       formData.append('tone', tone);
     }
 
-    progTxt.textContent = 'جاري التحسين بالذكاء الاصطناعي... قد يستغرق بضع دقائق';
+    const fileSize = file.size;
+  const estProds = Math.min(Math.round(fileSize / 500), 50);
+  progTxt.textContent = 'جاري التحسين... (~' + estProds + ' منتج، قد يستغرق ' + Math.ceil(estProds * 0.7) + ' ثانية)';
     progBar.style.width = '40%';
 
     const endpoint = isProducts ? '/api/excel/products' : '/api/excel/seo';
-    const res = await fetch(B + endpoint, { method:'POST', body: formData });
-    const data = await res.json();
+
+    // Set timeout for large files
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 300000); // 5 minutes
+
+    let res, data;
+    try {
+      res = await fetch(B + endpoint, { method:'POST', body: formData, signal: controller.signal });
+      clearTimeout(timeout);
+      const text = await res.text();
+      data = JSON.parse(text);
+    } catch(fetchErr) {
+      clearTimeout(timeout);
+      progBox.style.display = 'none';
+      if(fetchErr.name === 'AbortError') {
+        toast('⏱️ انتهى وقت الانتظار — جرّب عدد أقل من المنتجات','error');
+      } else {
+        toast('❌ خطأ في الاتصال: ' + fetchErr.message,'error');
+      }
+      btn.disabled = false;
+      return;
+    }
 
     progBar.style.width = '100%';
-    await sleep(300);
+    await sleep(200);
     progBox.style.display = 'none';
 
     if(!res.ok || data.error){
@@ -906,13 +928,14 @@ async function enhanceExcel(type){
     resultsBox.innerHTML = buildExcelResults(data, isProducts);
 
     // Auto download file
-    const blob = base64ToBlob(data.file, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = data.filename; a.click();
-    URL.revokeObjectURL(url);
-
-    toast('✅ تم التحسين وتحميل الملف!','success');
+    if(data.file){
+      const blob = base64ToBlob(data.file, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      const dlUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = dlUrl; a.download = data.filename || 'nmo-enhanced.xlsx'; a.click();
+      URL.revokeObjectURL(dlUrl);
+      toast('✅ تم التحسين! الملف يُحمَّل الآن','success');
+    }
 
   } catch(e){
     progBox.style.display = 'none';
