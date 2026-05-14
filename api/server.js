@@ -101,12 +101,6 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(publicPath, 'admin.html'));
 });
 
-// لوحة الإدارة
-app.get('/admin', (req, res) => {
-  const f = path.join(publicPath, 'admin.html');
-  fs.existsSync(f) ? res.sendFile(f) : res.status(404).send('Admin page not found');
-});
-
 const openai  = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const REDIRECT_URI = process.env.APP_URL ? process.env.APP_URL + '/auth/callback' : 'https://nmo-almatjar-production.up.railway.app/auth/callback';
@@ -494,8 +488,6 @@ app.get('/landing', (req, res) => {
 app.get('/landing.html', (req, res) => {
   res.sendFile(path.join(publicPath, 'landing.html'));
 });
-
-console.log('=== SERVER START ===', 'model:', AI_MODEL, 'anthropic_key:', !!process.env.ANTHROPIC_API_KEY);
 
 // ─────────────────────────────────────────
 // HELPERS
@@ -1234,11 +1226,6 @@ app.post('/webhook/salla', (req, res) => {
   res.json({ success: true });
 });
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`=== SERVER START === port:${PORT}`);
-});
-
 // DEBUG endpoint
 app.get('/api/debug', async (req, res) => {
   const result = {
@@ -1277,6 +1264,14 @@ app.get('/api/debug', async (req, res) => {
     result.supabase_error_detail = JSON.stringify(se.response?.data);
   }
   res.json(result);
+});
+
+// ─────────────────────────────────────────
+// START SERVER
+// ─────────────────────────────────────────
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log('=== SERVER READY === port:'+PORT+' model:'+AI_MODEL);
 });
 
 // ─────────────────────────────────────────
