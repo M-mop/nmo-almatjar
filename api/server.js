@@ -753,16 +753,20 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
         tagIds.push(existing.id);
         continue;
       }
-      // Create new tag using query param (salla docs)
+      // Create new tag - send tag_name as query string
       try {
         const r = await axios.post(
-          `https://api.salla.dev/admin/v2/products/tags?tag_name=${encodeURIComponent(tagName)}`,
-          {},
-          { headers: authHeader }
+          'https://api.salla.dev/admin/v2/products/tags',
+          null,
+          {
+            headers: authHeader,
+            params: { tag_name: tagName }
+          }
         );
         const newId = r.data?.data?.id;
         if (newId) { tagIds.push(newId); storeTags.push({id:newId,name:tagName}); }
-      } catch(e) { console.warn('create tag failed:', tagName, e.response?.data); }
+        else console.warn('no id returned for tag:', tagName, r.data);
+      } catch(e) { console.warn('create tag failed:', tagName, e.response?.data || e.message); }
     }
 
     console.log('Tag IDs to attach:', tagIds);
