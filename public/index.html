@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>نمو المتاجر الإلكترونية</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- ✅ Salla Embedded SDK الرسمي -->
+<script src="https://cdn.salla.sa/sdk/embedded/latest/embedded.min.js"></script>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -153,6 +157,11 @@ select option{background:#0d1f10}
 .bg:disabled{opacity:.35;cursor:not-allowed;transform:none}
 .brow{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;align-items:center}
 
+/* UPGRADE BANNER */
+.upgrade-banner{background:linear-gradient(135deg,rgba(0,255,136,0.08),rgba(0,229,255,0.05));border:1px solid var(--border2);border-radius:14px;padding:16px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ub-text{font-size:13px;color:var(--t2);line-height:1.6}
+.ub-text b{color:var(--neon)}
+
 /* PROGRESS */
 .prog{display:none;background:rgba(0,255,136,0.04);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:12px}
 .prog.on{display:block}
@@ -214,8 +223,6 @@ select option{background:#0d1f10}
 .h-dot{width:7px;height:7px;border-radius:50%;background:var(--neon);box-shadow:0 0 6px var(--neon);flex-shrink:0}
 .h-nm{font-size:12px;font-weight:600;flex:1;color:var(--tx)}.h-time{font-size:11px;color:var(--t3)}
 
-
-
 /* ALERTS */
 .al{padding:10px 13px;border-radius:10px;font-size:12px;margin-bottom:12px;line-height:1.6;display:flex;gap:8px}
 .al-i{background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.15);color:var(--neon)}
@@ -226,7 +233,7 @@ select option{background:#0d1f10}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.success{background:linear-gradient(135deg,var(--neon),var(--neon2));color:#020b06;box-shadow:0 8px 28px rgba(0,255,136,.3)}
 .toast.error{background:var(--rd);color:#fff}
-.toast.info{background:linear-gradient(135deg,var(--neon2),var(--purple));color:#fff}
+.toast.info{background:linear-gradient(135deg,var(--neon2),#7c3aed);color:#fff}
 
 /* MOBILE */
 @media(max-width:768px){
@@ -271,7 +278,8 @@ select option{background:#0d1f10}
       <div class="ubar"><div class="ufill" id="ufill" style="width:0%"></div></div>
       <div class="uplan" id="uplan">جاري التحقق...</div>
     </div>
-    <a href="/auth/salla" class="sb-btn">🔗 إعادة ربط المتجر</a>
+    <!-- زر الترقية — يعمل مع Embedded وبدونه -->
+    <button onclick="openUpgrade()" class="sb-btn" style="background:linear-gradient(135deg,rgba(0,255,136,.08),rgba(0,229,255,.05));border-color:var(--border2);color:var(--neon)">⭐ ترقية الخطة</button>
     <a href="https://wa.me/905340355912" target="_blank" class="sb-btn">📱 الدعم الفني</a>
   </div>
 </div>
@@ -392,59 +400,235 @@ select option{background:#0d1f10}
 <div class="toast" id="toast"></div>
 
 <script>
-const B=window.location.origin;
-let prods=[],sel={},res=[];
-let eIds=JSON.parse(localStorage.getItem('eI')||'[]');
-let eLog=JSON.parse(localStorage.getItem('eL')||'[]');
-const PI={enhance:{t:'⚡ تحسين المنتجات',g:'الأدوات'},history:{t:'✅ المنتجات المحسّنة',g:'التتبع'}};
+const B = window.location.origin;
+let prods=[], sel={}, res=[];
+let eIds = JSON.parse(localStorage.getItem('eI')||'[]');
+let eLog = JSON.parse(localStorage.getItem('eL')||'[]');
 
-function gp(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nit').forEach(n=>n.classList.remove('on'));document.getElementById('page-'+id)?.classList.add('on');document.getElementById('nav-'+id)?.classList.add('on');const i=PI[id]||{};document.getElementById('pg-title').textContent=i.t||id;document.getElementById('pg-tag').textContent=i.g||'';if(id==='history')renderH();closeSB();}
+// ✅ متغير الـ Embedded SDK
+let embeddedSDK = null;
+let currentStoreId = null;
+
+const PI = {
+  enhance: { t:'⚡ تحسين المنتجات', g:'الأدوات' },
+  history: { t:'✅ المنتجات المحسّنة', g:'التتبع' }
+};
+
+// ════════════════════════════════════════════
+// ✅ INIT — نقطة البداية
+// ════════════════════════════════════════════
+async function init() {
+  const isEmbedded = window.self !== window.top;
+
+  if (isEmbedded && window.SallaEmbedded) {
+    await initEmbedded();
+  } else {
+    await initStandalone();
+  }
+}
+
+// ── وضع Embedded داخل لوحة تحكم سلة ──
+async function initEmbedded() {
+  try {
+    embeddedSDK = window.SallaEmbedded;
+
+    // 1. تهيئة الـ bridge مع سلة
+    await embeddedSDK.init();
+
+    // 2. جلب التوكن من سلة
+    const sessionToken = await embeddedSDK.auth.getToken();
+    if (!sessionToken) throw new Error('لم يتم الحصول على توكن');
+
+    // 3. التحقق من التوكن في الـ backend
+    const verified = await verifyEmbeddedToken(sessionToken);
+    if (!verified) {
+      embeddedSDK.destroy();
+      return;
+    }
+
+    // 4. حفظ البيانات
+    localStorage.setItem('st', verified.access_token);
+    currentStoreId = verified.store_id;
+
+    // 5. تحديث الواجهة
+    document.getElementById('sn').textContent = verified.store_name || 'متجرك';
+
+    // 6. تجديد التوكن تلقائياً
+    if (embeddedSDK.auth.refresh) {
+      embeddedSDK.auth.refresh((newToken) => {
+        localStorage.setItem('st', newToken);
+      });
+    }
+
+    // 7. تحميل البيانات
+    await loadP();
+    await loadPlanFromAPI();
+
+    // 8. ✅ أخبر سلة أن التطبيق جاهز (يرفع شاشة التحميل)
+    embeddedSDK.ready();
+
+  } catch(err) {
+    console.error('Embedded init error:', err);
+    // fallback للوضع العادي
+    await initStandalone();
+    if (embeddedSDK) embeddedSDK.ready();
+  }
+}
+
+// ── وضع Standalone — OAuth redirect ──
+async function initStandalone() {
+  const p = new URLSearchParams(window.location.search);
+  const t = p.get('token');
+  const urlCode = (p.get('code')||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+
+  if (t) {
+    localStorage.setItem('st', t);
+    history.replaceState({}, '', '/app');
+  }
+  if (urlCode === 'MM1') {
+    localStorage.setItem('uP', 'trial');
+    localStorage.setItem('uC', '0');
+    history.replaceState({}, '', '/app');
+  }
+
+  await loadP();
+  await loadPlanFromAPI();
+  updU();
+}
+
+// ── التحقق من توكن سلة في الـ backend ──
+async function verifyEmbeddedToken(token) {
+  try {
+    const r = await fetch(B + '/api/auth/verify-embedded', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    if (!r.ok) return null;
+    return r.json();
+  } catch(e) {
+    console.error('verify token error:', e.message);
+    return null;
+  }
+}
+
+// ── جلب الخطة من الـ API ──
+async function loadPlanFromAPI() {
+  try {
+    const tk = localStorage.getItem('st');
+    if (!tk || tk === 'demo') return;
+    const d = await api('/api/plan', { token: tk, storeId: currentStoreId });
+    localStorage.setItem('uP', d.plan || 'free');
+    localStorage.setItem('uC', String(d.used || 0));
+    updU();
+  } catch(e) { console.warn('plan fetch:', e.message); }
+}
+
+// ── فتح نافذة الترقية ──
+function openUpgrade() {
+  // إذا كنا داخل سلة، استخدم الـ Checkout Module
+  if (embeddedSDK && embeddedSDK.checkout) {
+    embeddedSDK.checkout.create({
+      successUrl: window.location.href,
+      cancelUrl: window.location.href
+    });
+    // استمع لنتيجة الدفع
+    if (embeddedSDK.checkout.onResult) {
+      embeddedSDK.checkout.onResult(async (result) => {
+        if (result.success) {
+          await loadPlanFromAPI();
+          toast('🎉 تم تفعيل الاشتراك!', 'success');
+        }
+      });
+    }
+  } else {
+    // fallback — فتح واتساب
+    window.open('https://wa.me/905340355912?text=أريد ترقية خطة نمو المتاجر', '_blank');
+  }
+}
+
+// ════════════════════════════════════════════
+// UI HELPERS
+// ════════════════════════════════════════════
+function gp(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nit').forEach(n=>n.classList.remove('on'));
+  document.getElementById('page-'+id)?.classList.add('on');
+  document.getElementById('nav-'+id)?.classList.add('on');
+  const i=PI[id]||{};
+  document.getElementById('pg-title').textContent=i.t||id;
+  document.getElementById('pg-tag').textContent=i.g||'';
+  if(id==='history')renderH();
+  closeSB();
+}
 function toggleSB(){document.getElementById('sb').classList.toggle('open');document.getElementById('ov').classList.toggle('on');}
 function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('on');}
 
-function updU(){
-  const u=parseInt(localStorage.getItem('uC')||'0'),p=localStorage.getItem('uP')||'free';
-  const l={free:0,trial:50,pro:200,enterprise:99999}[p]||0;
-  document.getElementById('uplan').textContent=p==='free'?'⛔ يلزم اشتراك':p==='trial'?'🎯 تجربة':p==='pro'?'⭐ Pro':'💎 Enterprise';
-  document.getElementById('uval').textContent=l?u+' / '+l:'محجوب';
+function updU() {
+  const u=parseInt(localStorage.getItem('uC')||'0');
+  const p=localStorage.getItem('uP')||'free';
+  const l={free:2,trial:50,pro:200,enterprise:99999}[p]||2;
+  const names={free:'⛔ مجاني (2 منتج)',trial:'🎯 تجربة (50 منتج)',pro:'⭐ Pro (200 منتج)',enterprise:'💎 Enterprise'};
+  document.getElementById('uplan').textContent=names[p]||p;
+  document.getElementById('uval').textContent=u+' / '+l;
   const f=document.getElementById('ufill');
   if(f&&l){const pct=Math.min(100,Math.round(u/l*100));f.style.width=pct+'%';}
 }
-function incU(){localStorage.setItem('uC',(parseInt(localStorage.getItem('uC')||'0')+1));updU();}
 
-async function init(){
-  const p=new URLSearchParams(window.location.search);
-  const t=p.get('token');
-  const urlCode=(p.get('code')||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+// ════════════════════════════════════════════
+// PRODUCTS
+// ════════════════════════════════════════════
+const DEMO=[
+  {id:1,name:'جاكيت نسائي خفيف',price:{amount:84},description:'جاكيت أنيق'},
+  {id:2,name:'طاولة بلوت فاخرة',price:{amount:349},description:''},
+  {id:3,name:'تيشيرت الهلال 2025',price:{amount:129},description:'تيشيرت رسمي'},
+  {id:4,name:'عطر ورد الطائف',price:{amount:599},description:''}
+];
 
-  // استقبل token سلة
-  if(t){try{localStorage.setItem('st',t);}catch(e){}history.replaceState({},'','/app');}
-
-  // استقبل كود من URL
-  if(urlCode==='MM1'){
-    try{localStorage.setItem('uP','trial');localStorage.setItem('uC','0');}catch(e){}
-    history.replaceState({},'','/app');
-  }
-
-  await loadP();updU();
-}
-
-const DEMO=[{id:1,name:'جاكيت نسائي خفيف',price:{amount:84},description:'جاكيت أنيق'},{id:2,name:'طاولة بلوت فاخرة',price:{amount:349},description:''},{id:3,name:'تيشيرت الهلال 2025',price:{amount:129},description:'تيشيرت رسمي'},{id:4,name:'عطر ورد الطائف',price:{amount:599},description:''}];
-
-async function loadP(){
+async function loadP() {
   const tk=localStorage.getItem('st')||'demo';
   if(tk==='demo'){prods=DEMO;meta();rList(prods);return;}
-  try{const r=await fetch(B+'/api/products',{headers:{Authorization:'Bearer '+tk}});const tx=await r.text();if(tx.trim().startsWith('<'))throw 0;const d=JSON.parse(tx);prods=d.products?.length?d.products:DEMO;}catch{prods=DEMO;}
+  try{
+    const r=await fetch(B+'/api/products',{headers:{Authorization:'Bearer '+tk}});
+    const tx=await r.text();
+    if(tx.trim().startsWith('<'))throw 0;
+    const d=JSON.parse(tx);
+    prods=d.products?.length?d.products:DEMO;
+  }catch{prods=DEMO;}
   meta();rList(prods);
 }
-function meta(){document.getElementById('sn').textContent=prods.length+' منتج';document.getElementById('tb-r').textContent=prods.length+' منتج';}
+function meta(){
+  document.getElementById('sn').textContent=
+    document.getElementById('sn').textContent==='جاري التحميل...'
+    ? prods.length+' منتج'
+    : document.getElementById('sn').textContent;
+  document.getElementById('tb-r').textContent=prods.length+' منتج';
+}
 function gPr(p){if(!p.price)return'0';return typeof p.price==='object'?p.price.amount||p.price.regular||'0':p.price;}
 
-function doF(f,btn){document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');rList(f==='no'?prods.filter(p=>!p.description||p.description.length<10):f==='done'?prods.filter(p=>eIds.includes(String(p.id))):prods);}
+function doF(f,btn){
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  rList(
+    f==='no'?prods.filter(p=>!p.description||p.description.length<10):
+    f==='done'?prods.filter(p=>eIds.includes(String(p.id))):prods
+  );
+}
 function rList(list){
   const el=document.getElementById('plist');if(!el)return;
   if(!list.length){el.innerHTML='<div style="padding:24px;text-align:center;color:var(--t3)">لا توجد منتجات</div>';return;}
-  el.innerHTML=list.map(p=>{const ri=prods.indexOf(p);if(ri<0)return'';const img=p.images?.[0]?.url||p.thumbnail||'';const hd=!!(p.description&&p.description.length>10);const id=eIds.includes(String(p.id)),isl=!!sel[ri];return'<div class="pi'+(isl?' sel':'')+(id?' done':'')+'" onclick="tSel('+ri+')">'+'<input type="checkbox" class="pcb pcbb" data-i="'+ri+'" '+(isl?'checked':'')+' onclick="event.stopPropagation();tSel('+ri+')">'+(img?'<img class="pimg" src="'+img+'" alt="">':'<div class="pimg">📦</div>')+'<div class="pinfo"><div class="pnm">'+p.name+'</div><div class="ppr">'+gPr(p)+' ر.س</div></div>'+(id?'<span class="pbadge pb-done">✓ محسّن</span>':hd?'<span class="pbadge pb-ok">✓ وصف</span>':'<span class="pbadge pb-no">بدون وصف</span>')+'</div>';}).join('');
+  el.innerHTML=list.map(p=>{
+    const ri=prods.indexOf(p);if(ri<0)return'';
+    const img=p.images?.[0]?.url||p.thumbnail||'';
+    const hd=!!(p.description&&p.description.length>10);
+    const id=eIds.includes(String(p.id)),isl=!!sel[ri];
+    return'<div class="pi'+(isl?' sel':'')+(id?' done':'')+'" onclick="tSel('+ri+')">'
+      +'<input type="checkbox" class="pcb pcbb" data-i="'+ri+'" '+(isl?'checked':'')+' onclick="event.stopPropagation();tSel('+ri+')">'
+      +(img?'<img class="pimg" src="'+img+'" alt="">':'<div class="pimg">📦</div>')
+      +'<div class="pinfo"><div class="pnm">'+p.name+'</div><div class="ppr">'+gPr(p)+' ر.س</div></div>'
+      +(id?'<span class="pbadge pb-done">✓ محسّن</span>':hd?'<span class="pbadge pb-ok">✓ وصف</span>':'<span class="pbadge pb-no">بدون وصف</span>')
+      +'</div>';
+  }).join('');
   updC();
 }
 function tSel(ri){sel[ri]=!sel[ri];document.querySelectorAll('.pcbb[data-i="'+ri+'"]').forEach(c=>{c.checked=sel[ri];c.closest('.pi')?.classList.toggle('sel',sel[ri]);});updC();}
@@ -453,33 +637,68 @@ function updC(){document.getElementById('scnt').textContent=Object.values(sel).f
 
 function toS(n){
   if(n===2){const c=Object.values(sel).filter(Boolean).length;if(!c){toast('اختر منتجاً على الأقل','error');return;}if(c>50){toast('الحد الأقصى 50 منتج','error');return;}}
-  for(let i=1;i<=3;i++){document.getElementById('s'+i).style.display=i===n?'block':'none';const s=document.getElementById('stp'+i);s.classList.remove('on','dn');if(i===n)s.classList.add('on');else if(i<n)s.classList.add('dn');}
+  for(let i=1;i<=3;i++){
+    document.getElementById('s'+i).style.display=i===n?'block':'none';
+    const s=document.getElementById('stp'+i);
+    s.classList.remove('on','dn');
+    if(i===n)s.classList.add('on');
+    else if(i<n)s.classList.add('dn');
+  }
 }
 
+// ════════════════════════════════════════════
+// GENERATE
+// ════════════════════════════════════════════
 async function run(){
   const ps=Object.entries(sel).filter(([,v])=>v).map(([i])=>prods[+i]).filter(Boolean);
   if(!ps.length){toS(1);return;}
-  const d1=document.getElementById('o1').checked,d2=document.getElementById('o2').checked,d3=document.getElementById('o3').checked,d4=document.getElementById('o4').checked,d5=document.getElementById('o5').checked;
+  const d1=document.getElementById('o1').checked,d2=document.getElementById('o2').checked,
+        d3=document.getElementById('o3').checked,d4=document.getElementById('o4').checked,
+        d5=document.getElementById('o5').checked;
   const tone=document.getElementById('o-tone').value,inst=document.getElementById('o-inst').value;
-  incU();
-  document.getElementById('pg').classList.add('on');document.getElementById('rarea').style.display='none';
+
+  document.getElementById('pg').classList.add('on');
+  document.getElementById('rarea').style.display='none';
   const ub=document.getElementById('upbtn');ub.disabled=false;ub.textContent='🚀 رفع الكل لسلة';ub.className='btn bg';
   res=[];
+
   for(let i=0;i<ps.length;i++){
     const p=ps[i];
     document.getElementById('ptxt').textContent=(i+1)+'/'+ps.length+': جاري تحسين "'+p.name+'"...';
     document.getElementById('pfill').style.width=Math.round(i/ps.length*100)+'%';
     const r={product:p,data:{},status:'ld'};res.push(r);renderR();
     try{
-      if(d1||d3||d4){const d=await api('/api/generate-description',{name:p.name,currentDescription:p.description||'',audience:'العملاء السعوديين',tone,instructions:inst,mode:'write'});if(d1){r.data.description=d.description||'';r.data.descriptionHtml=d.descriptionHtml||'';}if(d3)r.data.seoTitle=d.seoTitle||'';if(d4)r.data.seoDescription=d.seoDescription||'';r.data.shortDescription=d.shortDescription||'';}
+      const storeId = currentStoreId || null;
+      if(d1||d3||d4){
+        const d=await api('/api/generate-description',{
+          name:p.name,currentDescription:p.description||'',
+          audience:'العملاء السعوديين',tone,instructions:inst,
+          mode:'write',storeId
+        });
+        if(d1){r.data.description=d.description||'';r.data.descriptionHtml=d.descriptionHtml||'';}
+        if(d3)r.data.seoTitle=d.seoTitle||'';
+        if(d4)r.data.seoDescription=d.seoDescription||'';
+        r.data.shortDescription=d.shortDescription||'';
+        // تحديث الاستهلاك في الـ UI
+        const used=parseInt(localStorage.getItem('uC')||'0')+1;
+        localStorage.setItem('uC',String(used));updU();
+      }
       if(d2){const t=await api('/api/optimize-title',{name:p.name,description:p.description||''});r.data.titleOptions=[t.title1,t.title2,t.title3].filter(Boolean);r.data.selectedTitle=t.title1||p.name;}
       if(d5){const tg=await api('/api/generate-tags',{name:p.name,description:p.description||''});r.data.tags=tg.tags||[];}
       r.status='ok';
-    }catch(e){r.status='err';r.error=e.message;}
+    }catch(e){
+      r.status='err';r.error=e.message;
+      // تحقق من تجاوز الحد
+      if(e.message?.includes('الحد الشهري')||e.message?.includes('limitReached')){
+        toast('⚠️ وصلت للحد الشهري — ارقّ لـ Pro','error');
+        break;
+      }
+    }
     renderR();await sleep(950);
   }
   document.getElementById('pfill').style.width='100%';await sleep(280);
-  document.getElementById('pg').classList.remove('on');document.getElementById('rarea').style.display='block';
+  document.getElementById('pg').classList.remove('on');
+  document.getElementById('rarea').style.display='block';
   const ok=res.filter(r=>r.status==='ok').length;
   document.getElementById('upinfo').textContent='✅ '+ok+' منتج جاهز للرفع'+(res.length-ok?' — ❌ '+(res.length-ok)+' خطأ':'');
 }
@@ -505,6 +724,9 @@ function pickT(ri,ti){const r=res[ri];if(!r?.data?.titleOptions)return;r.data.se
 function togD(ri){const el=document.getElementById('desc-'+ri),btn=document.getElementById('dtg-'+ri);if(!el)return;const ex=el.classList.toggle('exp');if(btn)btn.textContent=ex?'طي ↑':'عرض ↓';}
 function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
 
+// ════════════════════════════════════════════
+// UPLOAD
+// ════════════════════════════════════════════
 async function uploadAll(){
   const tk=localStorage.getItem('st');if(!tk||tk==='demo'){toast('لم يتم ربط المتجر','error');return;}
   const btn=document.getElementById('upbtn');btn.disabled=true;btn.textContent='جاري الرفع...';
@@ -527,25 +749,47 @@ async function upOne(ri,tk){
     if(d.tags&&d.tags.length)await api('/api/add-tags',{productId:r.product.id,tags:d.tags,token:tk});
     res[ri].status='uploaded';setD(ri,'uploaded','✅ تم الرفع');
     const pid=String(r.product.id);if(!eIds.includes(pid)){eIds.push(pid);localStorage.setItem('eI',JSON.stringify(eIds));}
-    eLog.unshift({name:r.product.name,time:new Date().toLocaleDateString('ar-SA')});if(eLog.length>100)eLog=eLog.slice(0,100);localStorage.setItem('eL',JSON.stringify(eLog));rList(prods);
+    eLog.unshift({name:r.product.name,time:new Date().toLocaleDateString('ar-SA')});
+    if(eLog.length>100)eLog=eLog.slice(0,100);
+    localStorage.setItem('eL',JSON.stringify(eLog));rList(prods);
   }catch(e){setD(ri,'err','❌ '+e.message);}
 }
 function setD(ri,cls,lbl){const d=document.getElementById('dot-'+ri);if(d)d.className='sdot '+cls;const l=document.getElementById('sl-'+ri);if(l)l.textContent=lbl;}
 
-async function runScore(){
-  const btn=document.getElementById('sbtn');btn.disabled=true;document.getElementById('spg').classList.add('on');document.getElementById('sres').style.display='none';
-  try{const d=await api('/api/seo-score',{products:prods});document.getElementById('spg').classList.remove('on');document.getElementById('sres').style.display='block';const gC={'A+':'gA','A':'gA','B':'gB','C':'gC','D':'gD','F':'gF'};document.getElementById('slist').innerHTML='<div class="sc-grid">'+d.results.map(r=>'<div class="sc-card"><div class="sc-nm">'+r.name+'</div><div class="sc-gr '+(gC[r.grade]||'gF')+'">'+r.grade+' · '+r.score+'%</div><div class="sc-iss">'+((r.issues||[]).slice(0,2).join(' • '))+'</div></div>').join('')+'</div>';}catch(e){document.getElementById('spg').classList.remove('on');toast('خطأ: '+e.message,'error');}
-  btn.disabled=false;
+// ════════════════════════════════════════════
+// HISTORY
+// ════════════════════════════════════════════
+function renderH(){
+  const t=prods.length||0,d=eIds.length;
+  document.getElementById('htot').textContent=d;
+  document.getElementById('hpct').textContent=t?Math.round(d/t*100)+'%':'0%';
+  document.getElementById('hlft').textContent=Math.max(0,t-d);
+  document.getElementById('hlist').innerHTML=eLog.length
+    ?eLog.map(h=>'<div class="h-item"><div class="h-dot"></div><div class="h-nm">'+h.name+'</div><div class="h-time">'+h.time+'</div></div>').join('')
+    :'<div style="padding:28px;text-align:center;color:var(--t3)">لا يوجد سجل بعد</div>';
 }
-
-function renderH(){const t=prods.length||0,d=eIds.length;document.getElementById('htot').textContent=d;document.getElementById('hpct').textContent=t?Math.round(d/t*100)+'%':'0%';document.getElementById('hlft').textContent=Math.max(0,t-d);document.getElementById('hlist').innerHTML=eLog.length?eLog.map(h=>'<div class="h-item"><div class="h-dot"></div><div class="h-nm">'+h.name+'</div><div class="h-time">'+h.time+'</div></div>').join(''):'<div style="padding:28px;text-align:center;color:var(--t3)">لا يوجد سجل بعد</div>';}
 function clearH(){if(!confirm('مسح السجل؟'))return;eIds=[];eLog=[];localStorage.removeItem('eI');localStorage.removeItem('eL');renderH();rList(prods);toast('🗑️ تم المسح','success');}
 
-async function api(ep,body){const r=await fetch(B+ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const tx=await r.text();if(tx.trim().startsWith('<'))throw new Error('Server غير متاح');const data=JSON.parse(tx);if(data.error)throw new Error(data.error);return data;}
+// ════════════════════════════════════════════
+// UTILITIES
+// ════════════════════════════════════════════
+async function api(ep,body){
+  const r=await fetch(B+ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const tx=await r.text();
+  if(tx.trim().startsWith('<'))throw new Error('Server غير متاح');
+  const data=JSON.parse(tx);
+  if(data.error)throw new Error(data.error);
+  return data;
+}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast on '+(type||'info');setTimeout(()=>t.classList.remove('on'),3500);}
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast on '+(type||'info');
+  setTimeout(()=>t.classList.remove('on'),3500);
+}
 
-document.addEventListener('DOMContentLoaded',init);
+// ── Start ──
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
