@@ -413,19 +413,17 @@ function updU(){
 function incU(){localStorage.setItem('uC',(parseInt(localStorage.getItem('uC')||'0')+1));updU();}
 
 async function init(){
-  const p=new URLSearchParams(window.location.search),t=p.get('token');
-  if(t){localStorage.setItem('st',t);history.replaceState({},'','/app');}
+  const p=new URLSearchParams(window.location.search);
+  const t=p.get('token');
+  const urlCode=(p.get('code')||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
 
-  // فحص تسجيل الدخول
-  const tk=localStorage.getItem('st');
-  const plan=localStorage.getItem('uP');
-  const hasSalla=tk&&tk!=='demo'&&tk.length>10;
-  const hasCode=plan&&plan!=='free';
+  // استقبل token سلة
+  if(t){try{localStorage.setItem('st',t);}catch(e){}history.replaceState({},'','/app');}
 
-  if(!hasSalla&&!hasCode){
-    // غير مسجل — أعده لصفحة الهبوط
-    window.location.href='/';
-    return;
+  // استقبل كود من URL
+  if(urlCode==='MM1'){
+    try{localStorage.setItem('uP','trial');localStorage.setItem('uC','0');}catch(e){}
+    history.replaceState({},'','/app');
   }
 
   await loadP();updU();
