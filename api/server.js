@@ -56,8 +56,14 @@ function requireAdmin(req, res, next) {
 
 // ─── SECURITY: Security Headers ────────────
 app.use((req, res, next) => {
+  // ✅ السماح لسلة بتضمين التطبيق في iframe
+  res.setHeader(
+    'Content-Security-Policy',
+    "frame-ancestors 'self' https://*.salla.sa https://*.salla.dev https://*.salla.partners"
+  );
+  // ✅ إزالة X-Frame-Options لأنه يتعارض مع iframe سلة
+  res.removeHeader('X-Frame-Options');
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
@@ -69,7 +75,7 @@ app.use(express.json({ limit: '5mb' }));
 const publicPath = path.join(__dirname, '../public');
 
 // ════════════════════════════════════════════
-// ✅ FIX: ROUTES قبل static — الترتيب مهم جداً
+// ROUTES قبل static
 // ════════════════════════════════════════════
 app.get('/', (req, res) => {
   res.sendFile(path.join(publicPath, 'landing.html'));
@@ -80,39 +86,22 @@ app.get('/app', (req, res) => {
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(publicPath, 'admin.html'));
 });
-app.get('/about', (req, res) => {
-  res.sendFile(path.join(publicPath, 'about.html'));
-});
-app.get('/about.html', (req, res) => {
-  res.sendFile(path.join(publicPath, 'about.html'));
-});
-app.get('/privacy', (req, res) => {
-  res.sendFile(path.join(publicPath, 'privacy.html'));
-});
-app.get('/privacy.html', (req, res) => {
-  res.sendFile(path.join(publicPath, 'privacy.html'));
-});
-app.get('/terms', (req, res) => {
-  res.sendFile(path.join(publicPath, 'terms.html'));
-});
-app.get('/terms.html', (req, res) => {
-  res.sendFile(path.join(publicPath, 'terms.html'));
-});
-app.get('/landing', (req, res) => {
-  res.sendFile(path.join(publicPath, 'landing.html'));
-});
-app.get('/landing.html', (req, res) => {
-  res.sendFile(path.join(publicPath, 'landing.html'));
-});
+app.get('/about', (req, res) => { res.sendFile(path.join(publicPath, 'about.html')); });
+app.get('/about.html', (req, res) => { res.sendFile(path.join(publicPath, 'about.html')); });
+app.get('/privacy', (req, res) => { res.sendFile(path.join(publicPath, 'privacy.html')); });
+app.get('/privacy.html', (req, res) => { res.sendFile(path.join(publicPath, 'privacy.html')); });
+app.get('/terms', (req, res) => { res.sendFile(path.join(publicPath, 'terms.html')); });
+app.get('/terms.html', (req, res) => { res.sendFile(path.join(publicPath, 'terms.html')); });
+app.get('/landing', (req, res) => { res.sendFile(path.join(publicPath, 'landing.html')); });
+app.get('/landing.html', (req, res) => { res.sendFile(path.join(publicPath, 'landing.html')); });
 
-// ════════════════════════════════════════════
-// ✅ STATIC — index:false يمنع index.html من الظهور تلقائياً
-// ════════════════════════════════════════════
 app.use(express.static(publicPath, { index: false }));
 
 const openai  = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const REDIRECT_URI = process.env.APP_URL ? process.env.APP_URL + '/auth/callback' : 'https://nmo-almatjar-production.up.railway.app/auth/callback';
+const REDIRECT_URI = process.env.APP_URL
+  ? process.env.APP_URL + '/auth/callback'
+  : 'https://nmo-almatjar-production.up.railway.app/auth/callback';
 
 // ─────────────────────────────────────────
 // SUPABASE
@@ -130,7 +119,7 @@ async function dbQuery(method, table, body, params) {
     'Content-Type': 'application/json',
     'Prefer': method === 'POST' ? 'resolution=merge-duplicates,return=representation' : 'return=representation'
   };
-  const r = await axios({ method: method, url: url, headers: headers, data: body });
+  const r = await axios({ method, url, headers, data: body });
   return r.data;
 }
 
@@ -156,23 +145,19 @@ async function saveCustomer(token, store) {
 const AI_MODEL = 'claude-haiku-4-5-20251001';
 
 const PLANS = {
-  free:       { limit: 2,      name: 'مجاني',      price: 0,   trialDays: 0  },
-  pro:        { limit: 200,    name: 'Pro',         price: 99,  trialDays: 0  },
-  enterprise: { limit: 99999,  name: 'Enterprise',  price: 299, trialDays: 0  }
+  free:       { limit: 2,     name: 'مجاني',     price: 0   },
+  pro:        { limit: 200,   name: 'Pro',        price: 99  },
+  enterprise: { limit: 99999, name: 'Enterprise', price: 299 }
 };
-
-function genReferralCode(storeId) {
-  return 'REF' + Buffer.from(String(storeId)).toString('base64').slice(0,6).toUpperCase();
-}
 
 async function checkLimit(storeId) {
   try {
-    const res = await dbQuery(
-      `SELECT plan, products_count FROM customers WHERE store_id = $1`,
-      [String(storeId)]
-    );
-    if (!res.rows.length) return { allowed: true, plan: 'free', used: 0, limit: 2 };
-    const { plan, products_count } = res.rows[0];
+    const url = SUPABASE_URL + '/rest/v1/customers?store_id=eq.' + String(storeId);
+    const headers = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
+    const r = await axios.get(url, { headers });
+    const customer = r.data?.[0];
+    if (!customer) return { allowed: true, plan: 'free', used: 0, limit: 2 };
+    const { plan, products_count } = customer;
     const limit = PLANS[plan]?.limit || 2;
     return { allowed: products_count < limit, plan, used: products_count, limit };
   } catch(e) {
@@ -182,66 +167,174 @@ async function checkLimit(storeId) {
 
 async function incUsageCount(storeId) {
   try {
-    await dbQuery(
-      `UPDATE customers SET products_count = products_count + 1 WHERE store_id = $1`,
-      [String(storeId)]
-    );
+    const url = SUPABASE_URL + '/rest/v1/customers?store_id=eq.' + String(storeId);
+    const headers = {
+      'apikey': SUPABASE_SERVICE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_SERVICE_KEY,
+      'Content-Type': 'application/json'
+    };
+    // جلب القيمة الحالية أولاً
+    const r = await axios.get(url, { headers });
+    const current = r.data?.[0]?.products_count || 0;
+    await axios.patch(url, { products_count: current + 1 }, { headers });
   } catch(e) { console.warn('incUsage error:', e.message); }
 }
 
+// ─────────────────────────────────────────
+// ✅ EMBEDDED AUTH — التحقق من توكن سلة المضمّن
+// ─────────────────────────────────────────
+app.post('/api/auth/verify-embedded', rateLimit(30, 60000), async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ error: 'token مطلوب' });
+
+    // التحقق عبر Salla Introspection API الرسمي
+    let merchantId = null;
+    try {
+      const introspect = await axios.post(
+        'https://api.salla.dev/exchange-authority/v1/introspect',
+        { token },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'S-Source': process.env.SALLA_CLIENT_ID
+          }
+        }
+      );
+      merchantId = introspect.data?.data?.merchant_id;
+    } catch(ie) {
+      console.warn('Introspect failed:', ie.response?.data || ie.message);
+      // نكمل — قد يكون التوكن عادي OAuth
+    }
+
+    // جلب معلومات المتجر
+    let storeName = 'متجرك';
+    let storeId = merchantId ? String(merchantId) : null;
+    try {
+      const storeInfo = await axios.get('https://api.salla.dev/admin/v2/store/info', {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      const data = storeInfo.data?.data || {};
+      storeName = data.name || storeName;
+      storeId = storeId || String(data.id || '');
+      await saveCustomer(token, data);
+    } catch(se) {
+      console.warn('Store info error:', se.message);
+      if (!storeId) return res.status(401).json({ error: 'فشل التحقق من المتجر' });
+    }
+
+    res.json({
+      success: true,
+      access_token: token,
+      merchant_id: merchantId,
+      store_id: storeId,
+      store_name: storeName
+    });
+
+  } catch(e) {
+    console.error('verify-embedded error:', e.message);
+    res.status(401).json({ error: 'فشل التحقق من الجلسة' });
+  }
+});
+
+// ─────────────────────────────────────────
+// ✅ BILLING WEBHOOK — استقبال اشتراكات سلة
+// ─────────────────────────────────────────
+app.post('/api/billing/webhook', async (req, res) => {
+  try {
+    const body = req.body;
+    console.log('Billing webhook:', JSON.stringify(body));
+
+    // سلة ترسل event مثل: app.subscription.started / app.subscription.renewed
+    const event   = body.event || body.type || '';
+    const storeId = String(body.data?.store?.id || body.store_id || body.merchant_id || '');
+    const planId  = body.data?.plan_id || body.plan || '';
+
+    if (!storeId) return res.status(400).json({ error: 'storeId مطلوب' });
+
+    // تحويل plan_id لاسم الخطة
+    const planMap = {
+      'pro':           'pro',
+      'pro_200':       'pro',
+      'enterprise':    'enterprise',
+      'enterprise_999':'enterprise',
+      'free':          'free'
+    };
+    const resolvedPlan = planMap[planId] || (planId.includes('enterprise') ? 'enterprise' : 'pro');
+
+    // تحديث في Supabase
+    const url = SUPABASE_URL + '/rest/v1/customers?store_id=eq.' + storeId;
+    const headers = {
+      'apikey': SUPABASE_SERVICE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_SERVICE_KEY,
+      'Content-Type': 'application/json'
+    };
+
+    const updateData = {
+      plan: resolvedPlan,
+      plan_updated_at: new Date().toISOString()
+    };
+
+    // عند إلغاء الاشتراك — ارجع لـ free
+    if (event.includes('ended') || event.includes('cancelled') || event.includes('canceled')) {
+      updateData.plan = 'free';
+    }
+
+    // عند بدء اشتراك جديد — أعد العداد
+    if (event.includes('started') || event.includes('renewed')) {
+      updateData.products_count = 0;
+    }
+
+    await axios.patch(url, updateData, { headers });
+    console.log(`✅ Billing: store=${storeId} plan=${updateData.plan} event=${event}`);
+    res.json({ success: true });
+
+  } catch(e) {
+    console.error('billing webhook error:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ─────────────────────────────────────────
+// PLAN API
+// ─────────────────────────────────────────
 app.post('/api/plan', async (req, res) => {
   try {
     const token = getToken(req);
     if (!token) return res.status(401).json({ error: 'غير مصرح' });
-    const storeInfo = await sallaGet('store/info', token);
-    const storeId = storeInfo.data?.id;
-    const info = await checkLimit(storeId);
-    res.json({ ...info, plans: PLANS });
+
+    let storeId = req.body.storeId;
+    if (!storeId && token !== 'demo') {
+      try {
+        const storeInfo = await sallaGet('store/info', token);
+        storeId = String(storeInfo.data?.id || '');
+      } catch(e) { storeId = 'unknown'; }
+    }
+
+    const url = SUPABASE_URL + '/rest/v1/customers?store_id=eq.' + storeId;
+    const headers = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
+    const r = await axios.get(url, { headers });
+    const customer = r.data?.[0];
+
+    const plan  = customer?.plan || 'free';
+    const used  = customer?.products_count || 0;
+    const limit = PLANS[plan]?.limit || 2;
+
+    res.json({
+      plan, used, limit,
+      allowed: used < limit,
+      plans: PLANS
+    });
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
 });
-
-app.post('/api/referral/apply', async (req, res) => {
-  try {
-    const { referralCode, token } = req.body;
-    if (!referralCode || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
-    const storeInfo = await sallaGet('store/info', token);
-    const storeId = String(storeInfo.data?.id || '');
-    const all = await dbQuery('SELECT store_id FROM customers', []);
-    const referrer = all.rows.find(r => genReferralCode(r.store_id) === referralCode.toUpperCase());
-    if (!referrer) return res.status(404).json({ error: 'كود الإحالة غير صحيح' });
-    if (referrer.store_id === storeId) return res.status(400).json({ error: 'لا يمكن استخدام كودك الخاص' });
-    const trialEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-    await dbQuery('UPDATE customers SET plan=$1, trial_end=$2, products_count=0 WHERE store_id=$3', ['trial', trialEnd, storeId]);
-    await dbQuery('UPDATE customers SET products_count = GREATEST(0, products_count - 50) WHERE store_id=$1', [referrer.store_id]);
-    res.json({ success: true, message: 'تم تطبيق كود الإحالة — استمتع بشهر مجاني!' });
-  } catch(e) { res.status(500).json({ error: e.message }); }
-});
-
-app.post('/api/upgrade-plan', async (req, res) => {
-  try {
-    const { storeId, plan, adminKey } = req.body;
-    if (adminKey !== process.env.ADMIN_PASSWORD) return res.status(401).json({ error: 'غير مصرح' });
-    if (!PLANS[plan]) return res.status(400).json({ error: 'خطة غير صحيحة' });
-    await dbQuery(
-      `UPDATE customers SET plan = $1 WHERE store_id = $2`,
-      [plan, String(storeId)]
-    );
-    res.json({ success: true, plan, limit: PLANS[plan].limit });
-  } catch(e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
-
 
 app.post('/api/leads', async (req, res) => {
   try {
     const { email, source } = req.body;
     if (!email || !email.includes('@')) return res.status(400).json({ error: 'بريد إلكتروني غير صحيح' });
     const cleanEmail = email.toLowerCase().trim();
-    console.log('Saving lead:', cleanEmail);
     const url = SUPABASE_URL + '/rest/v1/leads';
     const headers = {
       'apikey': SUPABASE_SERVICE_KEY,
@@ -250,32 +343,16 @@ app.post('/api/leads', async (req, res) => {
       'Prefer': 'resolution=ignore-duplicates'
     };
     try {
-      const saveRes = await axios.post(url, { email: cleanEmail, source: source||'excel' }, { headers });
-      console.log('Lead saved OK:', cleanEmail, saveRes.status);
+      await axios.post(url, { email: cleanEmail, source: source||'app' }, { headers });
     } catch(dbErr) {
       const code = dbErr.response?.data?.code || '';
-      if (code === '23505' || dbErr.response?.status === 409) {
-        console.log('Lead already exists:', cleanEmail);
-      } else {
+      if (code !== '23505' && dbErr.response?.status !== 409) {
         console.error('DB error:', dbErr.response?.data);
       }
     }
-    res.json({ success: true, message: 'تم التسجيل بنجاح' });
+    res.json({ success: true });
   } catch(e) {
-    console.error('leads error:', e.message);
     res.status(500).json({ error: 'حدث خطأ' });
-  }
-});
-
-app.get('/api/admin/leads', requireAdmin, async (req, res) => {
-  try {
-    const url = SUPABASE_URL + '/rest/v1/leads?order=created_at.desc';
-    const headers = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
-    const r = await axios.get(url, { headers });
-    const data = r.data;
-    res.json({ leads: data || [], total: (data||[]).length });
-  } catch(e) {
-    res.status(500).json({ error: e.message });
   }
 });
 
@@ -314,18 +391,11 @@ function descriptionToHtml(text) {
   const lines = text.split('\n');
   let html = '';
   let inList = false;
-
   for (let line of lines) {
     line = line.trim();
-    if (!line) {
-      if (inList) { html += '</ul>'; inList = false; }
-      continue;
-    }
+    if (!line) { if (inList) { html += '</ul>'; inList = false; } continue; }
     if (line.startsWith('- ') || line.startsWith('• ')) {
-      if (!inList) {
-        html += '<ul style="padding-right:20px;margin:10px 0;">';
-        inList = true;
-      }
+      if (!inList) { html += '<ul style="padding-right:20px;margin:10px 0;">'; inList = true; }
       html += `<li style="margin-bottom:6px;line-height:1.8;color:#444;">${line.replace(/^[-•]\s*/, '')}</li>`;
       continue;
     }
@@ -345,7 +415,7 @@ function descriptionToHtml(text) {
 }
 
 // ─────────────────────────────────────────
-// AUTH
+// AUTH — OAuth
 // ─────────────────────────────────────────
 app.get('/auth/salla', (req, res) => {
   const state = Math.random().toString(36).substring(2, 15);
@@ -408,9 +478,9 @@ app.post('/api/seo-score', rateLimit(10, 60000), async (req, res) => {
       if (desc.length > 100) score += 25; else issues.push('الوصف قصير جداً');
       if (desc.length > 300) score += 15;
       if ((p.name||'').length > 20) score += 20; else issues.push('العنوان قصير');
-      if (p.tags?.length > 0) score += 15;    else issues.push('لا توجد وسوم');
-      if (p.images?.length > 0) score += 15;  else issues.push('لا توجد صور');
-      if (p.metadata_title) score += 10;      else issues.push('عنوان SEO غير موجود');
+      if (p.tags?.length > 0) score += 15;   else issues.push('لا توجد وسوم');
+      if (p.images?.length > 0) score += 15; else issues.push('لا توجد صور');
+      if (p.metadata_title) score += 10;     else issues.push('عنوان SEO غير موجود');
       let grade = score >= 90 ? 'A+' : score >= 80 ? 'A' : score >= 70 ? 'B' : score >= 60 ? 'C' : score >= 40 ? 'D' : 'F';
       return { id: p.id, name: p.name, score, grade, issues };
     });
@@ -500,8 +570,6 @@ ${reviewsSection}
     });
 
     const text = message.content[0].text;
-    console.log('=== generate-description RAW (first 600) ===\n', text.substring(0, 600));
-
     const longDesc = extractSection(text, 'LONG_DESC');
     const features = extractSection(text, 'FEATURES')
       .split('\n').filter(f => f.trim().startsWith('-')).map(f => f.replace(/^-\s*/, '').trim());
@@ -584,9 +652,9 @@ app.post('/api/generate-seo', async (req, res) => {
     });
     const text = message.content[0].text;
     res.json({
-      seoTitle:    extractSection(text, 'SEO_TITLE'),
+      seoTitle:       extractSection(text, 'SEO_TITLE'),
       seoDescription: extractSection(text, 'SEO_DESC'),
-      seoKeywords: extractSection(text, 'SEO_KEYWORDS')
+      seoKeywords:    extractSection(text, 'SEO_KEYWORDS')
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -672,44 +740,6 @@ app.post('/api/generate-social', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/generate-blog', async (req, res) => {
-  try {
-    const { storeName, products, topic } = req.body;
-    const productNames = products.map(p => p.name).join('، ');
-    const message = await anthropic.messages.create({
-      model: AI_MODEL,
-      max_tokens: 2500,
-      messages: [{
-        role: 'user',
-        content: `مقالة SEO لمتجر "${storeName}". الموضوع: ${topic}. المنتجات: ${productNames}
-
-###BLOG_TITLE###
-[عنوان المقالة]
-
-###BLOG_INTRO###
-[مقدمة — فقرتان]
-
-###BLOG_BODY###
-[جسم المقالة — 4-5 فقرات]
-
-###BLOG_CONCLUSION###
-[خاتمة تحفز على الشراء]
-
-###BLOG_META###
-[وصف SEO للمقالة 150 حرف]`
-      }]
-    });
-    const text = message.content[0].text;
-    res.json({
-      title:      extractSection(text, 'BLOG_TITLE'),
-      intro:      extractSection(text, 'BLOG_INTRO'),
-      body:       extractSection(text, 'BLOG_BODY'),
-      conclusion: extractSection(text, 'BLOG_CONCLUSION'),
-      meta:       extractSection(text, 'BLOG_META')
-    });
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
 app.post('/api/update-product', rateLimit(30, 60000), async (req, res) => {
   try {
     const { productId, description, descriptionHtml, seoTitle, seoDescription, name, token } = req.body;
@@ -732,27 +762,18 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
   try {
     const { productId, tags, token } = req.body;
     if (!productId || !tags?.length || !token) return res.status(400).json({ error: 'بيانات ناقصة' });
-
     const cleanTags = tags.slice(0,10).map(t=>String(t).trim()).filter(t=>t.length>0);
     if (!cleanTags.length) return res.json({ success: true, added: 0 });
-
     const authHeader = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
     const tagIds = [];
-
-    // Step 1: Get all existing store tags once
     let storeTags = [];
     try {
       const listR = await axios.get('https://api.salla.dev/admin/v2/products/tags', { headers: authHeader });
       storeTags = listR.data?.data || [];
     } catch(e) { console.warn('list tags:', e.message); }
-
-    // Step 2: For each tag - find existing or create new
     for (const tagName of cleanTags) {
       const existing = storeTags.find(t => t.name?.trim().toLowerCase() === tagName.toLowerCase());
-      if (existing?.id) {
-        tagIds.push(existing.id);
-        continue;
-      }
+      if (existing?.id) { tagIds.push(existing.id); continue; }
       try {
         const r = await axios.post(
           'https://api.salla.dev/admin/v2/products/tags',
@@ -764,12 +785,7 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
       } catch(e) { console.warn('create tag:', tagName, e.response?.data?.error?.message || e.message); }
       await new Promise(r=>setTimeout(r,300));
     }
-
-    console.log('Tag IDs:', tagIds);
-
-    // Step 3: Attach ALL tag IDs to product in one call
     if (tagIds.length > 0) {
-      // Get existing product tags first to merge
       let existingTagIds = [];
       try {
         const prod = await sallaGet(`products/${productId}`, token);
@@ -777,12 +793,9 @@ app.post('/api/add-tags', rateLimit(5, 60000), async (req, res) => {
       } catch(e) {}
       const allTagIds = [...new Set([...existingTagIds, ...tagIds])];
       await sallaUpdate(productId, { tags: allTagIds }, token);
-      console.log('Attached', allTagIds.length, 'tags to product', productId);
     }
-
     res.json({ success: true, added: tagIds.length, tagIds });
   } catch(e) {
-    console.error('add-tags error:', e.response?.data || e.message);
     res.status(500).json({ error: e.message });
   }
 });
@@ -803,141 +816,76 @@ app.post('/api/get-reviews', async (req, res) => {
   }
 });
 
-app.post('/api/generate-alt', async (req, res) => {
+// ─────────────────────────────────────────
+// WEBHOOK سلة — أحداث التطبيق
+// ─────────────────────────────────────────
+app.post('/webhook/salla', async (req, res) => {
   try {
-    const { productName, count } = req.body;
-    const altTexts = [];
-    for (let i = 1; i <= (count || 1); i++) {
-      const msg = await anthropic.messages.create({
-        model: AI_MODEL, max_tokens: 100,
-        messages: [{ role: 'user', content: `Alt Text للصورة ${i} للمنتج: ${productName}. 50-100 حرف بالعربية. النص فقط:` }]
-      });
-      altTexts.push(msg.content[0].text.trim());
+    const { event, data } = req.body;
+    console.log('Webhook event:', event);
+
+    // ✅ استقبال تثبيت التطبيق من سلة (Easy Mode)
+    if (event === 'app.store.authorize') {
+      const token = data?.token?.access_token || data?.access_token;
+      const storeId = String(data?.merchant?.id || data?.store?.id || '');
+      if (token && storeId) {
+        try {
+          const storeInfo = await axios.get('https://api.salla.dev/admin/v2/store/info', {
+            headers: { Authorization: 'Bearer ' + token }
+          });
+          await saveCustomer(token, storeInfo.data?.data || { id: storeId });
+          console.log('✅ App installed for store:', storeId);
+        } catch(e) { console.warn('install webhook store info:', e.message); }
+      }
     }
-    res.json({ altTexts });
-  } catch(e) { res.status(500).json({ error: e.message }); }
-});
 
-app.post('/api/seo-pages', async (req, res) => {
-  try {
-    const { products, storeName } = req.body;
-    const msg = await anthropic.messages.create({
-      model: AI_MODEL, max_tokens: 800,
-      messages: [{ role: 'user', content: `منتجات: ${products.map(p=>p.name).join('، ')} — متجر: ${storeName||'المتجر'}
-اقترح 5 صفحات SEO.
-
-###PAGE1_TITLE###
-[عنوان]
-###PAGE1_URL###
-[slug]
-###PAGE1_DESC###
-[وصف]
-
-###PAGE2_TITLE###
-[عنوان]
-###PAGE2_URL###
-[slug]
-###PAGE2_DESC###
-[وصف]
-
-###PAGE3_TITLE###
-[عنوان]
-###PAGE3_URL###
-[slug]
-###PAGE3_DESC###
-[وصف]
-
-###PAGE4_TITLE###
-[عنوان]
-###PAGE4_URL###
-[slug]
-###PAGE4_DESC###
-[وصف]
-
-###PAGE5_TITLE###
-[عنوان]
-###PAGE5_URL###
-[slug]
-###PAGE5_DESC###
-[وصف]` }]
-    });
-    const text = msg.content[0].text;
-    const pages = [];
-    for (let i = 1; i <= 5; i++) {
-      const t = extractSection(text, `PAGE${i}_TITLE`);
-      const u = extractSection(text, `PAGE${i}_URL`);
-      const d = extractSection(text, `PAGE${i}_DESC`);
-      if (t) pages.push({ title: t, url: u, description: d });
+    // ✅ أحداث الاشتراك
+    if (event?.includes('app.subscription') || event?.includes('app.trial')) {
+      const storeId = String(data?.store?.id || data?.merchant?.id || '');
+      const planId  = data?.plan_id || '';
+      if (storeId) {
+        const planMap = { 'pro':'pro', 'pro_200':'pro', 'enterprise':'enterprise', 'enterprise_999':'enterprise' };
+        const plan = planMap[planId] || 'pro';
+        const url = SUPABASE_URL + '/rest/v1/customers?store_id=eq.' + storeId;
+        const headers = {
+          'apikey': SUPABASE_SERVICE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_SERVICE_KEY,
+          'Content-Type': 'application/json'
+        };
+        const updateData = { plan_updated_at: new Date().toISOString() };
+        if (event.includes('ended') || event.includes('cancelled')) {
+          updateData.plan = 'free';
+        } else {
+          updateData.plan = event.includes('trial') ? 'trial' : plan;
+          if (event.includes('started') || event.includes('renewed')) updateData.products_count = 0;
+        }
+        await axios.patch(url, updateData, { headers }).catch(e => console.warn(e.message));
+        console.log(`Subscription event: ${event} store:${storeId} plan:${updateData.plan}`);
+      }
     }
-    res.json({ pages });
-  } catch(e) { res.status(500).json({ error: e.message }); }
+
+    res.json({ success: true });
+  } catch(e) {
+    console.error('webhook error:', e.message);
+    res.json({ success: true }); // دائماً 200 لسلة
+  }
 });
 
 app.get('/api/templates', (req, res) => {
   res.json({ templates: [
-    { id:'fashion',     name:'👗 ملابس وأزياء',        tone:'youth',        instructions:'ركز على الأناقة والتناسق، اذكر المقاسات والألوان، أسلوب شبابي' },
-    { id:'electronics', name:'📱 إلكترونيات',           tone:'professional', instructions:'ركز على المواصفات التقنية والأداء، اذكر الضمان، أسلوب احترافي' },
-    { id:'perfume',     name:'🌸 عطور ومستحضرات',       tone:'luxury',       instructions:'ركز على الرائحة والثبات، اجعله فاخراً شاعرياً، اذكر المناسبات' },
-    { id:'food',        name:'🍃 غذاء وصحة',            tone:'friendly',     instructions:'ركز على الفوائد الصحية والمكونات الطبيعية، أسلوب ودي' },
-    { id:'home',        name:'🏠 منزل وديكور',          tone:'professional', instructions:'ركز على الجودة والتصميم، اذكر الأبعاد والمواد' },
-    { id:'jewelry',     name:'💍 مجوهرات',              tone:'luxury',       instructions:'ركز على المواد والتصميم الفريد، اذكر المناسبات والهدايا' }
+    { id:'fashion',     name:'👗 ملابس وأزياء',   tone:'youth',        instructions:'ركز على الأناقة والتناسق، اذكر المقاسات والألوان، أسلوب شبابي' },
+    { id:'electronics', name:'📱 إلكترونيات',      tone:'professional', instructions:'ركز على المواصفات التقنية والأداء، اذكر الضمان، أسلوب احترافي' },
+    { id:'perfume',     name:'🌸 عطور ومستحضرات', tone:'luxury',       instructions:'ركز على الرائحة والثبات، اجعله فاخراً شاعرياً، اذكر المناسبات' },
+    { id:'food',        name:'🍃 غذاء وصحة',       tone:'friendly',     instructions:'ركز على الفوائد الصحية والمكونات الطبيعية، أسلوب ودي' },
+    { id:'home',        name:'🏠 منزل وديكور',     tone:'professional', instructions:'ركز على الجودة والتصميم، اذكر الأبعاد والمواد' },
+    { id:'jewelry',     name:'💍 مجوهرات',         tone:'luxury',       instructions:'ركز على المواد والتصميم الفريد، اذكر المناسبات والهدايا' }
   ]});
-});
-
-app.post('/api/generate-image', async (req, res) => {
-  try {
-    const { name, prompt, style } = req.body;
-    if(!openai) return res.status(503).json({ error: 'خدمة توليد الصور غير متاحة حالياً' });
-    const r = await openai.images.generate({
-      model: 'dall-e-3',
-      prompt: `Professional product photo of ${name}. ${prompt || ''}. ${style}. High quality, commercial photography, no text.`,
-      n: 1, size: '1024x1024', quality: 'standard'
-    });
-    res.json({ imageUrl: r.data[0].url });
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-app.post('/api/edit-image', upload.single('image'), async (req, res) => {
-  try {
-    const { prompt } = req.body;
-    const base64 = req.file.buffer.toString('base64');
-    const mime   = req.file.mimetype;
-    const msg = await anthropic.messages.create({
-      model: AI_MODEL, max_tokens: 500,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'image', source: { type: 'base64', media_type: mime, data: base64 } },
-          { type: 'text', text: `خبير تحرير صور. المطلوب: "${prompt}". أنشئ DALL-E prompt إنجليزي احترافي. الـ prompt فقط.` }
-        ]
-      }]
-    });
-    const r = await openai.images.generate({ model: 'dall-e-3', prompt: msg.content[0].text.slice(0,900), n:1, size:'1024x1024', quality:'standard' });
-    res.json({ imageUrl: r.data[0].url });
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-app.post('/api/translate', async (req, res) => {
-  try {
-    const { text, language } = req.body;
-    const msg = await anthropic.messages.create({
-      model: AI_MODEL, max_tokens: 500,
-      messages: [{ role:'user', content:`ترجم إلى ${language} بشكل احترافي للتجارة الإلكترونية. الترجمة فقط:\n\n${text}` }]
-    });
-    res.json({ translation: msg.content[0].text });
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-app.post('/webhook/salla', (req, res) => {
-  console.log('Webhook:', req.body?.event);
-  res.json({ success: true });
 });
 
 app.get('/api/debug', async (req, res) => {
   const result = {
     model: AI_MODEL,
     anthropic_key_set: !!process.env.ANTHROPIC_API_KEY,
-    anthropic_key_prefix: process.env.ANTHROPIC_API_KEY?.substring(0,10) + '...',
     salla_client_id_set: !!process.env.SALLA_CLIENT_ID,
     openai_key_set: !!process.env.OPENAI_API_KEY,
     node_version: process.version,
@@ -952,51 +900,13 @@ app.get('/api/debug', async (req, res) => {
   } catch(e) {
     result.anthropic_test = 'FAILED: ' + e.message;
   }
-  result.supabase_service_key_set = !!process.env.SUPABASE_SERVICE_KEY;
-  result.supabase_key_prefix = SUPABASE_SERVICE_KEY.substring(0,20)+'...';
-  try {
-    const tUrl = SUPABASE_URL + '/rest/v1/leads';
-    const tH = {
-      'apikey': SUPABASE_SERVICE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_SERVICE_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'resolution=ignore-duplicates'
-    };
-    const tr = await axios.post(tUrl, {email:'debug@test.com', source:'debug'}, {headers:tH});
-    result.supabase_leads_test = 'SUCCESS: ' + tr.status;
-  } catch(se) {
-    result.supabase_leads_test = 'FAILED: ' + (se.response?.data?.message || se.response?.data?.code || se.message);
-    result.supabase_error_detail = JSON.stringify(se.response?.data);
-  }
   res.json(result);
-});
-
-// ════════════════════════════════════════════
-// ✅ FIX: CATCH-ALL — أي رابط ما عنده route يرجع landing
-// يجب أن يكون في آخر شيء قبل app.listen
-// ════════════════════════════════════════════
-app.get('*', (req, res) => {
-  // إذا الطلب لـ API أو auth أرجع 404
-  if (req.path.startsWith('/api/') || req.path.startsWith('/auth/') || req.path.startsWith('/webhook/')) {
-    return res.status(404).json({ error: 'Not found' });
-  }
-  // أي صفحة ثانية غير معروفة ترجع landing
-  res.sendFile(path.join(publicPath, 'landing.html'));
-});
-
-// ─────────────────────────────────────────
-// START SERVER
-// ─────────────────────────────────────────
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log('=== SERVER READY === port:'+PORT+' model:'+AI_MODEL);
 });
 
 // ─────────────────────────────────────────
 // ADMIN
 // ─────────────────────────────────────────
 const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'admin2025';
-
 function checkAdmin(req, res) {
   const pass = req.headers['x-admin-key'] || req.query.key;
   if (pass !== ADMIN_PASS) { res.status(401).json({ error: 'غير مصرح' }); return false; }
@@ -1043,4 +953,31 @@ app.get('/api/admin/stats', requireAdmin, async (req, res) => {
       latest: customers.slice(0, 5)
     });
   } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/admin/leads', requireAdmin, async (req, res) => {
+  try {
+    const url = SUPABASE_URL + '/rest/v1/leads?order=created_at.desc';
+    const headers = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
+    const r = await axios.get(url, { headers });
+    res.json({ leads: r.data || [], total: (r.data||[]).length });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ─────────────────────────────────────────
+// CATCH-ALL
+// ─────────────────────────────────────────
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api/') || req.path.startsWith('/auth/') || req.path.startsWith('/webhook/')) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  res.sendFile(path.join(publicPath, 'landing.html'));
+});
+
+// ─────────────────────────────────────────
+// START
+// ─────────────────────────────────────────
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log('=== SERVER READY === port:' + PORT + ' model:' + AI_MODEL);
 });
